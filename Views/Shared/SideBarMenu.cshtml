@@ -1,0 +1,102 @@
+﻿<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo">
+        <a href="/" class="app-brand-link">
+            <span class="app-brand-logo demo">
+                <i class="bx bx-book-bookmark bx-lg text-primary"></i>
+            </span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2">Thư Viện</span>
+        </a>
+
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="bx bx-chevron-left bx-sm align-middle"></i>
+        </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+        <!-- Dashboard -->
+        <li class="menu-item active">
+            <a href="/Home/Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div>Trang chủ</div>
+            </a>
+        </li>
+
+        <!-- Quản lý bạn đọc -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div>Quản lý bạn đọc</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="/BanDoc/ThongTin" class="menu-link">
+                        <div>Quản lý thông tin bạn đọc</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/BanDoc/TheBanDoc" class="menu-link">
+                        <div>Quản lý thẻ bạn đọc</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Quản lý tài liệu -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-book"></i>
+                <div>Quản lý tài liệu</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="/TaiLieu/DanhMuc" class="menu-link">
+                        <div>Danh mục tài liệu</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/TaiLieu/QuanLy" class="menu-link">
+                        <div>Quản lý tài liệu</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Quản lý mượn trả -->
+        <li class="menu-item">
+            <a href="/MuonTra/Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-transfer"></i>
+                <div>Quản lý mượn trả</div>
+            </a>
+        </li>
+
+        <!-- Quản lý phân quyền -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-user-check"></i>
+                <div>Quản lý phân quyền</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="/PhanQuyen/TaiKhoan" class="menu-link">
+                        <div>Quản lý tài khoản</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/PhanQuyen/NhanVien" class="menu-link">
+                        <div>Thông tin nhân viên</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Thống kê - Báo cáo -->
+        <li class="menu-item">
+            <a href="/ThongKe/Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
+                <div>Thống kê - Báo cáo</div>
+            </a>
+        </li>
+    </ul>
+</aside>
