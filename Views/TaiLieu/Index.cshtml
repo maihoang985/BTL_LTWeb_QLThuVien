@@ -1,0 +1,162 @@
+﻿@* @model IEnumerable<Library_Manager.Models.TTaiLieu>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TenTl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LanXuatBan)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NamXuatBan)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SoTrang)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.KhoCo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaDdNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaNnNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaNxbNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaThLNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaTkNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TenTl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LanXuatBan)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NamXuatBan)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoTrang)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.KhoCo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaDdNavigation.MaDd)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaNnNavigation.MaNn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaNxbNavigation.MaNxb)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaThLNavigation.MaThL)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaTkNavigation.MaTk)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.MaTl">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.MaTl">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.MaTl">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+ *@
+
+@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<Library_Manager.Models.TTaiLieu>
+
+@{
+    ViewData["Title"] = "Danh sách tài liệu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1 class="mb-3">Danh sách tài liệu</h1>
+
+    <partial name="SearchBar" />
+
+    <p>
+        <a class="btn btn-success" asp-action="Create">+ Thêm tài liệu</a>
+    </p>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-nowrap align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Tên tài liệu</th>
+                    <th>Lần xuất bản</th>
+                    <th>Năm xuất bản</th>
+                    <th>Số trang</th>
+                    <th>Khổ cỡ</th>
+                    <th>Địa điểm</th>
+                    <th>Ngôn ngữ</th>
+                    <th>Nhà xuất bản</th>
+                    <th>Thể loại</th>
+                    <th>Tài khoản tạo</th>
+                    <th style="min-width: 130px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.TenTl</td>
+                            <td>@item.LanXuatBan</td>
+                            <td>@item.NamXuatBan</td>
+                            <td>@item.SoTrang</td>
+                            <td>@item.KhoCo</td>
+                            <td>@item.MaDdNavigation?.TenDd</td>
+                            <td>@item.MaNnNavigation?.TenNn</td>
+                            <td>@item.MaNxbNavigation?.TenNxb</td>
+                            <td>@item.MaThLNavigation?.TenThL</td>
+                            <td>@item.MaTkNavigation?.TenDangNhap</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.MaTl">Sửa</a> |
+                                <a asp-action="Details" asp-route-id="@item.MaTl">Chi tiết</a> |
+                                <a asp-action="Delete" asp-route-id="@item.MaTl">Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="11" class="text-center text-muted">Không có dữ liệu</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <partial name="_Pagination" />
+    </div>
+</div>

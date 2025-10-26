@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using Library_Manager.Models;
+using Library_Manager   .Models.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Library_Manager.Controllers
 {
@@ -13,10 +14,13 @@ namespace Library_Manager.Controllers
             _logger = logger;
         }
 
+        //[Authentication]
         public IActionResult Index()
         {
             return View();
         }
+
+
 
         public IActionResult Privacy()
         {

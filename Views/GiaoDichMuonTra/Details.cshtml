@@ -1,0 +1,75 @@
+﻿@model Library_Manager.Models.TGiaoDichMuonTra
+
+@{
+    ViewData["Title"] = "Chi tiết giao dịch mượn trả";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h2 class="mb-4 text-primary">Chi tiết giao dịch mượn trả</h2>
+
+    <div class="card shadow-sm p-4">
+        <h5 class="card-title mb-3 text-secondary">Thông tin giao dịch</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 25%;">Ngày mượn</th>
+                        <td>@Html.DisplayFor(model => model.NgayMuon)</td>
+                    </tr>
+                    <tr>
+                        <th>Ngày hẹn trả</th>
+                        <td>@Html.DisplayFor(model => model.NgayHenTra)</td>
+                    </tr>
+                    <tr>
+                        <th>Ngày trả</th>
+                        <td>@Html.DisplayFor(model => model.NgayTra)</td>
+                    </tr>
+                    <tr>
+                        <th>Trạng thái</th>
+                        <td>@Html.DisplayFor(model => model.TrangThai)</td>
+                    </tr>
+                    <tr>
+                        <th>Thẻ bạn đọc</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaTbdNavigation.MaTbd)
+                            <a asp-controller="BanDoc"
+                               asp-action="Details"
+                               asp-route-id="@Model.MaTbdNavigation.MaTbd"
+                               class="btn btn-sm btn-info ms-2">
+                                <i class="bx bx-user"></i> Xem bạn đọc
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tài khoản</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaTkNavigation.MaTk)
+                            <a asp-controller="TaiKhoan"
+                               asp-action="Details"
+                               asp-route-id="@Model.MaTkNavigation.MaTk"
+                               class="btn btn-sm btn-info ms-2">
+                                <i class="bx bx-user"></i> Xem tài khoản
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.MaGd" class="btn btn-warning me-2">
+            <i class="bx bx-edit"></i> Chỉnh sửa
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bx bx-arrow-back"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

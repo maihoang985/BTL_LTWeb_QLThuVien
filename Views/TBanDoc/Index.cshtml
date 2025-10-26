@@ -1,0 +1,85 @@
+﻿@* @model IEnumerable<Library_Manager.Models.TBanDoc> *@
+@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<Library_Manager.Models.TBanDoc>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+<h1>Thông tin bạn đọc</h1>
+<partial name="SearchBar" />
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+    <div class="table-responsive-scroll">
+<table class="table table-bordered table-responsive text-nowrap">
+    <thead>
+        <tr>
+            <th style=" white-space: nowrap;">
+                @* @Html.DisplayNameFor(model => model.HoDem) *@
+                Họ Đệm
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.Ten) *@
+                Tên
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.NgaySinh) *@
+                Ngày Sinh
+            </th>
+            <th style="white-space: nowrap;">
+               @*  @Html.DisplayNameFor(model => model.GioiTinh) *@
+                Giới Tính
+            </th>
+            <th style="min-width: 250px">
+                @* @Html.DisplayNameFor(model => model.DiaChi) *@
+                Địa Chỉ
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.Sdt) *@
+                Số Điện Thoại
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.Email) *@
+                Email
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td style=" white-space: nowrap;">
+                @Html.DisplayFor(modelItem => item.HoDem)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ten)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgaySinh)
+            </td>
+            <td style="white-space:nowrap;">
+                @Html.DisplayFor(modelItem => item.GioiTinhHienThi)
+            </td>
+                    <td style="min-width: 250px">
+                @Html.DisplayFor(modelItem => item.DiaChi)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sdt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td style="min-width : 100px">
+                <a asp-action="Edit" asp-route-id="@item.MaBd">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.MaBd">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.MaBd">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+        <partial name="_Pagination" />
+    </div>
+</div>

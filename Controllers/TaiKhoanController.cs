@@ -1,0 +1,189 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Library_Manager.Models;
+using PagedList.Core;
+
+namespace Library_Manager.Controllers
+{
+    public class TaiKhoanController : Controller
+    {
+        private readonly QlthuVienContext _context;
+
+        public TaiKhoanController(QlthuVienContext context)
+        {
+            _context = context;
+        }
+
+        // GET: TTaiKhoans
+        public IActionResult Index(int? page, string searchString)
+        {
+            var pageNumber = page ?? 1;
+            var pageSize = 6;
+
+            IQueryable<TTaiKhoan> taiKhoans = _context.TTaiKhoans
+                .Include(t => t.MaNvNavigation)
+                .Include(t => t.MaVtNavigation);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                taiKhoans = taiKhoans.Where(tk =>
+                    tk.TenDangNhap.ToLower().Contains(searchString.ToLower()) ||
+                    tk.MaTk.Contains(searchString) ||
+                    tk.MaNv.Contains(searchString));
+            }
+
+            taiKhoans = taiKhoans.OrderBy(tk => tk.MaTk);
+
+            var pagedTaiKhoans = new PagedList<TTaiKhoan>(taiKhoans, pageNumber, pageSize);
+
+            ViewBag.CurrentFilter = searchString;
+            return View(pagedTaiKhoans);
+        }
+
+        // GET: TTaiKhoans/Details/5
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var tTaiKhoan = await _context.TTaiKhoans
+                .Include(t => t.MaNvNavigation)
+                .Include(t => t.MaVtNavigation)
+                .FirstOrDefaultAsync(m => m.MaTk == id);
+            if (tTaiKhoan == null)
+            {
+                return NotFound();
+            }
+
+            return View(tTaiKhoan);
+        }
+
+        // GET: TTaiKhoans/Create
+        public IActionResult Create()
+        {
+            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv");
+            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt");
+            return View();
+        }
+
+        // POST: TTaiKhoans/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("MaTk,MaNv,MaVt,TenDangNhap,MatKhau,TrangThai,NgayTao")] TTaiKhoan tTaiKhoan)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(tTaiKhoan);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
+            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
+            return View(tTaiKhoan);
+        }
+
+        // GET: TTaiKhoans/Edit/5
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var tTaiKhoan = await _context.TTaiKhoans.FindAsync(id);
+            if (tTaiKhoan == null)
+            {
+                return NotFound();
+            }
+            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
+            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
+            return View(tTaiKhoan);
+        }
+
+        // POST: TTaiKhoans/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, [Bind("MaTk,MaNv,MaVt,TenDangNhap,MatKhau,TrangThai,NgayTao")] TTaiKhoan tTaiKhoan)
+        {
+            if (id != tTaiKhoan.MaTk)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(tTaiKhoan);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TTaiKhoanExists(tTaiKhoan.MaTk))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
+            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
+            return View(tTaiKhoan);
+        }
+
+        // GET: TTaiKhoans/Delete/5
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var tTaiKhoan = await _context.TTaiKhoans
+                .Include(t => t.MaNvNavigation)
+                .Include(t => t.MaVtNavigation)
+                .FirstOrDefaultAsync(m => m.MaTk == id);
+            if (tTaiKhoan == null)
+            {
+                return NotFound();
+            }
+
+            return View(tTaiKhoan);
+        }
+
+        // POST: TTaiKhoans/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            var tTaiKhoan = await _context.TTaiKhoans.FindAsync(id);
+            if (tTaiKhoan != null)
+            {
+                _context.TTaiKhoans.Remove(tTaiKhoan);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool TTaiKhoanExists(string id)
+        {
+            return _context.TTaiKhoans.Any(e => e.MaTk == id);
+        }
+    }
+}

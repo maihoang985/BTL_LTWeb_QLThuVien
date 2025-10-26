@@ -1,0 +1,140 @@
+﻿@* @model Library_Manager.Models.TNhanVien
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TNhanVien</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.HoDem)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.HoDem)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Ten)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Ten)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NgaySinh)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NgaySinh)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.GioiTinh)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.GioiTinh)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DiaChi)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DiaChi)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Sdt)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Sdt)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.PhuTrach)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PhuTrach)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.MaNv">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+ *@
+
+@model Library_Manager.Models.TNhanVien
+
+@{
+    ViewData["Title"] = "Chi tiết nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h2 class="mb-4 text-primary">Chi tiết nhân viên</h2>
+
+    <div class="card shadow-sm p-4">
+        <h5 class="card-title mb-3 text-secondary">Thông tin nhân viên</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 25%;">Mã nhân viên</th>
+                        <td>@Html.DisplayFor(model => model.MaNv)</td>
+                    </tr>
+                    <tr>
+                        <th>Họ đệm</th>
+                        <td>@Html.DisplayFor(model => model.HoDem)</td>
+                    </tr>
+                    <tr>
+                        <th>Tên</th>
+                        <td>@Html.DisplayFor(model => model.Ten)</td>
+                    </tr>
+                    <tr>
+                        <th>Ngày sinh</th>
+                        <td>@Html.DisplayFor(model => model.NgaySinh)</td>
+                    </tr>
+                    <tr>
+                        <th>Giới tính</th>
+                        <td>@Html.DisplayFor(model => model.GioiTinh)</td>
+                    </tr>
+                    <tr>
+                        <th>Địa chỉ</th>
+                        <td>@Html.DisplayFor(model => model.DiaChi)</td>
+                    </tr>
+                    <tr>
+                        <th>Số điện thoại</th>
+                        <td>@Html.DisplayFor(model => model.Sdt)</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>@Html.DisplayFor(model => model.Email)</td>
+                    </tr>
+                    <tr>
+                        <th>Phụ trách</th>
+                        <td>@Html.DisplayFor(model => model.PhuTrach)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.MaNv" class="btn btn-warning me-2">
+            <i class="bx bx-edit"></i> Chỉnh sửa
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bx bx-arrow-back"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

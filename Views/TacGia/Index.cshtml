@@ -1,0 +1,58 @@
+﻿@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<Library_Manager.Models.TTacGia>
+
+@{
+    ViewData["Title"] = "Danh sách tác giả";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <partial name="_DanhMuc" />
+    <h1>Thông tin tác giả</h1>
+    <partial name="SearchBar" />
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+
+    <div class="table-responsive-scroll">
+        <table class="table table-bordered table-responsive text-nowrap">
+            <thead>
+                <tr>
+                    <th style="white-space: nowrap;">
+                        Mã Tác Giả
+                    </th>
+                    <th style="white-space: nowrap;">
+                        Họ Đệm
+                    </th>
+                    <th style="white-space: nowrap;">
+                        Tên
+                    </th>
+                    <th style="min-width: 120px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td style="white-space: nowrap;">
+                            @Html.DisplayFor(modelItem => item.MaTg)
+                        </td>
+                        <td style="white-space: nowrap;">
+                            @Html.DisplayFor(modelItem => item.HoDem)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Ten)
+                        </td>
+                        <td style="min-width: 150px;">
+                            <a asp-action="Edit" asp-route-id="@item.MaTg">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.MaTg">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.MaTg">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <partial name="_Pagination" />
+    </div>
+</div>

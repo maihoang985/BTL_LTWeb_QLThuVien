@@ -1,0 +1,38 @@
+﻿@model Library_Manager.Models.TDinhDang
+
+@{
+    ViewData["Title"] = "Chỉnh sửa định dạng";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Chỉnh sửa</h1>
+
+    <h4>TDinhDang</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input type="hidden" asp-for="MaDd" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="TenDd" class="control-label"></label>
+                    <input asp-for="TenDd" class="form-control" />
+                    <span asp-validation-for="TenDd" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Lưu" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại danh sách</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

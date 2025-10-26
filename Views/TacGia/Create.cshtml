@@ -1,0 +1,49 @@
+﻿@model Library_Manager.Models.TTacGia
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Thêm mới tác giả</h1>
+    <h4>TTacGia</h4>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="MaTg" class="control-label">Mã Tác Giả</label>
+                    <input asp-for="MaTg" class="form-control" />
+                    <span asp-validation-for="MaTg" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="HoDem" class="control-label">Họ Đệm</label>
+                    <input asp-for="HoDem" class="form-control" />
+                    <span asp-validation-for="HoDem" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Ten" class="control-label">Tên</label>
+                    <input asp-for="Ten" class="form-control" />
+                    <span asp-validation-for="Ten" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-3">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
