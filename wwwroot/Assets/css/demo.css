@@ -1,4 +1,4 @@
-/*
+﻿/*
 * demo.css
 * File include item demo only specific css only
 ******************************************************************************/
@@ -105,3 +105,17 @@
   text-align: center;
   margin-top: 1rem;
 }
+
+.table-responsive-scroll {
+    /* Cho phép cuộn ngang (horizontal scroll) khi nội dung tràn ra ngoài */
+    overflow-x: auto;
+    /* Đảm bảo div này chiếm hết chiều rộng có thể */
+    width: 100%;
+}
+
+    /* Tùy chọn: Thêm kiểu dáng để bảng vẫn nổi bật khi cuộn */
+    .table-responsive-scroll table {
+        /* Đảm bảo bảng không bị thu nhỏ để vừa với container */
+        width: max-content;
+        /* Hoặc dùng: min-width: 100%; */
+    }

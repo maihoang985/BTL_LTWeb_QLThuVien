@@ -1,0 +1,31 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    // Lấy controller hiện tại (để đánh dấu mục đang được chọn)
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Danh mục</h2>
+
+    <form method="get" id="categoryForm" class="d-flex">
+        <select class="form-select me-2" onchange="onCategoryChange(this)">
+            <option value="TacGia" selected="@(currentController == "TacGia")">Tác giả</option>
+            <option value="NhaXuatBan" selected="@(currentController == "NhaXuatBan")">Nhà xuất bản</option>
+            <option value="NgonNgu" selected="@(currentController == "NgonNgu")">Ngôn ngữ</option>
+            <option value="TheLoai" selected="@(currentController == "TheLoai")">Thể loại</option>
+            <option value="DinhDang" selected="@(currentController == "DinhDang")">Định dạng</option>
+        </select>
+    </form>
+</div>
+
+<script>
+    function onCategoryChange(select) {
+        const value = select.value;
+        // Chuyển hướng đến trang Index của controller tương ứng
+        window.location.href = `/${value}/Index`;
+    }
+</script>

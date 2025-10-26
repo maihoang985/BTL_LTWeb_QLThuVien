@@ -1,0 +1,35 @@
+﻿@model Library_Manager.Models.TTheLoai
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Details</h1>
+
+    <div>
+        <h4>TTheLoai</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.MaThL)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.MaThL)
+            </dd>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TenThL)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TenThL)
+            </dd>
+        </dl>
+    </div>
+
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.MaThL" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+    </div>
+</div>

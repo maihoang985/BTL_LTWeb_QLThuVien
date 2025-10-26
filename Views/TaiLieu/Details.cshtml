@@ -1,0 +1,174 @@
+﻿@* @model Library_Manager.Models.TTaiLieu
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TTaiLieu</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TenTl)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TenTl)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LanXuatBan)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LanXuatBan)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NamXuatBan)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NamXuatBan)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SoTrang)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SoTrang)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.KhoCo)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.KhoCo)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MaDdNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MaDdNavigation.MaDd)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MaNnNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MaNnNavigation.MaNn)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MaNxbNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MaNxbNavigation.MaNxb)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MaThLNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MaThLNavigation.MaThL)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MaTkNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MaTkNavigation.MaTk)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.MaTl">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+ *@
+
+@model Library_Manager.Models.TTaiLieu
+
+@{
+    ViewData["Title"] = "Chi tiết tài liệu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h2 class="mb-4 text-primary">Chi tiết tài liệu</h2>
+
+    <div class="card shadow-sm p-4">
+        <h5 class="card-title mb-3 text-secondary">Thông tin tài liệu</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 25%;">Mã tài liệu</th>
+                        <td>@Html.DisplayFor(model => model.MaTl)</td>
+                    </tr>
+                    <tr>
+                        <th>Tên tài liệu</th>
+                        <td>@Html.DisplayFor(model => model.TenTl)</td>
+                    </tr>
+                    <tr>
+                        <th>Lần xuất bản</th>
+                        <td>@Html.DisplayFor(model => model.LanXuatBan)</td>
+                    </tr>
+                    <tr>
+                        <th>Năm xuất bản</th>
+                        <td>@Html.DisplayFor(model => model.NamXuatBan)</td>
+                    </tr>
+                    <tr>
+                        <th>Số trang</th>
+                        <td>@Html.DisplayFor(model => model.SoTrang)</td>
+                    </tr>
+                    <tr>
+                        <th>Khổ cỡ</th>
+                        <td>@Html.DisplayFor(model => model.KhoCo)</td>
+                    </tr>
+                    <tr>
+                        <th>Nhà xuất bản</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaNxbNavigation.MaNxb)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Ngôn ngữ</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaNnNavigation.MaNn)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Thể loại</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaThLNavigation.MaThL)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Địa điểm</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaDdNavigation.MaDd)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tài khoản tạo</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaTkNavigation.MaTk)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.MaTl" class="btn btn-warning me-2">
+            <i class="bx bx-edit"></i> Chỉnh sửa
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bx bx-arrow-back"></i> Quay lại danh sách
+        </a>
+        <a asp-controller="BanSao" asp-action="Index" asp-route-id="@Model?.MaTl" class="btn btn-info me-2">
+            <i class="bx bx-book-content"></i> Xem bản sao  
+        </a>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

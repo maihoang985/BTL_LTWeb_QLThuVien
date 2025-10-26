@@ -1,0 +1,41 @@
+﻿@model Library_Manager.Models.TTacGia
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Chi tiết tác giả</h1>
+
+    <div>
+        <h4>TTacGia</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.MaTg)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.MaTg)
+            </dd>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.HoDem)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.HoDem)
+            </dd>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Ten)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Ten)
+            </dd>
+        </dl>
+    </div>
+
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.MaTg" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+    </div>
+</div>

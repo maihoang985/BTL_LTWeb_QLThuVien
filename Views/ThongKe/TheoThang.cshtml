@@ -1,0 +1,225 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@* @{
+    ViewData["Title"] = "Thống kê lượt mượn sách";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="mb-3">📊 Thống kê lượt mượn sách theo tháng</h4>
+
+    <!-- Chọn năm -->
+    <div class="mb-3">
+        <label for="yearSelector" class="form-label">Chọn năm:</label>
+        <select id="yearSelector" class="form-select w-auto d-inline-block">
+            <option value="2025">Năm 2021</option>
+            <option value="2025">Năm 2025</option>
+            <option value="2024">Năm 2024</option>
+            <option value="2023">Năm 2023</option>
+        </select>
+    </div>
+
+    <!-- Biểu đồ -->
+    <div id="chart" style="min-height: 400px;"></div>
+   @*  <div class="col-md-8">
+        <h5 class="card-header m-0 me-2 pb-3">Total Revenue</h5>
+        <div id="totalRevenueChart" class="px-2" style="min-height: 315px;"></div>
+    </div> *@
+
+
+
+@*     @section Scripts {
+        <script src="~/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+
+        <script>
+            // BẮT ĐẦU: Đảm bảo toàn bộ code chỉ chạy khi HTML đã sẵn sàng
+            document.addEventListener("DOMContentLoaded", function () {
+
+                // 1. Tìm thẻ div để vẽ biểu đồ
+                const chartElement = document.querySelector("#chart");
+                const yearSelector = document.querySelector("#yearSelector");
+                let chart;
+
+                // Kiểm tra xem có tìm thấy thẻ div không
+                if (!chartElement) {
+                    console.error("LỖI QUAN TRỌNG: Không tìm thấy thẻ div nào có id='chart' trên trang.");
+                    return; // Dừng thực thi nếu không tìm thấy
+                }
+
+                // 2. Hàm để lấy dữ liệu và vẽ biểu đồ
+                function renderChart(year) {
+                    // Đảm bảo URL là "/ThongKe/..."
+                    fetch(`/ThongKe/GetMonthlyBorrowingData?year=${year}`)
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error(`Lỗi HTTP! Trạng thái: ${res.status}`);
+                            }
+                            return res.json();
+                        })
+                        .then(data => {
+                            const months = data.map(d => "Tháng " + d.month);
+                            const counts = data.map(d => d.count);
+
+                            const options = {
+                                chart: { type: 'bar', height: 400, toolbar: { show: true } },
+                                series: [{ name: "Số lượt mượn", data: counts }],
+                                xaxis: { categories: months },
+                                yaxis: { title: { text: "Số lượt" }, labels: { formatter: val => val.toFixed(0) } },
+                                dataLabels: { enabled: false },
+                                colors: ['#696cff'],
+                                title: { text: `Biểu đồ lượt mượn sách năm ${year}`, align: 'center' }
+                            };
+
+                            if (!chart) {
+                                chart = new ApexCharts(chartElement, options);
+                                chart.render();
+                            } else {
+                                chart.updateOptions({
+                                    series: [{ data: counts }],
+                                    xaxis: { categories: months },
+                                    title: { text: `Biểu đồ lượt mượn sách năm ${year}` }
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Lỗi khi tải dữ liệu cho biểu đồ:", err);
+                            chartElement.innerHTML = `<div class='alert alert-danger'>${err.message}. Không thể tải dữ liệu.</div>`;
+                        });
+                }
+
+                // 3. Chạy lần đầu khi tải trang
+                const currentYear = new Date().getFullYear();
+                if ([...yearSelector.options].some(option => option.value == currentYear)) {
+                     yearSelector.value = currentYear;
+                }
+                renderChart(yearSelector.value);
+
+                // 4. Thêm sự kiện khi người dùng đổi năm
+                yearSelector.addEventListener("change", function () {
+                    renderChart(this.value);
+                });
+
+            }); // KẾT THÚC: DDOMContentLoaded
+        </script>
+    }
+   *@ @*  </div> *@
+
+@{
+    ViewData["Title"] = "Thống kê lượt mượn sách";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">📊 Thống kê lượt mượn sách theo tháng</h4>
+            <div>
+                <label for="yearSelector" class="form-label me-2 mb-0">Chọn năm:</label>
+                <select id="yearSelector" class="form-select d-inline-block w-auto">
+                    <option value="2025">Năm 2025</option>
+                    <option value="2024">Năm 2024</option>
+                    <option value="2023">Năm 2023</option>
+                    <option value="2022">Năm 2022</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div id="totalRevenueChart" style="min-height: 400px;"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chartElement = document.querySelector("#totalRevenueChart");
+            const yearSelector = document.querySelector("#yearSelector");
+            let chart;
+
+            if (!chartElement) {
+                console.error("Không tìm thấy phần tử có id='chart'.");
+                return;
+            }
+
+            // 🧮 Hàm vẽ hoặc cập nhật biểu đồ
+            function renderChart(year) {
+                fetch(`/ThongKe/GetMonthlyBorrowingData?year=${year}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`Lỗi HTTP ${res.status}`);
+                        return res.json();
+                    })
+                    .then(data => {
+                        const months = data.map(d => "Tháng " + d.month);
+                        const counts = data.map(d => d.count);
+
+                        const options = {
+                            chart: {
+                                type: 'bar',
+                                height: 400,
+                                toolbar: { show: true },
+                                zoom: { enabled: false }
+                            },
+                            series: [{ name: "Số lượt mượn", data: counts }],
+                            xaxis: {
+                                categories: months,
+                                title: { text: "Tháng" },
+                                labels: { rotate: -45 }
+                            },
+                            yaxis: {
+                                title: { text: "Số lượt mượn" },
+                                labels: { formatter: val => val.toFixed(0) }
+                            },
+                            colors: ['#696cff'],
+                            dataLabels: { enabled: false },
+                            grid: { borderColor: '#f1f1f1' },
+                            title: {
+                                text: `Biểu đồ lượt mượn sách năm ${year}`,
+                                align: 'center'
+                            },
+                            tooltip: {
+                                y: { formatter: val => `${val} lượt mượn` }
+                            }
+                        };
+
+                        if (!chart) {
+                            chart = new ApexCharts(chartElement, options);
+                            chart.render();
+                        } else {
+                            chart.updateOptions({
+                                series: [{ data: counts }],
+                                xaxis: { categories: months },
+                                title: { text: `Biểu đồ lượt mượn sách năm ${year}` }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        chartElement.innerHTML =
+                            `<div class='alert alert-danger text-center mt-3'>
+                                ⚠️ ${err.message} - Không thể tải dữ liệu.
+                            </div>`;
+                    });
+            }
+
+            // 🕒 Mặc định: năm hiện tại
+            const currentYear = new Date().getFullYear();
+            if ([...yearSelector.options].some(o => o.value == currentYear))
+                yearSelector.value = currentYear;
+            renderChart(yearSelector.value);
+
+            // 🔁 Cập nhật khi người dùng chọn năm khác
+            yearSelector.addEventListener("change", function () {
+                renderChart(this.value);
+            });
+        });
+    </script>
+}
+
+} 
+

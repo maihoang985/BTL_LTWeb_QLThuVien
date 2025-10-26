@@ -1,0 +1,116 @@
+﻿@* @model IEnumerable<Library_Manager.Models.TTheBanDoc>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NgayCap)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NgayHetHan)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TrangThai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaBdNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgayCap)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgayHetHan)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrangThai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaBdNavigation.MaBd)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.MaTbd">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.MaTbd">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.MaTbd">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+ *@
+
+@model IEnumerable<Library_Manager.Models.TTheBanDoc>
+
+@{
+    ViewData["Title"] = "Danh sách thẻ bạn đọc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Danh sách Thẻ Bạn Đọc</h1>
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary mb-3">Tạo thẻ mới</a>
+    </p>
+
+    <div class="table-responsive-scroll">
+        <table class="table table-bordered table-striped text-nowrap">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã Thẻ</th>
+                    <th>Tên Bạn Đọc</th>
+                    <th>Ngày Cấp</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Trạng Thái</th>
+                    <th style="width: 150px;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MaTbd</td>
+
+                        @* Lấy tên bạn đọc từ khóa ngoại *@
+                        <td>
+                            @(item.MaBdNavigation != null
+                                                    ? item.MaBdNavigation.HoDem + " " + item.MaBdNavigation.Ten
+                                                    : "(Không có thông tin)")
+                    </td>
+
+                        <td>@item.NgayCap.ToString("dd/MM/yyyy")</td>
+                        <td>@item.NgayHetHan?.ToString("dd/MM/yyyy")</td>
+                        <td>@item.TrangThai</td>
+
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.MaTbd">Sửa</a> |
+                            @*< a asp-action="Details" asp-route-id="@item.MaTbd">Chi tiết</a> | *@
+                            <a asp-controller="TBanDoc"
+                               asp-action="Details"
+                               asp-route-id="@item.MaBd">
+                                Chi tiết bạn đọc
+                            </a> |
+
+                            <a asp-action="Delete" asp-route-id="@item.MaTbd">Xóa</a>
+                        </td>
+                    </tr>
+                                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+﻿@model Library_Manager.Models.TBanSao
+
+@{
+    ViewData["Title"] = "Chi tiết bản sao";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h2 class="mb-4 text-primary">Chi tiết bản sao</h2>
+
+    <div class="card shadow-sm p-4">
+        <h5 class="card-title mb-3 text-secondary">Thông tin bản sao</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 25%;">Mã bản sao</th>
+                        <td>@Html.DisplayFor(model => model.MaBs)</td>
+                    </tr>
+                    <tr>
+                        <th>Mã tài liệu</th>
+                        <td>@Html.DisplayFor(model => model.MaTl)</td>
+                    </tr>
+                    <tr>
+                        <th>Tên tài liệu</th>
+                        <td>@Html.DisplayFor(model => model.MaTlNavigation.TenTl)</td>
+                    </tr>
+                    <tr>
+                        <th>Tình trạng</th>
+                        <td>@Html.DisplayFor(model => model.TinhTrang)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.MaBs" class="btn btn-warning me-2">
+            <i class="bx bx-edit"></i> Chỉnh sửa
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bx bx-arrow-back"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

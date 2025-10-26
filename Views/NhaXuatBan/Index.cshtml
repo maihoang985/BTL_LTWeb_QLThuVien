@@ -1,0 +1,53 @@
+﻿@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<Library_Manager.Models.TNhaXuatBan>
+
+@{
+    ViewData["Title"] = "Nhà Xuất Bản";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <partial name="_DanhMuc" />
+    <h1>Thông tin Nhà Xuất Bản</h1>
+
+    <partial name="SearchBar" />
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+
+    <div class="table-responsive-scroll">
+        <table class="table table-bordered table-responsive text-nowrap">
+            <thead>
+                <tr>
+                    <th style="white-space: nowrap;">
+                        Mã Nhà Xuất Bản
+                    </th>
+                    <th style="min-width: 250px;">
+                        Tên Nhà Xuất Bản
+                    </th>
+                    <th style="min-width: 150px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td style="white-space: nowrap;">
+                            @Html.DisplayFor(modelItem => item.MaNxb)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TenNxb)
+                        </td>
+                        <td style="min-width: 150px;">
+                            <a asp-action="Edit" asp-route-id="@item.MaNxb">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.MaNxb">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.MaNxb">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <partial name="_Pagination" />
+    </div>
+</div>

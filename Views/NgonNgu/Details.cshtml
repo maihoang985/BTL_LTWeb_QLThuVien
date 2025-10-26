@@ -1,0 +1,35 @@
+﻿@model Library_Manager.Models.TNgonNgu
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Details</h1>
+
+    <div>
+        <h4>TNgonNgu</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.MaNn)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.MaNn)
+            </dd>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TenNn)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TenNn)
+            </dd>
+        </dl>
+    </div>
+
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.MaNn" class="btn btn-primary me-2">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

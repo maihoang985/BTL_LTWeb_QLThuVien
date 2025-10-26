@@ -1,0 +1,175 @@
+﻿@* @model Library_Manager.Models.TTaiLieu
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>TTaiLieu</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MaTl" />
+            <div class="form-group">
+                <label asp-for="MaNxb" class="control-label"></label>
+                <select asp-for="MaNxb" class="form-control" asp-items="ViewBag.MaNxb"></select>
+                <span asp-validation-for="MaNxb" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaNn" class="control-label"></label>
+                <select asp-for="MaNn" class="form-control" asp-items="ViewBag.MaNn"></select>
+                <span asp-validation-for="MaNn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaThL" class="control-label"></label>
+                <select asp-for="MaThL" class="form-control" asp-items="ViewBag.MaThL"></select>
+                <span asp-validation-for="MaThL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaDd" class="control-label"></label>
+                <select asp-for="MaDd" class="form-control" asp-items="ViewBag.MaDd"></select>
+                <span asp-validation-for="MaDd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TenTl" class="control-label"></label>
+                <input asp-for="TenTl" class="form-control" />
+                <span asp-validation-for="TenTl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LanXuatBan" class="control-label"></label>
+                <input asp-for="LanXuatBan" class="form-control" />
+                <span asp-validation-for="LanXuatBan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NamXuatBan" class="control-label"></label>
+                <input asp-for="NamXuatBan" class="form-control" />
+                <span asp-validation-for="NamXuatBan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoTrang" class="control-label"></label>
+                <input asp-for="SoTrang" class="form-control" />
+                <span asp-validation-for="SoTrang" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="KhoCo" class="control-label"></label>
+                <input asp-for="KhoCo" class="form-control" />
+                <span asp-validation-for="KhoCo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaTk" class="control-label"></label>
+                <select asp-for="MaTk" class="form-control" asp-items="ViewBag.MaTk"></select>
+                <span asp-validation-for="MaTk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
+@model Library_Manager.Models.TTaiLieu
+
+@{
+    ViewData["Title"] = "Chỉnh sửa tài liệu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Chỉnh sửa tài liệu</h1>
+
+    <h4>Thông tin tài liệu</h4>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-5">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="MaTl" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="TenTl" class="control-label">Tên tài liệu</label>
+                    <input asp-for="TenTl" class="form-control" />
+                    <span asp-validation-for="TenTl" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MaNxb" class="control-label">Nhà xuất bản</label>
+                    <select asp-for="MaNxb" class="form-control" asp-items="ViewBag.MaNxb"></select>
+                    <span asp-validation-for="MaNxb" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MaNn" class="control-label">Ngôn ngữ</label>
+                    <select asp-for="MaNn" class="form-control" asp-items="ViewBag.MaNn"></select>
+                    <span asp-validation-for="MaNn" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MaThL" class="control-label">Thể loại</label>
+                    <select asp-for="MaThL" class="form-control" asp-items="ViewBag.MaThL"></select>
+                    <span asp-validation-for="MaThL" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MaDd" class="control-label">Địa điểm</label>
+                    <select asp-for="MaDd" class="form-control" asp-items="ViewBag.MaDd"></select>
+                    <span asp-validation-for="MaDd" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="LanXuatBan" class="control-label">Lần xuất bản</label>
+                    <input asp-for="LanXuatBan" class="form-control" />
+                    <span asp-validation-for="LanXuatBan" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="NamXuatBan" class="control-label">Năm xuất bản</label>
+                    <input asp-for="NamXuatBan" class="form-control" />
+                    <span asp-validation-for="NamXuatBan" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="SoTrang" class="control-label">Số trang</label>
+                    <input asp-for="SoTrang" class="form-control" />
+                    <span asp-validation-for="SoTrang" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="KhoCo" class="control-label">Khổ cỡ</label>
+                    <input asp-for="KhoCo" class="form-control" />
+                    <span asp-validation-for="KhoCo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MaTk" class="control-label">Tài khoản tạo</label>
+                    <select asp-for="MaTk" class="form-control" asp-items="ViewBag.MaTk"></select>
+                    <span asp-validation-for="MaTk" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
