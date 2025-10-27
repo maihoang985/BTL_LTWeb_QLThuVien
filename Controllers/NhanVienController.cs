@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Library_Manager.Filters;
+using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Library_Manager.Models;
 using PagedList.Core; // Thêm dòng này
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
+    [Authorization("QTV,QLB,QLT,QLM")]
     public class NhanVienController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -54,6 +56,7 @@ namespace Library_Manager.Controllers
 
 
         // GET: NhanVien/Details/5
+        [Authorization("QTV")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -72,6 +75,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: NhanVien/Create
+        [Authorization("QTV")]
         public IActionResult Create()
         {
             return View();
@@ -82,6 +86,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorization("QTV")]
         public async Task<IActionResult> Create([Bind("MaNv,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
             if (ModelState.IsValid)
@@ -94,6 +99,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: NhanVien/Edit/5
+        [Authorization("QTV")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -114,6 +120,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorization("QTV")]
         public async Task<IActionResult> Edit(string id, [Bind("MaNv,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
             if (id != tNhanVien.MaNv)
@@ -145,6 +152,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: NhanVien/Delete/5
+        [Authorization("QTV")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -165,6 +173,7 @@ namespace Library_Manager.Controllers
         // POST: NhanVien/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorization("QTV")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tNhanVien = await _context.TNhanViens.FindAsync(id);

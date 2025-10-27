@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Library_Manager.Filters;
+using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Library_Manager.Models;
 using PagedList.Core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
+    [Authorization("QTV")]
     public class TaiKhoanController : Controller
     {
         private readonly QlthuVienContext _context;

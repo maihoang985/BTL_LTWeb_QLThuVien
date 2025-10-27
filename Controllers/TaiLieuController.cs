@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Library_Manager.Filters;
+using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Library_Manager.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
+    [Authorization("QTV,QLB,QLT,QLM")]
     public class TaiLieuController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -56,6 +58,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Details/5
+        [Authorization("QLT")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -79,6 +82,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Create
+        [Authorization("QLT")]
         public IActionResult Create()
         {
             ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "MaDd");
@@ -94,6 +98,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorization("QLT")]
         public async Task<IActionResult> Create([Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu)
         {
             if (ModelState.IsValid)
@@ -111,6 +116,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Edit/5
+        [Authorization("QLT")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -136,6 +142,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorization("QLT")]
         public async Task<IActionResult> Edit(string id, [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu)
         {
             if (id != tTaiLieu.MaTl)
@@ -172,6 +179,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Delete/5
+        [Authorization("QLT")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -197,6 +205,7 @@ namespace Library_Manager.Controllers
         // POST: TaiLieu/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorization("QLT")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTaiLieu = await _context.TTaiLieus.FindAsync(id);

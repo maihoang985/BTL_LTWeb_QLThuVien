@@ -1,3 +1,4 @@
+using Library_Manager.Filters;
 using Library_Manager.Models;
 using Library_Manager   .Models.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace Library_Manager.Controllers
         }
 
         //[Authentication]
+        [Authorization("QTV,QLB,QLT,QLM")]
         public IActionResult Index()
         {
             return View();
