@@ -1,139 +1,69 @@
 ﻿@model Library_Manager.Models.TGiaoDichMuonTra
 
 @{
-    ViewData["Title"] = "Chỉnh sửa Giao dịch: " + Model.MaGd;
+    ViewData["Title"] = "Chỉnh sửa giao dịch mượn trả";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@* ========================================================================
-    KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Chỉnh sửa giao dịch mượn trả</h1>
 
-    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
-    <h1 class="fw-bold text-primary mb-4">
-        <i class='bx bx-pencil fs-2 me-2 border p-1 rounded-2'></i> Chỉnh sửa Giao dịch Mượn/Trả
-    </h1>
+    <h4>Thông tin giao dịch</h4>
+    <hr />
 
-    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
-    <div class="card">
-
-        @* HEADER CỦA CARD: Tiêu đề cố định *@
-        <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Chỉnh sửa thông tin cho Giao dịch: <span class="text-info fw-bold">@Model.MaGd</span></h5>
-        </div>
-
-        <form asp-action="Edit">
-            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
-            <div class="card-body">
-
-                @* Phần hiển thị lỗi tổng thể *@
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
-
-                @* Mã Giao dịch (Hidden Field) - Cần thiết cho việc chỉnh sửa *@
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="MaGd" />
 
-                @* CHIA BIỂU MẪU THÀNH 2 CỘT *@
-                <div class="row">
-
-                    @* --- CỘT 1: THÔNG TIN CHÍNH (6/12) --- *@
-                    <div class="col-md-6 pt-3">
-                        <h6 class="text-muted text-uppercase mb-3 mt-0">
-                            <i class='bx bx-info-circle me-1'></i> Thông tin chính
-                        </h6>
-
-                        @* Thẻ Bạn đọc (Select) *@
-                        <div class="mb-3">
-                            <label asp-for="MaTbd" class="form-label">Thẻ Bạn đọc</label>
-                            <select asp-for="MaTbd" class="form-select" asp-items="ViewBag.MaTbd">
-                                <option value="">-- Chọn Thẻ Bạn đọc --</option>
-                            </select>
-                            <span asp-validation-for="MaTbd" class="text-danger"></span>
-                        </div>
-
-                        @* Tài khoản (Nhân viên) (Select) *@
-                        <div class="mb-3">
-                            <label asp-for="MaTk" class="form-label">Tài khoản (Nhân viên)</label>
-                            <select asp-for="MaTk" class="form-select" asp-items="ViewBag.MaTk">
-                                <option value="">-- Chọn Tài khoản --</option>
-                            </select>
-                            <span asp-validation-for="MaTk" class="text-danger"></span>
-                        </div>
-
-                        @* Trạng Thái (Select) *@
-                        <div class="mb-3">
-                            <label asp-for="TrangThai" class="form-label">Trạng thái</label>
-                            <select asp-for="TrangThai" class="form-select">
-                                <option value="Đang mượn">Đang mượn</option>
-                                <option value="Đã trả">Đã trả</option>
-                                <option value="Quá hạn">Quá hạn</option>
-                            </select>
-                            <span asp-validation-for="TrangThai" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    @* --- CỘT 2: THỜI GIAN (6/12) --- *@
-                    <div class="col-md-6 pt-3">
-                        <h6 class="text-muted text-uppercase mb-3 mt-0">
-                            <i class='bx bx-calendar me-1'></i> Thời gian
-                        </h6>
-
-                        @* Ngày Mượn *@
-                        <div class="mb-3">
-                            <label asp-for="NgayMuon" class="form-label">Ngày Mượn</label>
-                            <input asp-for="NgayMuon" class="form-control" type="date" value="@Model.NgayMuon.ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="NgayMuon" class="text-danger"></span>
-                        </div>
-
-                        @* Ngày Hẹn Trả *@
-                        <div class="mb-3">
-                            <label asp-for="NgayHenTra" class="form-label">Ngày Hẹn Trả</label>
-                            <input asp-for="NgayHenTra" class="form-control" type="date" value="@Model.NgayHenTra.ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="NgayHenTra" class="text-danger"></span>
-                        </div>
-
-                        @* Ngày Trả (Thực tế) *@
-                        <div class="mb-3">
-                            <label asp-for="NgayTra" class="form-label">Ngày Trả (Thực tế)</label>
-                            <input asp-for="NgayTra" class="form-control" type="date" value="@Model.NgayTra?.ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="NgayTra" class="text-danger"></span>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label asp-for="MaTbd" class="control-label">Thẻ bạn đọc</label>
+                    <select asp-for="MaTbd" class="form-control" asp-items="ViewBag.MaTbd"></select>
+                    <span asp-validation-for="MaTbd" class="text-danger"></span>
                 </div>
-            </div> @* End card-body *@
 
-            @* FOOTER CỦA CARD: Nút Lưu, Quay lại và Chi tiết *@
-            <div class="card-footer border-top pt-3">
-                <div class="d-flex justify-content-between">
-
-                    @* KHỐI NÚT TRÁI (Quay lại) *@
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                    </a>
-
-                    @* KHỐI NÚT PHẢI (Lưu và Chi tiết) *@
-                    <div class="d-flex gap-2">
-
-                        @* NÚT LƯU *@
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-save me-1"></i> Lưu thay đổi
-                        </button>
-
-                        @* NÚT CHUYỂN QUA CHI TIẾT *@
-                        <a asp-action="Details" asp-route-id="@Model?.MaGd" class="btn btn-success">
-                            <i class="bx bx-detail me-1"></i> Xem chi tiết Giao dịch
-                        </a>
-                    </div>
-
+                <div class="form-group">
+                    <label asp-for="MaTk" class="control-label">Tài khoản</label>
+                    <select asp-for="MaTk" class="form-control" asp-items="ViewBag.MaTk"></select>
+                    <span asp-validation-for="MaTk" class="text-danger"></span>
                 </div>
-            </div>
-        </form>
-    </div> @* End card *@
-</div> @* End container-xxl *@
+
+                <div class="form-group">
+                    <label asp-for="NgayMuon" class="control-label">Ngày mượn</label>
+                    <input asp-for="NgayMuon" class="form-control" type="date" />
+                    <span asp-validation-for="NgayMuon" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NgayHenTra" class="control-label">Ngày hẹn trả</label>
+                    <input asp-for="NgayHenTra" class="form-control" type="date" />
+                    <span asp-validation-for="NgayHenTra" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NgayTra" class="control-label">Ngày trả</label>
+                    <input asp-for="NgayTra" class="form-control" type="date" />
+                    <span asp-validation-for="NgayTra" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="TrangThai" class="control-label">Trạng thái</label>
+                    <input asp-for="TrangThai" class="form-control" />
+                    <span asp-validation-for="TrangThai" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-3">
+                    <input type="submit" value="Lưu" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

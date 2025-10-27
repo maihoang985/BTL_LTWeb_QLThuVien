@@ -1,147 +1,70 @@
-﻿@model Library_Manager.Models.TTaiKhoan
+﻿
+@model Library_Manager.Models.TTaiKhoan
 
 @{
-    ViewData["Title"] = "Chi tiết Tài khoản: " + Model.TenDangNhap;
+    ViewData["Title"] = "Chi tiết tài khoản";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@* ========================================================================
-    KHỐI 1: LOGIC PHÂN QUYỀN VÀ BADGE
-    ======================================================================== *@
-@{
-    var userRole = Context.Session.GetString("UserRole");
-    // CHỈ QUẢN TRỊ VIÊN MỚI CÓ QUYỀN CHỈNH SỬA TÀI KHOẢN
-    bool canEdit = (userRole == "QTV");
-
-    // Logic cho Badge Trạng Thái
-    var trangThai = Model.TrangThai;
-    var badgeTrangThaiClass = trangThai == "Hoạt động" ? "bg-label-success" : "bg-label-danger";
-
-    // Logic cho Badge Vai Trò
-    var vaiTro = Model.MaVtNavigation?.MaVt; // Giả sử MaVt là "QTV", "QLB", "NV"
-    var badgeVaiTroClass = "bg-label-secondary"; // Mặc định
-    if (vaiTro == "QTV") { badgeVaiTroClass = "bg-label-primary"; }
-    else if (vaiTro == "QLB") { badgeVaiTroClass = "bg-label-info"; }
-    else if (vaiTro == "NV") { badgeVaiTroClass = "bg-label-warning"; }
-}
-
-
-@* ========================================================================
-    KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+    <h2 class="mb-4 text-primary">Chi tiết tài khoản</h2>
 
-    @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
-    <h1 class="fw-bold text-primary mb-4">
-        <i class='bx bxs-user-detail fs-2 me-2'></i> Chi tiết Tài khoản
-    </h1>
-
-    @* --- KHỐI: CARD BAO QUANH DỮ LIỆU --- *@
-    <div class="card">
-
-        @* HEADER CỦA CARD: Hiển thị tên tài khoản và ID *@
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">
-                Thông tin của <span class="text-primary fw-bold">@Model.TenDangNhap</span>
-            </h5>
-            <small class="text-muted">Mã TK: <span class="fw-bold">@Model.MaTk</span></small>
+    <div class="card shadow-sm p-4">
+        <h5 class="card-title mb-3 text-secondary">Thông tin tài khoản</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 25%;">Tên đăng nhập</th>
+                        <td>@Html.DisplayFor(model => model.TenDangNhap)</td>
+                    </tr>
+                    <tr>
+                        <th>Mật khẩu</th>
+                        <td>@Html.DisplayFor(model => model.MatKhau)</td>
+                    </tr>
+                    <tr>
+                        <th>Trạng thái</th>
+                        <td>
+                            @Html.DisplayFor(model => model.TrangThai)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Ngày tạo</th>
+                        <td>@Html.DisplayFor(model => model.NgayTao)</td>
+                    </tr>
+                    <tr>
+                        <th>Mã nhân viên</th>
+                        <td>
+                            @Html.DisplayFor(model => model.MaNvNavigation.MaNv)
+                            <a asp-controller="NhanVien"
+                               asp-action="Details"
+                               asp-route-id="@Model.MaNvNavigation.MaNv"
+                               class="btn btn-sm btn-info ms-2">
+                                <i class="bx bx-user"></i> Xem nhân viên
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Vai trò</th>
+                        <td>@Html.DisplayFor(model => model.MaVtNavigation.MaVt)</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        @* BODY CỦA CARD: CHIA THÀNH 2 CỘT *@
-        <div class="card-body">
-            <div class="row">
-
-                @* --- CỘT 1: THÔNG TIN ĐĂNG NHẬP --- *@
-                <div class="col-md-6 pt-3">
-                    <h6 class="text-muted text-uppercase mb-3 mt-0">
-                        <i class='bx bxs-user-account me-1'></i> Thông tin Đăng nhập
-                    </h6>
-
-                    @* Mã Tài khoản *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Mã Tài khoản</label>
-                        <p class="fw-semibold mb-0">@Model.MaTk</p>
-                    </div>
-
-                    @* Tên Đăng nhập *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Tên Đăng nhập</label>
-                        <p class="fw-semibold mb-0">@Model.TenDangNhap</p>
-                    </div>
-
-                    @* Mật khẩu (Bảo mật) *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Mật khẩu</label>
-                        <p class="text-muted fst-italic mb-0">(Không hiển thị vì lý do bảo mật)</p>
-                    </div>
-
-                    @* Ngày tạo *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Ngày tạo</label>
-                        <p class="mb-0">@Model.NgayTao.ToString("dd/MM/yyyy")</p>
-                    </div>
-                </div>
-
-                @* --- CỘT 2: QUYỀN & LIÊN KẾT --- *@
-                <div class="col-md-6 pt-3">
-                    <h6 class="text-muted text-uppercase mb-3 mt-0">
-                        <i class='bx bx-sitemap me-1'></i> Quyền & Liên kết
-                    </h6>
-
-                    @* Vai trò *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Vai trò</label>
-                        <p class="mb-0"><span class="badge @badgeVaiTroClass fs-6">@vaiTro</span></p>
-                    </div>
-
-                    @* Trạng thái *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Trạng thái</label>
-                        <p class="mb-0"><span class="badge @badgeTrangThaiClass fs-6">@trangThai</span></p>
-                    </div>
-
-                    @* Nhân viên liên kết *@
-                    <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Nhân viên liên kết</label>
-                        @if (Model.MaNvNavigation != null)
-                        {
-                            <p class="mb-0">
-                                @Model.MaNvNavigation.HoDem @Model.MaNvNavigation.Ten
-
-                                @* TODO: Cập nhật asp-controller nếu tên Controller là TNhanVien *@
-                                <a asp-controller="TNhanVien" asp-action="Details" asp-route-id="@Model.MaNv"
-                                   class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
-                                   data-bs-toggle="tooltip" title="Xem chi tiết Nhân viên">
-                                    <i class='bx bx-link-external'></i>
-                                </a>
-                            </p>
-                        }
-                        else
-                        {
-                            <p class="mb-0 text-muted fst-italic">(Chưa liên kết)</p>
-                        }
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
-        <div class="card-footer border-top pt-3">
-            <div class="d-flex gap-3">
-
-                @* Nút Sửa (Chỉ QTV) *@
-                <a asp-action="Edit" asp-route-id="@Model?.MaTk" class="btn btn-primary @(canEdit ? "" : "disabled")">
-                    <i class="bx bx-pencil me-1"></i> Sửa tài khoản
-                </a>
-
-                @* Nút Quay lại *@
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                </a>
-            </div>
-        </div>
-
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.MaTk" class="btn btn-warning me-2">
+            <i class="bx bx-edit"></i> Chỉnh sửa
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bx bx-arrow-back"></i> Quay lại danh sách
+        </a>
     </div>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
