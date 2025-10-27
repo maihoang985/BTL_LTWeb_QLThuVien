@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 //lấy chuỗi kết nối(connectionstring) từ file appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("QlthuVienContext");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 //đăng ký DbContext với chuỗi kết nối đã lấy được
 builder.Services.AddDbContext<Library_Manager.Models.QlthuVienContext>(options =>
     options.UseSqlServer(connectionString));
