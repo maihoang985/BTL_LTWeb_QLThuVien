@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Library_Manager.Models;
+using PagedList.Core;
 
 namespace Library_Manager.Controllers
 {

@@ -141,3 +141,41 @@ html[data-theme="theme-dark-custom"] {
             color: #fff; /* Chữ trắng khi hover */
             background-color: #696cff;
         }
+
+    /* -----------------------------------------------------------------------------
+ * 6. CUSTOM TABLE HEAD COLOR FIX (Từ bước trước)
+ * -----------------------------------------------------------------------------*/
+
+    /* Bắt buộc màu chữ tối khi thead là Light (.table-light) trong Dark Theme */
+    html[data-theme="theme-dark-custom"] #myTableHead.table-light,
+    html[data-theme="theme-dark-custom"] #myTableHead.table-light th,
+    html[data-theme="theme-dark-custom"] #myTableHead.table-light th a {
+        color: #435971 !important; /* Màu chữ tối, tương phản với nền sáng */
+    }
+
+    /* Đảm bảo màu chữ sáng khi thead là Dark (.table-dark) trong Dark Theme (phòng trường hợp) */
+    html[data-theme="theme-dark-custom"] #myTableHead.table-dark,
+    html[data-theme="theme-dark-custom"] #myTableHead.table-dark th {
+        color: #fff !important; /* Màu chữ trắng/sáng */
+    }
+
+    /* -----------------------------------------------------------------------------
+ * 7. CUSTOM TABLE STYLES (Khắc phục màu nền thân bảng & hover)
+ * -----------------------------------------------------------------------------*/
+
+    /* Khắc phục màu nền thân bảng chính khi có class .table-dark */
+    html[data-theme="theme-dark-custom"] .table.table-dark {
+        /* Thiết lập màu nền thân bảng tối hơn nền Body */
+        --bs-table-bg: #383d4c;
+        --bs-table-striped-bg: #3c4253; /* Màu cho hàng xen kẽ (nếu dùng striped) */
+        --bs-table-active-bg: #3c4253;
+        --bs-table-hover-bg: #434857; /* Nền đậm hơn một chút khi hover */
+        --bs-table-color: #a1acb8; /* Màu chữ chính cho thân bảng */
+        border-color: #3c4253;
+    }
+
+    /* Chỉnh màu hover để nổi bật hơn trên nền tối */
+    html[data-theme="theme-dark-custom"] .table.table-hover.table-dark > tbody > tr:hover > * {
+        background-color: var(--bs-table-hover-bg) !important;
+        color: #fff; /* Chữ trắng khi hover */
+    }

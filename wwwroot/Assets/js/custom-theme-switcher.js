@@ -18,35 +18,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const lightTheme = 'theme-default';
     const darkTheme = 'theme-dark-custom';
 
-    if (!themeToggle) {
-        // Thoát nếu công tắc chuyển đổi theme không tồn tại trên NavBar
+    // ✨ Thêm: Tham chiếu DOM cho Bảng và Table Head
+    const tableElement = document.getElementById('myTable');
+    const tableHeadElement = document.getElementById('myTableHead');
+
+    // ✨ Thêm: Các Class của Table
+    const tableDarkClass = 'table-dark';
+    const tableLightClass = 'table-light';
+
+    if (!themeToggle || !tableElement || !tableHeadElement) {
+        // Thoát nếu công tắc chuyển đổi theme hoặc bảng không tồn tại
         return;
     }
 
     // 2. Hàm áp dụng theme
     function applyTheme(theme) {
         if (theme === 'dark') {
-            // Áp dụng theme tối
+            // Áp dụng theme tối cho toàn bộ trang
             htmlElement.classList.remove(lightClass);
             htmlElement.classList.add(darkClass);
-
             htmlElement.setAttribute('data-theme', darkTheme);
-
             themeToggle.checked = true;
+
+            // ✨ CHỈNH SỬA: Theme Dark -> thead phải là Light (table-light)
+            tableHeadElement.classList.remove(tableDarkClass); // Bỏ dark
+            tableHeadElement.classList.add(tableLightClass);  // Thêm light
+
         } else {
-            // Áp dụng theme sáng (mặc định)
+            // Áp dụng theme sáng (mặc định) cho toàn bộ trang
             htmlElement.classList.remove(darkClass);
             htmlElement.classList.add(lightClass);
-
             htmlElement.setAttribute('data-theme', lightTheme);
-
             themeToggle.checked = false;
+
+            // ✨ CHỈNH SỬA: Theme Light -> thead phải là Dark (table-dark)
+            tableHeadElement.classList.remove(tableLightClass); // Bỏ light
+            tableHeadElement.classList.add(tableDarkClass);   // Thêm dark
         }
 
         // Lưu trạng thái mới vào Local Storage
         localStorage.setItem(localStorageKey, theme);
-
-        // Kích hoạt sự kiện resize để các thành phần JS (ví dụ: Charts) cập nhật
         window.dispatchEvent(new Event('resize'));
     }
 
@@ -54,12 +65,12 @@ document.addEventListener('DOMContentLoaded', function () {
     let savedTheme = localStorage.getItem(localStorageKey);
 
     if (savedTheme) {
-        // Áp dụng theme đã lưu
         applyTheme(savedTheme);
     } else {
-        // Nếu không có theme lưu, thiết lập trạng thái toggle dựa trên class hiện tại của <html> (mặc định là light-style)
         const currentTheme = htmlElement.classList.contains(darkClass) ? 'dark' : 'light';
         themeToggle.checked = (currentTheme === 'dark');
+        // Gọi applyTheme để đảm bảo bảng được thiết lập đúng ngay cả khi không có savedTheme
+        applyTheme(currentTheme);
     }
 
     // 4. Xử lý sự kiện chuyển đổi

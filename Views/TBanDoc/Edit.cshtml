@@ -1,74 +1,140 @@
 ﻿@model Library_Manager.Models.TBanDoc
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Chỉnh sửa Bạn đọc";
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-<h1>Edit</h1>
 
-<h4>TBanDoc</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-pencil fs-2 me-2 border p-1 rounded-2'></i> Chỉnh sửa thông tin bạn đọc
+    </h1>
+
+    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
+    <div class="card">
+
+        @* HEADER CỦA CARD: Tên biểu mẫu đang chỉnh sửa *@
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Chỉnh sửa thông tin cho: <span class="text-info fw-bold">@Model.HoDem @Model.Ten</span></h5>
+        </div>
+
         <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="MaBd" />
-            <div class="form-group">
-                <label asp-for="HoDem" class="control-label"></label>
-                <input asp-for="HoDem" class="form-control" />
-                <span asp-validation-for="HoDem" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Ten" class="control-label"></label>
-                <input asp-for="Ten" class="form-control" />
-                <span asp-validation-for="Ten" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NgaySinh" class="control-label"></label>
-                <input asp-for="NgaySinh" class="form-control" />
-                <span asp-validation-for="NgaySinh" class="text-danger"></span>
-            </div>
-            @* <div class="form-group">
-                <label asp-for="GioiTinh" class="control-label"></label>
-                <input asp-for="GioiTinh" class="form-control" />
-                <span asp-validation-for="GioiTinh" class="text-danger"></span>
-            </div> *@
-            <div class="form-group">
-                <label asp-for="GioiTinh" class="control-label"></label>
-                <select asp-for="GioiTinh" class="form-control">
-                    <option value="M">Nam</option>
-                    <option value="F">Nữ</option>
-                </select>
-                <span asp-validation-for="GioiTinh" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DiaChi" class="control-label"></label>
-                <input asp-for="DiaChi" class="form-control" />
-                <span asp-validation-for="DiaChi" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Sdt" class="control-label"></label>
-                <input asp-for="Sdt" class="form-control" />
-                <span asp-validation-for="Sdt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+            <div class="card-body">
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-</div>
+                @* Phần hiển thị lỗi tổng thể *@
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                @* Mã Bạn đọc (Hidden Field) - Cần thiết cho việc chỉnh sửa *@
+                <input type="hidden" asp-for="MaBd" />
+
+                @* TÁI CẤU TRÚC: CHIA BIỂU MẪU THÀNH 2 CỘT & CHIA NHÓM THÔNG TIN *@
+                <div class="row">
+
+                    @* --- CỘT 1: THÔNG TIN CÁ NHÂN (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-user me-1'></i> Thông tin cá nhân
+                        </h6>
+
+                        @* Họ Đệm *@
+                        <div class="mb-3">
+                            <label for="HoDem" class="form-label">Họ Đệm</label>
+                            <input asp-for="HoDem" class="form-control" />
+                            <span asp-validation-for="HoDem" class="text-danger"></span>
+                        </div>
+
+                        @* Tên *@
+                        <div class="mb-3">
+                            <label for="Ten" class="form-label">Tên</label>
+                            <input asp-for="Ten" class="form-control" />
+                            <span asp-validation-for="Ten" class="text-danger"></span>
+                        </div>
+
+                        @* Ngày Sinh (Sử dụng type="date") *@
+                        <div class="mb-3">
+                            <label for="NgaySinh" class="form-label">Ngày Sinh</label>
+                            <input asp-for="NgaySinh" class="form-control" type="date" value="@Model.NgaySinh.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                        </div>
+
+                        @* Giới Tính (Sử dụng Select) *@
+                        <div class="mb-3">
+                            <label for="GioiTinh" class="form-label">Giới Tính</label>
+                            <select asp-for="GioiTinh" class="form-select">
+                                <option value="M">Nam</option>
+                                <option value="F">Nữ</option>
+                            </select>
+                            <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @* --- CỘT 2: THÔNG TIN LIÊN HỆ & ĐỊA CHỈ (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-phone me-1'></i> Thông tin liên hệ
+                        </h6>
+
+                        @* Địa Chỉ *@
+                        <div class="mb-3">
+                            <label for="DiaChi" class="form-label">Địa Chỉ</label>
+                            <input asp-for="DiaChi" class="form-control" />
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
+                        </div>
+
+                        @* Số Điện Thoại *@
+                        <div class="mb-3">
+                            <label for="Sdt" class="form-label">Số Điện Thoại</label>
+                            <input asp-for="Sdt" class="form-control" />
+                            <span asp-validation-for="Sdt" class="text-danger"></span>
+                        </div>
+
+                        @* Email *@
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div> @* End card-body *@
+
+            @* FOOTER CỦA CARD: Nút Lưu, Quay lại và Chi tiết *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex justify-content-between">
+
+                    @* KHỐI NÚT TRÁI (Quay lại) *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+
+                    @* KHỐI NÚT PHẢI (Lưu và Chi tiết) *@
+                    <div class="d-flex gap-2">
+
+                        @* NÚT LƯU (Bên trái khối này, bên phải nút Quay lại) *@
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i> Lưu thay đổi
+                        </button>
+
+                        @* NÚT CHUYỂN QUA CHI TIẾT (Bên phải cùng) *@
+                        <a asp-action="Details" asp-route-id="@Model?.MaBd" class="btn btn-success">
+                            <i class="bx bx-detail me-1"></i> Xem chi tiết Bạn đọc
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </div> @* End card *@
+</div> @* End container-xxl *@
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
