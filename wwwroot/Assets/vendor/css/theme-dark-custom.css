@@ -1,0 +1,143 @@
+﻿/*==================================================================================
+// DARK THEME CUSTOM CSS (Dựa trên theme-default.css)
+// Tên theme: theme-dark-custom
+// Áp dụng khi <html> có data-theme="theme-dark-custom"
+==================================================================================*/
+
+/* -----------------------------------------------------------------------------
+ * 1. KHU VỰC CHUNG (BODY, LAYOUT WRAPPER, BORDER)
+ * -----------------------------------------------------------------------------*/
+
+/* Áp dụng cho toàn bộ HTML khi Dark Theme được kích hoạt */
+html[data-theme="theme-dark-custom"] {
+    --bs-body-bg: #2d3243; /* Nền tối cho Body */
+    --bs-body-color: #a1acb8; /* Màu chữ chính */
+    color: #a1acb8;
+}
+
+    /* Đổi màu liên kết chung */
+    html[data-theme="theme-dark-custom"] a {
+        color: #8c8fff; /* Primary lightened */
+    }
+
+        html[data-theme="theme-dark-custom"] a:hover {
+            color: #a1a3ff;
+        }
+
+    /* Thay đổi màu nền của các thành phần chính */
+    html[data-theme="theme-dark-custom"] .card,
+    html[data-theme="theme-dark-custom"] .list-group-item,
+    html[data-theme="theme-dark-custom"] .dropdown-menu {
+        background-color: #383d4c !important; /* Nền của Card/Dropdown */
+        border-color: #3c4253 !important;
+    }
+
+    /* Màu viền */
+    html[data-theme="theme-dark-custom"] .border,
+    html[data-theme="theme-dark-custom"] .card-header,
+    html[data-theme="theme-dark-custom"] .card-footer {
+        border-color: #3c4253 !important;
+    }
+
+    /* -----------------------------------------------------------------------------
+ * 2. NAVBAR (bg-navbar-theme)
+ * -----------------------------------------------------------------------------*/
+    html[data-theme="theme-dark-custom"] .bg-navbar-theme {
+        background-color: #1c202d !important; /* Nền tối cho Navbar */
+        color: #a1acb8;
+        /* Xóa hiệu ứng blur (nếu có) */
+        backdrop-filter: none;
+    }
+
+        html[data-theme="theme-dark-custom"] .bg-navbar-theme .navbar-nav > .nav-link,
+        html[data-theme="theme-dark-custom"] .bg-navbar-theme .navbar-text {
+            color: #a1acb8; /* Màu chữ Navbar */
+        }
+
+            html[data-theme="theme-dark-custom"] .bg-navbar-theme .navbar-nav > .nav-link:hover,
+            html[data-theme="theme-dark-custom"] .bg-navbar-theme .navbar-nav .show > .nav-link {
+                color: #fff; /* Màu chữ khi hover/active */
+            }
+
+        /* Navbar Toggle icon (Hamburger icon) */
+        html[data-theme="theme-dark-custom"] .bg-navbar-theme .navbar-toggler-icon {
+            /* Đổi màu icon sang trắng (cần sửa SVG Data-URL nếu sử dụng icon custom) */
+            background-image: url("data:image/svg+xml,...fill='rgba(255, 255, 255, 0.8)'...");
+        }
+
+
+    /* -----------------------------------------------------------------------------
+ * 3. MENU / SIDEBAR (bg-menu-theme)
+ * -----------------------------------------------------------------------------*/
+    html[data-theme="theme-dark-custom"] .bg-menu-theme {
+        background-color: #1c202d !important; /* Nền tối cho Menu */
+        color: #a1acb8;
+    }
+
+        /* Màu chữ Menu Link */
+        html[data-theme="theme-dark-custom"] .bg-menu-theme .menu-link {
+            color: #a1acb8;
+        }
+
+            /* Màu chữ Menu Link khi hover/open */
+            html[data-theme="theme-dark-custom"] .bg-menu-theme .menu-link:hover,
+            html[data-theme="theme-dark-custom"] .bg-menu-theme .menu-item.open:not(.menu-item-closing) > .menu-toggle {
+                color: #fff;
+                background-color: #3c4253 !important; /* Nền xám đậm khi hover/open */
+            }
+
+        /* Menu Item Active */
+        html[data-theme="theme-dark-custom"] .bg-menu-theme .menu-inner > .menu-item.active > .menu-link {
+            color: #fff; /* Màu chữ trắng */
+            background-color: rgba(105, 108, 255, 0.2) !important; /* Nền nhấn Primary hơi trong suốt */
+        }
+
+        /* Dấu nhấn Menu Active dọc (thanh màu primary bên cạnh) */
+        html[data-theme="theme-dark-custom"] .bg-menu-theme .menu-inner > .menu-item.active:before {
+            background: #696cff; /* Vẫn giữ Primary */
+        }
+
+        /* Menu Header (Tiêu đề nhóm menu) */
+        html[data-theme="theme-dark-custom"] .bg-menu-theme .menu-header {
+            color: #697a8d; /* Màu xám đậm */
+        }
+
+    /* -----------------------------------------------------------------------------
+ * 4. FOOTER (bg-footer-theme)
+ * -----------------------------------------------------------------------------*/
+    html[data-theme="theme-dark-custom"] .bg-footer-theme {
+        background-color: #383d4c !important; /* Nền footer tối */
+        color: #a1acb8;
+    }
+
+    /* -----------------------------------------------------------------------------
+ * 5. CÁC THÀNH PHẦN KHÁC (Progress, Form Controls,...)
+ * -----------------------------------------------------------------------------*/
+
+    /* Form Controls (Input/Select focus) */
+    html[data-theme="theme-dark-custom"] .form-control,
+    html[data-theme="theme-dark-custom"] .form-select,
+    html[data-theme="theme-dark-custom"] .input-group-text {
+        background-color: #383d4c;
+        border-color: #3c4253;
+        color: #a1acb8;
+    }
+
+        html[data-theme="theme-dark-custom"] .form-control:focus,
+        html[data-theme="theme-dark-custom"] .form-select:focus {
+            border-color: #696cff; /* Giữ màu nhấn Primary */
+            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+        }
+
+    /* Button Primary (Giữ nguyên vì đã là màu đậm) */
+
+    /* Button Outline Primary */
+    html[data-theme="theme-dark-custom"] .btn-outline-primary {
+        color: #696cff;
+        border-color: #696cff;
+    }
+
+        html[data-theme="theme-dark-custom"] .btn-outline-primary:hover {
+            color: #fff; /* Chữ trắng khi hover */
+            background-color: #696cff;
+        }

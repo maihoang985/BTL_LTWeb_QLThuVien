@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Library-Manager.csproj": {}
+    "E:\\00_UNIVERSITY\\TERM_05\\LapTrinhWeb\\BTL\\BTL_LTWeb_QLThuVien\\Library-Manager.csproj": {}
   },
   "projects": {
-    "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Library-Manager.csproj": {
+    "E:\\00_UNIVERSITY\\TERM_05\\LapTrinhWeb\\BTL\\BTL_LTWeb_QLThuVien\\Library-Manager.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Library-Manager.csproj",
+        "projectUniqueName": "E:\\00_UNIVERSITY\\TERM_05\\LapTrinhWeb\\BTL\\BTL_LTWeb_QLThuVien\\Library-Manager.csproj",
         "projectName": "Library-Manager",
-        "projectPath": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Library-Manager.csproj",
-        "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
-        "outputPath": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\obj\\",
+        "projectPath": "E:\\00_UNIVERSITY\\TERM_05\\LapTrinhWeb\\BTL\\BTL_LTWeb_QLThuVien\\Library-Manager.csproj",
+        "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
+        "outputPath": "E:\\00_UNIVERSITY\\TERM_05\\LapTrinhWeb\\BTL\\BTL_LTWeb_QLThuVien\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\hoang\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -92,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

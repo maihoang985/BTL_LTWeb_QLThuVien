@@ -42,6 +42,7 @@
     <!-- Core CSS -->
     <link rel="stylesheet" href="~/Assets/vendor/css/core.css" class="template-customizer-core-css" />
     <link rel="stylesheet" href="~/Assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="~/Assets/vendor/css/theme-dark-custom.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="~/Assets/css/demo.css" />
 
     <!-- Vendors CSS -->
@@ -62,24 +63,31 @@
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
+
             <!-- Menu -->
             <partial name="SideBarMenu" />
             <!-- / Menu -->
+
             <!-- Layout container -->
             <div class="layout-page">
+
                 <!-- Navbar -->
                 <partial name="NavBar" />
                 <!-- / Navbar -->
+
                 <!-- Content wrapper -->
                 @RenderBody();
                 <!-- Content wrapper -->
+
             </div>
             <!-- / Layout page/ Layout container -->
+
         </div>
 
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
+
     <!-- / Layout wrapper -->
     <!-- Helpers -->
     <script src="~/Assets/vendor/js/helpers.js"></script>
@@ -103,6 +111,8 @@
 
     <!-- Page JS -->
     <script src="~/Assets/js/dashboards-analytics.js"></script>
+
+    <script src="~/Assets/js/custom-theme-switcher.js"></script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

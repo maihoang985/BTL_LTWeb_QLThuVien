@@ -4,6 +4,7 @@ wwwroot\Assets\img\avatars\5.png
 wwwroot\Assets\img\avatars\6.png
 wwwroot\Assets\img\avatars\7.png
 wwwroot\Assets\img\backgrounds\18.jpg
+wwwroot\Assets\img\branding\logo.png
 wwwroot\Assets\img\elements\1.jpg
 wwwroot\Assets\img\elements\11.jpg
 wwwroot\Assets\img\elements\12.jpg
@@ -44,6 +45,7 @@ wwwroot\Assets\img\layouts\layout-fluid-light.png
 wwwroot\Assets\img\layouts\layout-without-menu-light.png
 wwwroot\Assets\img\layouts\layout-without-navbar-light.png
 wwwroot\Assets\js\config.js
+wwwroot\Assets\js\custom-theme-switcher.js
 wwwroot\Assets\js\dashboards-analytics.js
 wwwroot\Assets\js\extended-ui-perfect-scrollbar.js
 wwwroot\Assets\js\form-basic-inputs.js
@@ -57,6 +59,8 @@ wwwroot\Assets\vendor\css\pages\page-account-settings.css
 wwwroot\Assets\vendor\css\pages\page-auth.css
 wwwroot\Assets\vendor\css\pages\page-icons.css
 wwwroot\Assets\vendor\css\pages\page-misc.css
+wwwroot\Assets\vendor\css\sidebar-custom.css
+wwwroot\Assets\vendor\css\theme-dark-custom.css
 wwwroot\Assets\vendor\css\theme-default.css
 wwwroot\Assets\vendor\fonts\boxicons.css
 wwwroot\Assets\vendor\fonts\boxicons\boxicons.eot
