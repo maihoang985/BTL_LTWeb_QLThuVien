@@ -6,6 +6,7 @@
     ViewData["Title"] = "Index";
 }
 
+
 <div class="container-xxl flex-grow-1 container-p-y">
 <h1>Thông tin bạn đọc</h1>
 <partial name="SearchBar" />
@@ -71,10 +72,11 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
-            <td style="min-width : 100px">
-                <a asp-action="Edit" asp-route-id="@item.MaBd">Edit</a> |
+
+            <td style="min-width : 100px" >
+                <a asp-action="Edit" asp-route-id="@item.MaBd" >Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.MaBd">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MaBd">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.MaBd" >Delete</a>
             </td>
         </tr>
 }
