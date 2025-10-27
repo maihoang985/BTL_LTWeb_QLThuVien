@@ -13,6 +13,13 @@ builder.Services.AddDbContext<Library_Manager.Models.QlthuVienContext>(options =
 
 //thêm dịch vụ session
 builder.Services.AddSession();
+builder.Services.AddDistributedMemoryCache(); // Thêm dịch vụ lưu cache session trong bộ nhớ
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian hết hạn session
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
