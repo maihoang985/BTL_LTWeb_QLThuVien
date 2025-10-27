@@ -1,0 +1,141 @@
+﻿@{
+    ViewData["Title"] = "📊 Thống kê lượt mượn sách theo tháng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Assets/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">📊 Thống kê lượt mượn sách</h4>
+
+            <div>
+                <label for="yearSelector" class="form-label me-2 mb-0">Chọn năm:</label>
+                <select id="yearSelector" class="form-select d-inline-block w-auto">
+                    <option value="2025">Năm 2025</option>
+                    <option value="2024">Năm 2024</option>
+                    <option value="2023">Năm 2023</option>
+                    <option value="2022">Năm 2022</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div id="horizontalBarChart"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/Assets/vendor/libs/apex-charts/apexcharts.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chartEl = document.querySelector('#horizontalBarChart');
+            const yearSelector = document.querySelector('#yearSelector');
+            let chart = null;
+
+            // --- Các biến màu sắc và style (không đổi) ---
+            const labelColor = '#6c757d';
+            const borderColor = '#f1f1f1';
+            const chartColors = ['#696cff', '#71dd37', '#ff3e1d', '#03c3ec', '#ffab00', '#8592a3', '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0', '#9966ff'];
+
+            function renderChart(year) {
+                // Luôn hủy biểu đồ cũ trước khi làm bất cứ điều gì khác
+                if (chart) {
+                    chart.destroy();
+                    chart = null;
+                }
+
+                // Hiển thị loading spinner
+                chartEl.innerHTML = `<div class="d-flex justify-content-center mt-3"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
+
+                fetch(`/ThongKe/GetLuotMuonTheoThang?year=${year}`)
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error(`Lỗi HTTP ${res.status} - Không tìm thấy API hoặc có lỗi ở server.`);
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        // --- BẮT ĐẦU PHẦN SỬA LỖI ---
+
+                        // KIỂM TRA DỮ LIỆU NGAY TỪ ĐẦU
+                        if (!data || data.length === 0) {
+                            // Nếu không có dữ liệu: Chỉ hiển thị alert và kết thúc.
+                            // KHÔNG khởi tạo ApexCharts.
+                            chartEl.innerHTML = `<div class='alert alert-warning text-center mt-3'>⚠️ Không có dữ liệu thống kê cho năm ${year}.</div>`;
+                            return; // Dừng hàm tại đây
+                        }
+
+                        // Nếu có dữ liệu: Xóa spinner và tiến hành vẽ biểu đồ
+                        chartEl.innerHTML = '';
+
+                        const categories = data.map(x => 'Tháng ' + x.thang);
+                        const counts = data.map(x => x.soLuotMuon);
+                        const maxValue = Math.max(0, ...counts) + Math.ceil(Math.max(0, ...counts) * 0.1);
+
+                        const chartConfig = {
+                            series: [{
+                                name: 'Số lượt mượn',
+                                data: counts
+                            }],
+                            chart: {
+                                height: 400,
+                                type: 'bar',
+                                toolbar: { show: false }
+                            },
+                            title: {
+                                text: `Thống kê lượt mượn sách năm ${year}`,
+                                align: 'center',
+                                style: { fontSize: '18px', color: '#566a7f', fontWeight: '600' }
+                            },
+                            xaxis: {
+                                min: 0,
+                                max: maxValue,
+                                tickAmount: 5,
+                                categories: categories,
+                                axisBorder: { show: false },
+                                labels: { style: { colors: labelColor, fontSize: '13px' } },
+                                title: { text: 'Số Lượt Mượn', style: { color: labelColor, fontSize: '14px', fontWeight: 600 } }
+                            },
+                            // Các cấu hình còn lại
+                            plotOptions: { bar: { horizontal: true, barHeight: '30%', borderRadius: 8, borderRadiusApplication: 'end' } },
+                            grid: { borderColor: borderColor, xaxis: { lines: { show: false } }, padding: { top: -20, bottom: -12 } },
+                            colors: chartColors,
+                            dataLabels: {
+                                enabled: true,
+                                style: { fontSize: '13px', fontWeight: 'bold', colors: ['#fff'] },
+                                formatter: val => (val > 0 ? val : '')
+                            },
+                            yaxis: { labels: { style: { colors: labelColor, fontSize: '14px', fontWeight: '500' } } },
+                            legend: { show: false },
+                            tooltip: { y: { formatter: val => `${val} lượt` } }
+                        };
+
+                        chart = new ApexCharts(chartEl, chartConfig);
+                        chart.render();
+
+                        // --- KẾT THÚC PHẦN SỬA LỖI ---
+                    })
+                    .catch(err => {
+                        // Xử lý lỗi nếu fetch thất bại
+                        chartEl.innerHTML = `<div class='alert alert-danger text-center mt-3'>❌ ${err.message}</div>`;
+                    });
+            }
+
+            const currentYear = new Date().getFullYear();
+            if ([...yearSelector.options].some(o => o.value == currentYear)) {
+                yearSelector.value = currentYear;
+            }
+            renderChart(yearSelector.value);
+
+            yearSelector.addEventListener("change", function () {
+                renderChart(this.value);
+            });
+        });
+    </script>
+}
