@@ -426,3 +426,21 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+####################################
+# Custom files/folders to ignore   #
+####################################
+
+# App Settings - Ignore environment-specific settings that may contain secrets.
+# Always keep appsettings.json (base config) tracked, but ignore environment ones.
+
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
+appsettings.Local.json
+
+# If you want to ignore ALL appsettings.json except the base file:
+# appsettings.*.json
+
+# Ignore launchsettings.json which contains local debug environment variables
+Properties/launchSettings.json
