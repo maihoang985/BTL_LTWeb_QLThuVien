@@ -1,79 +1,132 @@
 ﻿@model Library_Manager.Models.TBanDoc
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới Bạn đọc";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Create</h1>
-    <h4>TBanDoc</h4>
-    <hr />
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới thông tin bạn đọc
+    </h1>
 
-                <div class="form-group">
-                    <label asp-for="MaBd" class="control-label">Mã bạn đọc</label>
-                    <input asp-for="MaBd" class="form-control" />
-                    <span asp-validation-for="MaBd" class="text-danger"></span>
-                </div>
+    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
+    <div class="card">
 
-                <div class="form-group">
-                    <label asp-for="HoDem" class="control-label">Họ Đệm</label>
-                    <input asp-for="HoDem" class="form-control" />
-                    <span asp-validation-for="HoDem" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Ten" class="control-label">Tên</label>
-                    <input asp-for="Ten" class="form-control" />
-                    <span asp-validation-for="Ten" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="NgaySinh" class="control-label">Ngày Sinh</label>
-                    <input asp-for="NgaySinh" class="form-control" type="date" />
-                    <span asp-validation-for="NgaySinh" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="GioiTinh" class="control-label">Giới Tính</label>
-                    <select asp-for="GioiTinh" class="form-control">
-                        <option value="M">Nam</option>
-                        <option value="F">Nữ</option>
-                    </select>
-                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="DiaChi" class="control-label">Địa Chỉ</label>
-                    <input asp-for="DiaChi" class="form-control" />
-                    <span asp-validation-for="DiaChi" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Sdt" class="control-label">Số Điện Thoại</label>
-                    <input asp-for="Sdt" class="form-control" />
-                    <span asp-validation-for="Sdt" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Email" class="control-label">Email</label>
-                    <input asp-for="Email" class="form-control" type="email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-3">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
-                </div>
-            </form>
+        @* HEADER CỦA CARD: Tiêu đề cố định *@
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Nhập thông tin bạn đọc mới</h5>
         </div>
-    </div>
-</div>
+
+        <form asp-action="Create">
+            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+            <div class="card-body">
+
+                @* Phần hiển thị lỗi tổng thể *@
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                @* TÁI CẤU TRÚC: CHIA BIỂU MẪU THÀNH 2 CỘT & CHIA NHÓM THÔNG TIN *@
+                <div class="row">
+
+                    @* --- CỘT 1: THÔNG TIN CÁ NHÂN (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-user me-1'></i> Thông tin cá nhân
+                        </h6>
+
+                        @* Mã Bạn đọc (KHÔNG HIDDEN trong Create) *@
+                        <div class="mb-3">
+                            <label for="MaBd" class="form-label">Mã Bạn đọc</label>
+                            <input asp-for="MaBd" class="form-control" />
+                            <span asp-validation-for="MaBd" class="text-danger"></span>
+                        </div>
+
+                        @* Họ Đệm *@
+                        <div class="mb-3">
+                            <label for="HoDem" class="form-label">Họ Đệm</label>
+                            <input asp-for="HoDem" class="form-control" />
+                            <span asp-validation-for="HoDem" class="text-danger"></span>
+                        </div>
+
+                        @* Tên *@
+                        <div class="mb-3">
+                            <label for="Ten" class="form-label">Tên</label>
+                            <input asp-for="Ten" class="form-control" />
+                            <span asp-validation-for="Ten" class="text-danger"></span>
+                        </div>
+
+                        @* Ngày Sinh (Sử dụng type="date") *@
+                        <div class="mb-3">
+                            <label for="NgaySinh" class="form-label">Ngày Sinh</label>
+                            <input asp-for="NgaySinh" class="form-control" type="date" title="Định dạng Ngày/Tháng/Năm" placeholder="dd/mm/yyyy" />
+                            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                        </div>
+
+                        @* Giới Tính (Sử dụng Select) *@
+                        <div class="mb-3">
+                            <label for="GioiTinh" class="form-label">Giới Tính</label>
+                            <select asp-for="GioiTinh" class="form-select">
+                                <option value="M">Nam</option>
+                                <option value="F">Nữ</option>
+                            </select>
+                            <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @* --- CỘT 2: THÔNG TIN LIÊN HỆ & ĐỊA CHỈ (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-phone me-1'></i> Thông tin liên hệ
+                        </h6>
+
+                        @* Địa Chỉ *@
+                        <div class="mb-3">
+                            <label for="DiaChi" class="form-label">Địa Chỉ</label>
+                            <input asp-for="DiaChi" class="form-control" />
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
+                        </div>
+
+                        @* Số Điện Thoại *@
+                        <div class="mb-3">
+                            <label for="Sdt" class="form-label">Số Điện Thoại</label>
+                            <input asp-for="Sdt" class="form-control" />
+                            <span asp-validation-for="Sdt" class="text-danger"></span>
+                        </div>
+
+                        @* Email *@
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div> @* End card-body *@
+
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex justify-content-start gap-3">
+                    @* Dùng justify-content-start vì chỉ có 2 nút * @
+                    
+                    @* NÚT TẠO MỚI *@
+                    <button type="submit" value="Create" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Tạo mới
+                    </button>
+
+                    @* NÚT QUAY LẠI DANH SÁCH *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div> @* End card *@
+</div> @* End container-xxl *@
 
 @section Scripts {
     @{
