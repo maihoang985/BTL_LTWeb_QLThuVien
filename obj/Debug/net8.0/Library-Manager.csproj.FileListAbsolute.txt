@@ -267,3 +267,4 @@ D:\Mai\nam_3\Ki_1\thiet_ke_web\btl\Library-Manager\bin\Debug\net8.0\runtimes\win
 D:\Mai\nam_3\Ki_1\thiet_ke_web\btl\Library-Manager\bin\Debug\net8.0\PagedList.Core.dll
 D:\Mai\nam_3\Ki_1\thiet_ke_web\btl\Library-Manager\bin\Debug\net8.0\PagedList.Core.Mvc.dll
 D:\Mai\nam_3\Ki_1\thiet_ke_web\btl\Library-Manager\obj\Debug\net8.0\Library-Manager.MvcApplicationPartsAssemblyInfo.cs
+D:\Mai\nam_3\Ki_1\thiet_ke_web\btl\Library-Manager\obj\Debug\net8.0\Library-Manager.sourcelink.json
