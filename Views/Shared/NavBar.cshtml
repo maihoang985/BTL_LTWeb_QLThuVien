@@ -12,111 +12,109 @@
     </div>
 
     @* <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse"> *@
-        <!-- Search -->
+    <!-- Search -->
         
-        <!-- /Search -->
-        @* <div> *@
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Place this tag where you want the button to render. -->
-            @* <li class="nav-item lh-1 me-3">
-                <a class="github-button"
-                   href="https://github.com/themeselection/sneat-html-admin-template-free"
-                   data-icon="octicon-star"
-                   data-size="large"
-                   data-show-count="true"
-                   aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
-            </li> *@
+    <!-- /Search -->
+    @* <div> *@
+    <ul class="navbar-nav flex-row align-items-center ms-auto">
+        <!-- Place this tag where you want the button to render. -->
+        @* <li class="nav-item lh-1 me-3">
+            <a class="github-button"
+                href="https://github.com/themeselection/sneat-html-admin-template-free"
+                data-icon="octicon-star"
+                data-size="large"
+                data-show-count="true"
+                aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
+        </li> *@
 
-            <!-- User -->
-           
-                <li class="nav-item navbar-dropdown dropdown-user dropdown me-3">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                        <img src="~/Assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 me-3">
-                                    <div class="avatar avatar-online">
-                                        <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <span class="fw-semibold d-block">John Doe</span>
-                                    <small class="text-muted">Admin</small>
+        <!-- Change Light/Dark Theme -->
+        <li class="nav-item me-3">
+            <div class="form-check form-switch d-flex ai-c" style="margin: 0; padding: 0;">
+                <label class="form-check-label me-2 text-nowrap c-grey-700" for="theme-toggle" style="font-size: 12px; margin-right: 8px;">
+                    <i class="bx bx-sun" style="margin-right: 4px;"></i><span class="theme-label">Light</span>
+                </label>
+                <input class="form-check-input" type="checkbox" id="theme-toggle" style="margin: 0;">
+                <label class="form-check-label ms-2 text-nowrap c-grey-700" for="theme-toggle" style="font-size: 12px; margin-left: 8px;">
+                    <span class="theme-label">Dark</span><i class="bx bx-moon" style="margin-left: 4px;"></i>
+                </label>
+            </div>
+        </li>
+        <!-- Change Light/Dark Theme -->
+
+        <!-- User -->
+        <li class="nav-item navbar-dropdown dropdown-user dropdown me-3">
+            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                <div class="avatar avatar-online">
+                    <img src="~/Assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar avatar-online">
+                                    <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
                                 </div>
                             </div>
-                        </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bx bx-user me-2"></i>
-                            <span class="align-middle">My Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bx bx-cog me-2"></i>
-                            <span class="align-middle">Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <span class="d-flex align-items-center align-middle">
-                                <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
-                                <span class="flex-grow-1 align-middle">Billing</span>
-                                <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="auth-login-basic.html">
-                            <i class="bx bx-power-off me-2"></i>
-                            @* <span class="align-middle">Log Out</span> *@
+                            <div class="flex-grow-1">
+                                <span class="fw-semibold d-block">John Doe</span>
+                                <small class="text-muted">Admin</small>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <div class="dropdown-divider"></div>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="bx bx-user me-2"></i>
+                        <span class="align-middle">My Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="bx bx-cog me-2"></i>
+                        <span class="align-middle">Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <span class="d-flex align-items-center align-middle">
+                            <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
+                            <span class="flex-grow-1 align-middle">Billing</span>
+                            <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <div class="dropdown-divider"></div>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="auth-login-basic.html">
+                        <i class="bx bx-power-off me-2"></i>
+                        @* <span class="align-middle">Log Out</span> *@
                           
-                           @*  <span class="align-middle">
-                                <a asp-controller="Account" asp-action="Logout">Log Out</a>
-                            </span> *@
+                        @*  <span class="align-middle">
+                            <a asp-controller="Account" asp-action="Logout">Log Out</a>
+                        </span> *@
 
-                            @* <form asp-controller="Account" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-link align-middle">
-                                    Log Out
-                                </button>
-                            </form> *@
-                            <span class="align-middle">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link p-0 m-0 align-middle">Log Out</button>
-                                </form>
-                            </span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-         
-            <!--/ User -->
-
-            <!-- Change Light/Dark Theme -->
-            <li class="nav-item me-3">
-                <div class="form-check form-switch d-flex ai-c" style="margin: 0; padding: 0;">
-                    <label class="form-check-label me-2 text-nowrap c-grey-700" for="theme-toggle" style="font-size: 12px; margin-right: 8px;">
-                        <i class="bx bx-sun" style="margin-right: 4px;"></i><span class="theme-label">Light</span>
-                    </label>
-                    <input class="form-check-input" type="checkbox" id="theme-toggle" style="margin: 0;">
-                    <label class="form-check-label ms-2 text-nowrap c-grey-700" for="theme-toggle" style="font-size: 12px; margin-left: 8px;">
-                        <span class="theme-label">Dark</span><i class="bx bx-moon" style="margin-left: 4px;"></i>
-                    </label>
-                </div>
-            </li>
-            <!-- Change Light/Dark Theme -->
+                        @* <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button type="submit" class="btn btn-link align-middle">
+                                Log Out
+                            </button>
+                        </form> *@
+                        <span class="align-middle">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-link p-0 m-0 align-middle">Log Out</button>
+                            </form>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!--/ User -->
     </ul>
     @* </div> *@
 </nav>
