@@ -6,6 +6,8 @@
 
 @{
     ViewData["Title"] = "Quản lý Bạn đọc"; // Tiêu đề trang
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLB");
 }
 
 @* ========================================================================
@@ -29,9 +31,9 @@
                 </div>
 
                 @* Nút Thêm mới - Cố định bên phải *@
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 ">
                     <p class="m-0">
-                        <a asp-action="Create" class="btn btn-primary text-nowrap">
+                        <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
                             <i class="bx bx-plus me-1"></i> Thêm Bạn đọc mới
                         </a>
                     </p>
@@ -82,21 +84,21 @@
 
                                     @* 1. Chi tiết (Details) *@
                                     <a asp-action="Details" asp-route-id="@item.MaBd"
-                                       class="btn btn-icon btn-label-info waves-effect"
+                                       class="btn btn-icon btn-label-info waves-effect "
                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
                                         <i class='bx bx-detail'></i>
                                     </a>
 
                                     @* 2. Sửa (Edit) *@
                                     <a asp-action="Edit" asp-route-id="@item.MaBd"
-                                       class="btn btn-icon btn-label-primary waves-effect"
+                                       class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
                                         <i class='bx bx-pencil'></i>
                                     </a>
 
                                     @* 3. Xóa (Delete) *@
                                     <a asp-action="Delete" asp-route-id="@item.MaBd"
-                                       class="btn btn-icon btn-label-danger waves-effect"
+                                       class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
                                         <i class='bx bx-trash'></i>
                                     </a>
