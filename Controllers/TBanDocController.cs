@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Library_Manager.Filters;
+using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using PagedList.Core; // Thêm dòng này
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Library_Manager.Models;
 using PagedList.Core;
 
 namespace Library_Manager.Controllers
 {
+    [Authorization("QTV,QLB,QLT,QLM")]
     public class TBanDocController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -56,6 +60,7 @@ namespace Library_Manager.Controllers
             return View(pagedBanDocs);
         }
 
+        //[Authorization("QLB")]
         // GET: TBanDoc/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -74,6 +79,7 @@ namespace Library_Manager.Controllers
             return View(tBanDoc);
         }
 
+        //[Authorization("QLB")]
         // GET: TBanDoc/Create
         public IActionResult Create()
         {
@@ -85,6 +91,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        //[Authorization("QLB")]
         public async Task<IActionResult> Create([Bind("MaBd,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email")] TBanDoc tBanDoc)
         {
             if (ModelState.IsValid)
@@ -96,6 +103,7 @@ namespace Library_Manager.Controllers
             return View(tBanDoc);
         }
 
+        //[Authorization("QLB")]
         // GET: TBanDoc/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -117,6 +125,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        //[Authorization("QLB")]
         public async Task<IActionResult> Edit(string id, [Bind("MaBd,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email")] TBanDoc tBanDoc)
         {
             if (id != tBanDoc.MaBd)
@@ -147,6 +156,7 @@ namespace Library_Manager.Controllers
             return View(tBanDoc);
         }
 
+        //[Authorization("QLB")]
         // GET: TBanDoc/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -168,6 +178,7 @@ namespace Library_Manager.Controllers
         // POST: TBanDoc/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        //[Authorization("QLB")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tBanDoc = await _context.TBanDocs.FindAsync(id);
