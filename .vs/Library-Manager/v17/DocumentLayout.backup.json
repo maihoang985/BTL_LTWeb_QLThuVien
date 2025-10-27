@@ -1,12 +1,71 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2C2D8D0B-5E72-4521-A1CF-B166FBBA2ED9}|Library-Manager.csproj|d:\\mai\\nam_3\\ki_1\\thiet_ke_web\\btl\\library-manager\\views\\thongke\\theothang.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C2D8D0B-5E72-4521-A1CF-B166FBBA2ED9}|Library-Manager.csproj|solutionrelative:views\\thongke\\theothang.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C2D8D0B-5E72-4521-A1CF-B166FBBA2ED9}|Library-Manager.csproj|d:\\mai\\nam_3\\ki_1\\thiet_ke_web\\btl\\library-manager\\controllers\\thongkecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C2D8D0B-5E72-4521-A1CF-B166FBBA2ED9}|Library-Manager.csproj|solutionrelative:controllers\\thongkecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C2D8D0B-5E72-4521-A1CF-B166FBBA2ED9}|Library-Manager.csproj|d:\\mai\\nam_3\\ki_1\\thiet_ke_web\\btl\\library-manager\\views\\shared\\sidebarmenu.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C2D8D0B-5E72-4521-A1CF-B166FBBA2ED9}|Library-Manager.csproj|solutionrelative:views\\shared\\sidebarmenu.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SideBarMenu.cshtml",
+              "DocumentMoniker": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Views\\Shared\\SideBarMenu.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\SideBarMenu.cshtml",
+              "ToolTip": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Views\\Shared\\SideBarMenu.cshtml",
+              "RelativeToolTip": "Views\\Shared\\SideBarMenu.cshtml",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAGIAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-25T13:24:39.776Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TheoThang.cshtml",
+              "DocumentMoniker": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Views\\ThongKe\\TheoThang.cshtml",
+              "RelativeDocumentMoniker": "Views\\ThongKe\\TheoThang.cshtml",
+              "ToolTip": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Views\\ThongKe\\TheoThang.cshtml",
+              "RelativeToolTip": "Views\\ThongKe\\TheoThang.cshtml",
+              "ViewState": "AgIAAHgAAAAAAAAAAAAAAIAAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-25T13:23:21.318Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ThongKeController.cs",
+              "DocumentMoniker": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Controllers\\ThongKeController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ThongKeController.cs",
+              "ToolTip": "D:\\Mai\\nam_3\\Ki_1\\thiet_ke_web\\btl\\Library-Manager\\Controllers\\ThongKeController.cs",
+              "RelativeToolTip": "Controllers\\ThongKeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T13:16:32.666Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
