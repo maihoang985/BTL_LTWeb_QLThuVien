@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Library_Manager.Models;
-using PagedList.Core; // Thêm dòng này
+using PagedList.Core;
 
 namespace Library_Manager.Controllers
 {
