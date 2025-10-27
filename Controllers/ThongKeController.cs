@@ -15,36 +15,34 @@ namespace Library_Manager.Controllers
         {
             _context = context;
         }
-        public IActionResult TheoThang()
+        //Hiển thị trang biểu đồ
+        public IActionResult LuotMuonTheoThang()
         {
+            // Mặc định lấy năm hiện tại để hiển thị ban đầu
+            int nam = DateTime.Now.Year;
+            ViewBag.Nam = nam;
             return View();
         }
 
-        // Action trả dữ liệu JSON cho chart
-        [HttpGet]
-        public async Task<JsonResult> GetMonthlyBorrowingData(int year)
+        //API: Lấy dữ liệu thống kê theo năm
+       [HttpGet]
+        public IActionResult GetLuotMuonTheoThang(int year)
         {
-            // Lấy dữ liệu từ database, nhóm theo tháng
-            var monthlyData = await _context.TGiaoDichMuonTras
+            var thongKe = _context.TGiaoDichMuonTras
                 .Where(g => g.NgayMuon.Year == year)
                 .GroupBy(g => g.NgayMuon.Month)
-                .Select(group => new
+                .Select(g => new
                 {
-                    Month = group.Key,
-                    Count = group.Count()
+                    Thang = g.Key,
+                    SoLuotMuon = g.Count()
                 })
-                .ToListAsync();
-
-            // Đảm bảo đủ 12 tháng (những tháng không có dữ liệu => Count = 0)
-            var chartData = Enumerable.Range(1, 12)
-                .Select(month => new
-                {
-                    Month = month,
-                    Count = monthlyData.FirstOrDefault(d => d.Month == month)?.Count ?? 0
-                })
+                .OrderBy(x => x.Thang)
                 .ToList();
 
-            return Json(chartData);
+            return Json(thongKe);
         }
+
+        
     }
 }
+
