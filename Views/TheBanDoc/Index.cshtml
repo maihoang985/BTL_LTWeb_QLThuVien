@@ -1,116 +1,129 @@
-﻿@* @model IEnumerable<Library_Manager.Models.TTheBanDoc>
+﻿@* ========================================================================
+    KHỐI 1: KHAI BÁO MODEL VÀ VIEWDATA
+    ======================================================================== *@
+@using PagedList.Core.Mvc
+@model PagedList.Core.IPagedList<Library_Manager.Models.TTheBanDoc>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý Thẻ Bạn đọc"; // Tiêu đề trang
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLB");
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NgayCap)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NgayHetHan)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TrangThai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MaBdNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NgayCap)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NgayHetHan)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrangThai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaBdNavigation.MaBd)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.MaTbd">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.MaTbd">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MaTbd">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
- *@
-
-@model IEnumerable<Library_Manager.Models.TTheBanDoc>
-
-@{
-    ViewData["Title"] = "Danh sách thẻ bạn đọc";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
+@* ========================================================================
+    KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Danh sách Thẻ Bạn Đọc</h1>
 
-    <p>
-        <a asp-action="Create" class="btn btn-primary mb-3">Tạo thẻ mới</a>
-    </p>
+    @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-id-card fa-border fs-1 me-2'></i> @ViewData["Title"]
+    </h1>
 
-    <div class="table-responsive-scroll">
-        <table class="table table-bordered table-striped text-nowrap">
-            <thead class="table-light">
-                <tr>
-                    <th>Mã Thẻ</th>
-                    <th>Tên Bạn Đọc</th>
-                    <th>Ngày Cấp</th>
-                    <th>Ngày Hết Hạn</th>
-                    <th>Trạng Thái</th>
-                    <th style="width: 150px;">Thao Tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    <div class="card">
+        @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
+        <div class="card-header border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+
+                @* Thanh Tìm kiếm (SearchBar Partial) - Chiếm phần lớn không gian *@
+                <div class="flex-grow-1 me-3">
+                    <partial name="SearchBar" />
+                </div>
+
+                @* Nút Thêm mới - Cố định bên phải *@
+                <div class="flex-shrink-0 ">
+                    <p class="m-0">
+                        <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
+                            <i class="bx bx-plus me-1"></i> Thêm Thẻ mới
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @* ========================================================================
+            KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
+            ======================================================================== *@
+        <div class="table-responsive">
+            <table class="table table-bordered text-nowrap table-hover" id="myTable">
+
+                @* --- PHẦN 3.1: TIÊU ĐỀ BẢNG (THEAD) --- *@
+                <thead id="myTableHead">
                     <tr>
-                        <td>@item.MaTbd</td>
+                        <th style="white-space: nowrap;">Mã Thẻ</th>
+                        <th style="white-space: nowrap;">Tên Bạn Đọc</th>
+                        <th>Ngày Cấp</th>
+                        <th>Ngày Hết Hạn</th>
+                        <th style="white-space: nowrap;">Trạng Thái</th>
+                        <th style="min-width: 120px;">Hành động</th>
+                    </tr>
+                </thead>
 
-                        @* Lấy tên bạn đọc từ khóa ngoại *@
-                        <td>
-                            @(item.MaBdNavigation != null
-                                                    ? item.MaBdNavigation.HoDem + " " + item.MaBdNavigation.Ten
-                                                    : "(Không có thông tin)")
-                    </td>
-
+                @* --- PHẦN 3.2: NỘI DUNG BẢNG (TBODY) --- *@
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="white-space: nowrap;">@Html.DisplayFor(modelItem => item.MaTbd)</td>
+                            <td style="white-space: nowrap;">
+                                @(item.MaBdNavigation != null
+                                                            ? item.MaBdNavigation.HoDem + " " + item.MaBdNavigation.Ten
+                                                            : "(Không có thông tin)")
+                        </td>
                         <td>@item.NgayCap.ToString("dd/MM/yyyy")</td>
                         <td>@item.NgayHetHan?.ToString("dd/MM/yyyy")</td>
-                        <td>@item.TrangThai</td>
+                        <td style="white-space: nowrap;">
+                            @{
+                                    var trangThai = item.TrangThai; // Giả sử TrangThai là string
+                                    var badgeClass = "bg-label-secondary"; // Mặc định
 
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.MaTbd">Sửa</a> |
-                            @*< a asp-action="Details" asp-route-id="@item.MaTbd">Chi tiết</a> | *@
-                            <a asp-controller="TBanDoc"
-                               asp-action="Details"
-                               asp-route-id="@item.MaBd">
-                                Chi tiết bạn đọc
-                            </a> |
-
-                            <a asp-action="Delete" asp-route-id="@item.MaTbd">Xóa</a>
-                        </td>
-                    </tr>
+                                    if (trangThai == "Hoạt động" || trangThai == "Còn hạn")
+                                    {
+                                        badgeClass = "bg-label-success";
+                                    }
+                                    else if (trangThai == "Đã khóa" || trangThai == "Hết hạn")
+                                    {
+                                        badgeClass = "bg-label-danger";
+                                    }
                                 }
-            </tbody>
-        </table>
+                                <span class="badge @badgeClass">
+                                    @trangThai
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex w-100 justify-content-around">
+
+                                    @* 1. Chi tiết Bạn đọc (Link to TBanDoc) *@
+                                    <a asp-controller="TBanDoc" asp-action="Details" asp-route-id="@item.MaBd"
+                                       class="btn btn-icon btn-label-info waves-effect "
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết Bạn đọc">
+                                        <i class='bx bx-user'></i>
+                                    </a>
+
+                                    @* 2. Sửa Thẻ (Edit TTheBanDoc) *@
+                                    <a asp-action="Edit" asp-route-id="@item.MaTbd"
+                                       class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa thẻ">
+                                        <i class='bx bx-pencil'></i>
+                                    </a>
+
+                                    @* 3. Xóa Thẻ (Delete TTheBanDoc) *@
+                                    <a asp-action="Delete" asp-route-id="@item.MaTbd"
+                                       class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa thẻ">
+                                        <i class='bx bx-trash'></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @* --- PHẦN 3.3: PHÂN TRANG (PAGINATION) --- *@
+        <div class="card-footer pt-0">
+            <partial name="_Pagination" />
+        </div>
     </div>
 </div>
