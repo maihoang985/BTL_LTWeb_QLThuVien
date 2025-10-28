@@ -127,9 +127,25 @@
                 </a>
 
                 @* Nút Quay lại *@
-                <a asp-action="Index" class="btn btn-secondary">
+                <div>
+                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        // Nếu có returnUrl, quay lại trang đó
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                        </a>
+                    }
+                    else
+                    {
+                        // Nếu không, quay về trang Index mặc định của BanDoc
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                            </a>
+                    }
+                </div>
+                @* <a asp-action="Index" class="btn btn-secondary">
                     <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                </a>
+                </a> *@
             </div>
         </div>
 

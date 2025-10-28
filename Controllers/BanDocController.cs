@@ -62,7 +62,7 @@ namespace Library_Manager.Controllers
 
         //[Authorization("QLB")]
         // GET: TBanDoc/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null)
             {
@@ -75,6 +75,9 @@ namespace Library_Manager.Controllers
             {
                 return NotFound();
             }
+
+            // Dùng ViewBag hoặc ViewData để truyền returnUrl sang View
+            ViewBag.ReturnUrl = returnUrl;
 
             return View(tBanDoc);
         }
