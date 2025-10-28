@@ -1,7 +1,8 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+﻿@*
+    Đây là Partial View (_Pagination.cshtml) dùng để hiển thị thanh phân trang
+    cho Model dạng PagedList.Core.IPagedList<T>.
 *@
+@model PagedList.Core.IPagedList
 
 <div class="d-flex justify-content-between align-items-center mt-3">
     <nav aria-label="Page navigation">
@@ -11,6 +12,7 @@
                 var currentAction = ViewContext.RouteData.Values["action"].ToString();
             }
 
+            @* Nút Previous *@
             <li class="page-item @(Model.IsFirstPage ? "disabled" : "")">
                 <a class="page-link"
                    href="@Url.Action(currentAction, new { page = Model.PageNumber - 1 })"
@@ -19,6 +21,7 @@
                 </a>
             </li>
 
+            @* Các trang số *@
             @for (int i = 1; i <= Model.PageCount; i++)
             {
                 <li class="page-item @(i == Model.PageNumber ? "active" : "")">
@@ -29,6 +32,7 @@
                 </li>
             }
 
+            @* Nút Next *@
             <li class="page-item @(Model.IsLastPage ? "disabled" : "")">
                 <a class="page-link"
                    href="@Url.Action(currentAction, new { page = Model.PageNumber + 1 })"
@@ -38,4 +42,10 @@
             </li>
         </ul>
     </nav>
+
+    @* Hiển thị thông tin trang (Tùy chọn) *@
+    <div class="text-muted d-none d-sm-block">
+        Trang @Model.PageNumber / @Model.PageCount
+        (@Model.TotalItemCount mục)
+    </div>
 </div>
