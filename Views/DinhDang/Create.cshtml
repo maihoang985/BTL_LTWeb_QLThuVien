@@ -1,40 +1,75 @@
 ﻿@model Library_Manager.Models.TDinhDang
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới Định dạng";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Create</h1>
-    <h4>TDinhDang</h4>
-    <hr />
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới thông tin Định dạng
+    </h1>
 
-                <div class="form-group">
-                    <label asp-for="MaDd" class="control-label">Mã định dạng</label>
-                    <input asp-for="MaDd" class="form-control" />
-                    <span asp-validation-for="MaDd" class="text-danger"></span>
-                </div>
+    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
+    <div class="card">
 
-                <div class="form-group">
-                    <label asp-for="TenDd" class="control-label">Tên định dạng</label>
-                    <input asp-for="TenDd" class="form-control" />
-                    <span asp-validation-for="TenDd" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-3">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
-                </div>
-            </form>
+        @* HEADER CỦA CARD: Tiêu đề cố định *@
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Nhập thông tin Định dạng mới</h5>
         </div>
-    </div>
-</div>
+
+        <form asp-action="Create">
+            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+            <div class="card-body">
+
+                @* Phần hiển thị lỗi tổng thể *@
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                <div class="row">
+                    @* Định dạng chỉ có MaDd và TenDd, nên ta chỉ cần 1 cột *@
+                    <div class="col-md-6 pt-3">
+
+                        @* Mã Định dạng *@
+                        <div class="mb-3">
+                            <label asp-for="MaDd" class="form-label">Mã Định dạng</label>
+                            <input asp-for="MaDd" class="form-control" />
+                            <span asp-validation-for="MaDd" class="text-danger"></span>
+                        </div>
+
+                        @* Tên Định dạng *@
+                        <div class="mb-3">
+                            <label asp-for="TenDd" class="form-label">Tên Định dạng</label>
+                            <input asp-for="TenDd" class="form-control" />
+                            <span asp-validation-for="TenDd" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div> @* End card-body *@
+
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex justify-content-start gap-3">
+
+                    @* NÚT TẠO MỚI *@
+                    <button type="submit" value="Create" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Tạo mới
+                    </button>
+
+                    @* NÚT QUAY LẠI DANH SÁCH *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div> @* End card *@
+</div> @* End container-xxl *@
 
 @section Scripts {
     @{

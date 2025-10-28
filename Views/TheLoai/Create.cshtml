@@ -1,40 +1,74 @@
 ﻿@model Library_Manager.Models.TTheLoai
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới Thể loại";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Thêm thể loại</h1>
-    <h4>TTheLoai</h4>
-    <hr />
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới thông tin Thể loại
+    </h1>
 
-                <div class="form-group">
-                    <label asp-for="MaThL" class="control-label">Mã thể loại</label>
-                    <input asp-for="MaThL" class="form-control" />
-                    <span asp-validation-for="MaThL" class="text-danger"></span>
-                </div>
+    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
+    <div class="card">
 
-                <div class="form-group">
-                    <label asp-for="TenThL" class="control-label">Tên thể loại</label>
-                    <input asp-for="TenThL" class="form-control" />
-                    <span asp-validation-for="TenThL" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-3">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
-                </div>
-            </form>
+        @* HEADER CỦA CARD: Tiêu đề cố định *@
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Nhập thông tin Thể loại mới</h5>
         </div>
-    </div>
-</div>
+
+        <form asp-action="Create">
+            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+            <div class="card-body">
+
+                @* Phần hiển thị lỗi tổng thể *@
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                <div class="row">
+                    <div class="col-md-6 pt-3">
+
+                        @* Mã Thể loại *@
+                        <div class="mb-3">
+                            <label asp-for="MaThL" class="form-label">Mã Thể loại</label>
+                            <input asp-for="MaThL" class="form-control" />
+                            <span asp-validation-for="MaThL" class="text-danger"></span>
+                        </div>
+
+                        @* Tên Thể loại *@
+                        <div class="mb-3">
+                            <label asp-for="TenThL" class="form-label">Tên Thể loại</label>
+                            <input asp-for="TenThL" class="form-control" />
+                            <span asp-validation-for="TenThL" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div> @* End card-body *@
+
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex justify-content-start gap-3">
+
+                    @* NÚT TẠO MỚI *@
+                    <button type="submit" value="Create" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Tạo mới
+                    </button>
+
+                    @* NÚT QUAY LẠI DANH SÁCH *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div> @* End card *@
+</div> @* End container-xxl *@
 
 @section Scripts {
     @{

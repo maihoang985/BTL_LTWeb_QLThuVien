@@ -1,31 +1,60 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+﻿@*     PARTIAL VIEW: _DanhMuc.cshtml
+    Chức năng: Cung cấp menu Tabs chuyển đổi giữa các Controller quản lý danh mục.
 *@
 
 @{
-    // Lấy controller hiện tại (để đánh dấu mục đang được chọn)
-    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    // Lấy controller hiện tại (để đánh dấu mục đang được chọn)
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    // Đảm bảo Controller hiện tại được in hoa chữ cái đầu tiên (ví dụ: dinhdang -> DinhDang)
+    if (!string.IsNullOrEmpty(currentController))
+    {
+        currentController = char.ToUpper(currentController[0]) + currentController.Substring(1);
+    }
+
+    // Danh sách các Controller, tên hiển thị và Icon tương ứng
+    var categories = new List<(string Value, string DisplayName, string IconClass)>
+  {
+    ("TacGia", "Tác giả", "bx-pen"),
+    ("NhaXuatBan", "Nhà xuất bản", "bx-buildings"),
+    ("NgonNgu", "Ngôn ngữ", "bx-globe"),
+    ("TheLoai", "Thể loại", "bx-book-bookmark"),
+    ("DinhDang", "Định dạng", "bx-tag-alt")
+  };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Danh mục</h2>
+@* Sử dụng cấu trúc Card bao ngoài Nav-Pills để tạo khối điều hướng nổi bật *@
+<div class="card mb-4">
+    @* Sử dụng card-header để làm tiêu đề khối *@
+    <div class="card-header border-bottom pb-3">
+        <h5 class="m-0 text-dark">Danh mục quản lý nhanh</h5>
+    </div>
 
-    <form method="get" id="categoryForm" class="d-flex">
-        <select class="form-select me-2" onchange="onCategoryChange(this)">
-            <option value="TacGia" selected="@(currentController == "TacGia")">Tác giả</option>
-            <option value="NhaXuatBan" selected="@(currentController == "NhaXuatBan")">Nhà xuất bản</option>
-            <option value="NgonNgu" selected="@(currentController == "NgonNgu")">Ngôn ngữ</option>
-            <option value="TheLoai" selected="@(currentController == "TheLoai")">Thể loại</option>
-            <option value="DinhDang" selected="@(currentController == "DinhDang")">Định dạng</option>
-        </select>
-    </form>
+    @* Đặt Nav-Pills vào card-body để có padding chuẩn *@
+    <div class="card-body pt-3 pb-2">
+        @* ĐIỀU CHỈNH: Đã thêm lại nav-fill và loại bỏ justify-content-center *@
+        <ul class="nav nav-pills nav-fill flex-wrap" role="tablist">
+            @foreach (var category in categories)
+            {
+                var isActive = (currentController == category.Value) ? "active" : "";
+                var linkUrl = $"/{category.Value}/Index";
+
+                @* ĐIỀU CHỈNH: Sử dụng mx-1 để tạo khoảng cách nhỏ giữa các pill 
+                   và căn chỉnh margin/padding của nav-item. *@
+                <li class="nav-item mx-1 mb-1">
+                    <a href="@linkUrl"
+                       class="nav-link @isActive"
+                       role="tab"
+                       aria-selected="@(currentController == category.Value ? "true" : "false")">
+
+                        <span class="d-none d-sm-inline-flex align-items-center">
+                            <i class='icon-base bx @category.IconClass icon-sm me-2'></i>@category.DisplayName
+                        </span>
+
+                        @* Chỉ hiển thị icon cho màn hình nhỏ (mobile) *@
+                        <i class='icon-base bx @category.IconClass icon-sm d-sm-none'></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
 </div>
-
-<script>
-    function onCategoryChange(select) {
-        const value = select.value;
-        // Chuyển hướng đến trang Index của controller tương ứng
-        window.location.href = `/${value}/Index`;
-    }
-</script>

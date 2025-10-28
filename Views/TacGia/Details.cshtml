@@ -1,41 +1,87 @@
 ﻿@model Library_Manager.Models.TTacGia
 
 @{
-    ViewData["Title"] = "Details";
+    // Tiêu đề trang, sử dụng Họ tên Tác giả để hiển thị
+    ViewData["Title"] = "Chi tiết Tác giả: " + Model.HoDem + " " + Model.Ten;
+
+    // Logic kiểm tra quyền chỉnh sửa/xóa (Giả định QTV/QLS có quyền)
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLS");
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Chi tiết tác giả</h1>
 
-    <div>
-        <h4>TTacGia</h4>
-        <hr />
-        <dl class="row">
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.MaTg)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.MaTg)
-            </dd>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-detail bxs-pen fs-2 me-2'></i> Chi tiết Tác giả
+    </h1>
 
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.HoDem)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.HoDem)
-            </dd>
+    @* --- KHỐI: CARD BAO QUANH DỮ LIỆU --- *@
+    <div class="card">
 
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Ten)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Ten)
-            </dd>
-        </dl>
-    </div>
+        @* HEADER CỦA CARD: Hiển thị Họ tên Tác giả và Mã TG *@
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                Thông tin chi tiết của <span class="text-primary fw-bold">@Model.HoDem @Model.Ten</span>
+            </h5>
+            <small class="text-muted">Mã TG: <span class="fw-bold">@Model.MaTg</span></small>
+        </div>
 
-    <div>
-        <a asp-action="Edit" asp-route-id="@Model?.MaTg" class="btn btn-primary">Edit</a>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+        @* BODY CỦA CARD: CHIA THÀNH CÁC PHẦN DÙNG GRID (Gọn gàng 2 cột) *@
+        <div class="card-body">
+
+            @* === 1. THÔNG TIN CƠ BẢN === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-user me-1'></i> Thông tin Tác giả
+            </h6>
+            <div class="row mb-4">
+
+                @* Cột 1 *@
+                <div class="col-md-6">
+                    @* Mã Tác giả *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Mã Tác giả</label>
+                        <p class="text-primary fw-bold mb-0">@Model.MaTg</p>
+                    </div>
+
+                    @* Họ Đệm *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Họ Đệm</label>
+                        <p class="fw-semibold mb-0">@Model.HoDem</p>
+                    </div>
+                </div>
+
+                @* Cột 2 *@
+                <div class="col-md-6">
+                    @* Tên *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Tên</label>
+                        <p class="fw-semibold mb-0">@Model.Ten</p>
+                    </div>
+
+                    @* (Có thể thêm thông tin khác như Ngày sinh, Quê quán nếu có) *@
+                </div>
+            </div>
+
+        </div>
+
+        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
+        <div class="card-footer border-top pt-3">
+            <div class="d-flex gap-3">
+                @* Nút Sửa *@
+                <a asp-action="Edit" asp-route-id="@Model?.MaTg" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
+                </a>
+
+                @* Nút Quay lại *@
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
