@@ -14,11 +14,11 @@ using PagedList.Core;
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
-    public class TBanDocController : Controller
+    public class BanDocController : Controller
     {
         private readonly QlthuVienContext _context;
 
-        public TBanDocController(QlthuVienContext context)
+        public BanDocController(QlthuVienContext context)
         {
             _context = context;
         }
