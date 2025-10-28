@@ -1,38 +1,79 @@
 ﻿@model Library_Manager.Models.TNgonNgu
 
 @{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Đặt tiêu đề cho trang
+    ViewData["Title"] = "Chỉnh sửa Ngôn ngữ: " + Model.TenNn;
+
+    // Logic kiểm tra quyền chỉnh sửa (Giả định QTV/QLS có quyền)
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLS");
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Edit</h1>
 
-    <h4>TNgonNgu</h4>
-    <hr />
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-pencil fs-2 me-2'></i> Chỉnh sửa Ngôn ngữ
+    </h1>
+
+    @* --- KHỐI: CARD BAO QUANH FORM --- *@
+    <div class="card">
+
+        @* HEADER CỦA CARD: Hiển thị tên Ngôn ngữ đang chỉnh sửa *@
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                Chỉnh sửa thông tin Ngôn ngữ: <span class="text-primary fw-bold">@Model.TenNn</span>
+            </h5>
+            <small class="text-muted">Mã NN: <span class="fw-bold">@Model.MaNn</span></small>
+        </div>
+
+        @* FORM BẮT ĐẦU *@
+        <form asp-action="Edit">
+            @* BODY CỦA CARD: CHỨA CÁC TRƯỜNG DỮ LIỆU *@
+            <div class="card-body">
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                @* Mã NN được lưu dưới dạng Hidden Field *@
                 <input type="hidden" asp-for="MaNn" />
 
-                <div class="form-group">
-                    <label asp-for="TenNn" class="control-label"></label>
-                    <input asp-for="TenNn" class="form-control" />
-                    <span asp-validation-for="TenNn" class="text-danger"></span>
+                <div class="row">
+                    @* Chỉ có một trường TenNn *@
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="TenNn" class="form-label">Tên Ngôn ngữ</label>
+                            <input asp-for="TenNn" class="form-control" />
+                            <span asp-validation-for="TenNn" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group mt-3">
-                    <input type="submit" value="Save" class="btn btn-primary me-2" />
-                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+
+            @* FOOTER CỦA CARD: Chứa các nút Hành động *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex gap-3">
+                    @* Nút Lưu *@
+                    <button type="submit" value="Save" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                        <i class="bx bx-save me-1"></i> Lưu thay đổi
+                    </button>
+
+                    @* Nút Quay lại *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 @section Scripts {
     @{
+        // Đảm bảo Validation Script được render
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
