@@ -1,46 +1,104 @@
 ﻿@model Library_Manager.Models.TBanSao
 
 @{
-    ViewData["Title"] = "Tạo bản sao";
+    ViewData["Title"] = "Tạo mới Bản sao";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Tạo bản sao</h1>
 
-    <h4>Thông tin bản sao</h4>
-    <hr />
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới Bản sao
+    </h1>
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
+    <div class="card">
 
-                <div class="form-group">
-                    <label asp-for="MaBs" class="control-label">Mã bản sao</label>
-                    <input asp-for="MaBs" class="form-control" />
-                    <span asp-validation-for="MaBs" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="MaTl" class="control-label">Mã tài liệu</label>
-                    <select asp-for="MaTl" class="form-control" asp-items="ViewBag.MaTl"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="TinhTrang" class="control-label">Tình trạng</label>
-                    <input asp-for="TinhTrang" class="form-control" />
-                    <span asp-validation-for="TinhTrang" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-3">
-                    <input type="submit" value="Tạo mới" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
-                </div>
-            </form>
+        @* HEADER CỦA CARD: Tiêu đề cố định *@
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Nhập thông tin bản sao mới</h5>
         </div>
-    </div>
-</div>
+
+        <form asp-action="Create">
+            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+            <div class="card-body">
+
+                @* Phần hiển thị lỗi tổng thể *@
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                @* TÁI CẤU TRÚC: CHIA BIỂU MẪU THÀNH 2 CỘT *@
+                <div class="row">
+
+                    @* --- CỘT 1: THÔNG TIN BẢN SAO (Mã & Tình trạng) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-copy me-1'></i> Thông tin Bản sao
+                        </h6>
+
+                        @* Mã Bản sao *@
+                        <div class="mb-3">
+                            <label asp-for="MaBs" class="form-label">Mã Bản sao (Nếu tự động, có thể ẩn)</label>
+                            <input asp-for="MaBs" class="form-control" />
+                            <span asp-validation-for="MaBs" class="text-danger"></span>
+                        </div>
+
+                        @* Tình trạng (Select với các giá trị cố định) *@
+                        <div class="mb-3">
+                            <label asp-for="TinhTrang" class="form-label">Tình trạng</label>
+                            <select asp-for="TinhTrang" class="form-select">
+                                <option value="Có sẵn">Có sẵn</option>
+                                <option value="Đang mượn">Đang mượn</option>
+                                <option value="Hỏng">Hỏng</option>
+                                <option value="Thất lạc">Thất lạc</option>
+                            </select>
+                            <span asp-validation-for="TinhTrang" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @* --- CỘT 2: TÀI LIỆU GỐC --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-book me-1'></i> Liên kết Tài liệu
+                        </h6>
+
+                        @* Mã Tài liệu (Select) *@
+                        <div class="mb-3">
+                            <label asp-for="MaTl" class="form-label">Chọn Tài liệu gốc</label>
+                            <select asp-for="MaTl" class="form-select" asp-items="ViewBag.MaTl">
+                                <option value="">-- Chọn Tài liệu --</option>
+                            </select>
+                            <span asp-validation-for="MaTl" class="text-danger"></span>
+                        </div>
+
+                        <p class="text-muted fst-italic mt-4">
+                            Lưu ý: Nếu bạn tạo bản sao từ trang Chi tiết Tài liệu, Mã Tài liệu có thể đã được điền sẵn.
+                        </p>
+                    </div>
+                </div>
+            </div> @* End card-body *@
+
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex justify-content-start gap-3">
+
+                    @* NÚT TẠO MỚI *@
+                    <button type="submit" value="Create" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Tạo Bản sao
+                    </button>
+
+                    @* NÚT QUAY LẠI DANH SÁCH *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div> @* End card *@
+</div> @* End container-xxl *@
 
 @section Scripts {
     @{
