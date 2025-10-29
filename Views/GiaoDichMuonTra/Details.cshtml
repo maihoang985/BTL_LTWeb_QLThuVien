@@ -132,14 +132,23 @@
                 <div class="col-md-6">
                     @* Nhân viên xử lý *@
                     <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Nhân viên xử lý (Tài khoản)</label>
+                        <label class="form-label d-block text-secondary">Nhân viên xử lý</label>
                         <p class="mb-0">
-                            @Model.MaTk
+                            @* @Model.MaTk *@
+                            @(Model.MaTkNavigation?.MaNvNavigation != null ?
+                                                        (Model.MaTkNavigation.MaNvNavigation.HoDem + " " + Model.MaTkNavigation.MaNvNavigation.Ten) :
+                                                        "(Không rõ)")
                             @* Link to Staff Account *@
-                            <a asp-controller="TaiKhoan" asp-action="Details" asp-route-id="@Model.MaTk"
-                               class="btn btn-xs btn-outline-secondary ms-2" title="Xem chi tiết Tài khoản">
-                                <i class="bx bx-user-circle"></i>
-                            </a>
+                            @if (Model.MaTkNavigation?.MaNv != null)
+                            {
+                                <a asp-controller="NhanVien" 
+                                asp-action="Details" 
+                                asp-route-id="@Model.MaTkNavigation.MaNv"
+                                asp-route-returnUrl="@Context.Request.Path"
+                                class="btn btn-xs btn-outline-secondary ms-2" title="Xem chi tiết Nhân viên">
+                                    <i class="bx bx-user-circle"></i>
+                                </a>
+                            }
                         </p>
                     </div>
                 </div>
