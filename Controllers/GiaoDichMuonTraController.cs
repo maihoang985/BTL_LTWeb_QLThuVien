@@ -29,7 +29,8 @@ namespace Library_Manager.Controllers
 
             // 1. Giữ ở dạng IQueryable, include các navigation property
             IQueryable<TGiaoDichMuonTra> giaoDiches = _context.TGiaoDichMuonTras
-                .Include(t => t.MaTbdNavigation)
+                .Include(t => t.MaTbdNavigation)    
+                    .ThenInclude(TheBanDocController => TheBanDocController.MaBdNavigation)
                 .Include(t => t.MaTkNavigation);
 
             // 2. Nếu có tìm kiếm theo Mã giao dịch hoặc Mã bạn đọc
@@ -65,6 +66,7 @@ namespace Library_Manager.Controllers
 
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras
                 .Include(t => t.MaTbdNavigation)
+                    .ThenInclude(TheBanDocController => TheBanDocController.MaBdNavigation)
                 .Include(t => t.MaTkNavigation)
                 .FirstOrDefaultAsync(m => m.MaGd == id);
             if (tGiaoDichMuonTra == null)
