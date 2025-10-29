@@ -1,162 +1,161 @@
-﻿@* @model Library_Manager.Models.TTaiLieu
+﻿@model Library_Manager.Models.TTaiLieu
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới Tài liệu";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
+<div class="container-xxl flex-grow-1 container-p-y">
 
-<h4>TTaiLieu</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới thông tin Tài liệu
+    </h1>
+
+    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
+    <div class="card">
+
+        @* HEADER CỦA CARD: Tiêu đề cố định *@
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Nhập thông tin tài liệu mới</h5>
+        </div>
+
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="MaTl" class="control-label"></label>
-                <input asp-for="MaTl" class="form-control" />
-                <span asp-validation-for="MaTl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaNxb" class="control-label"></label>
-                <select asp-for="MaNxb" class ="form-control" asp-items="ViewBag.MaNxb"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaNn" class="control-label"></label>
-                <select asp-for="MaNn" class ="form-control" asp-items="ViewBag.MaNn"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaThL" class="control-label"></label>
-                <select asp-for="MaThL" class ="form-control" asp-items="ViewBag.MaThL"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaDd" class="control-label"></label>
-                <select asp-for="MaDd" class ="form-control" asp-items="ViewBag.MaDd"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TenTl" class="control-label"></label>
-                <input asp-for="TenTl" class="form-control" />
-                <span asp-validation-for="TenTl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LanXuatBan" class="control-label"></label>
-                <input asp-for="LanXuatBan" class="form-control" />
-                <span asp-validation-for="LanXuatBan" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NamXuatBan" class="control-label"></label>
-                <input asp-for="NamXuatBan" class="form-control" />
-                <span asp-validation-for="NamXuatBan" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SoTrang" class="control-label"></label>
-                <input asp-for="SoTrang" class="form-control" />
-                <span asp-validation-for="SoTrang" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="KhoCo" class="control-label"></label>
-                <input asp-for="KhoCo" class="form-control" />
-                <span asp-validation-for="KhoCo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+            <div class="card-body">
+
+                @* Phần hiển thị lỗi tổng thể *@
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                @* TÁI CẤU TRÚC: CHIA BIỂU MẪU THÀNH 2 CỘT & CHIA NHÓM THÔNG TIN *@
+                <div class="row">
+
+                    @* --- CỘT 1: THÔNG TIN CƠ BẢN & XUẤT BẢN (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-book me-1'></i> Thông tin cơ bản
+                        </h6>
+
+                        @* Mã Tài liệu *@
+                        <div class="mb-3">
+                            <label asp-for="MaTl" class="form-label">Mã Tài liệu</label>
+                            <input asp-for="MaTl" class="form-control" />
+                            <span asp-validation-for="MaTl" class="text-danger"></span>
+                        </div>
+
+                        @* Tên Tài liệu *@
+                        <div class="mb-3">
+                            <label asp-for="TenTl" class="form-label">Tên Tài liệu</label>
+                            <input asp-for="TenTl" class="form-control" />
+                            <span asp-validation-for="TenTl" class="text-danger"></span>
+                        </div>
+
+                        @* Nhà xuất bản (Select) *@
+                        <div class="mb-3">
+                            <label asp-for="MaNxb" class="form-label">Nhà xuất bản</label>
+                            <select asp-for="MaNxb" class="form-select" asp-items="ViewBag.MaNxb">
+                                <option value="">-- Chọn Nhà xuất bản --</option>
+                            </select>
+                            <span asp-validation-for="MaNxb" class="text-danger"></span>
+                        </div>
+
+                        @* Lần Xuất bản *@
+                        <div class="mb-3">
+                            <label asp-for="LanXuatBan" class="form-label">Lần Xuất bản</label>
+                            <input asp-for="LanXuatBan" class="form-control" type="number" />
+                            <span asp-validation-for="LanXuatBan" class="text-danger"></span>
+                        </div>
+
+                        @* Năm Xuất bản *@
+                        <div class="mb-3">
+                            <label asp-for="NamXuatBan" class="form-label">Năm Xuất bản</label>
+                            <input asp-for="NamXuatBan" class="form-control" type="number" />
+                            <span asp-validation-for="NamXuatBan" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @* --- CỘT 2: PHÂN LOẠI & KÍCH THƯỚC (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-category me-1'></i> Phân loại & Kích thước
+                        </h6>
+
+                        @* Thể loại (Select) *@
+                        <div class="mb-3">
+                            <label asp-for="MaThL" class="form-label">Thể loại</label>
+                            <select asp-for="MaThL" class="form-select" asp-items="ViewBag.MaThL">
+                                <option value="">-- Chọn Thể loại --</option>
+                            </select>
+                            <span asp-validation-for="MaThL" class="text-danger"></span>
+                        </div>
+
+                        @* Ngôn ngữ (Select) *@
+                        <div class="mb-3">
+                            <label asp-for="MaNn" class="form-label">Ngôn ngữ</label>
+                            <select asp-for="MaNn" class="form-select" asp-items="ViewBag.MaNn">
+                                <option value="">-- Chọn Ngôn ngữ --</option>
+                            </select>
+                            <span asp-validation-for="MaNn" class="text-danger"></span>
+                        </div>
+
+                        @* Định dạng (MaDd) (Select) *@
+                        <div class="mb-3">
+                            <label asp-for="MaDd" class="form-label">Định dạng</label>
+                            <select asp-for="MaDd" class="form-select" asp-items="ViewBag.MaDd">
+                                <option value="">-- Chọn Định dạng --</option>
+                            </select>
+                            <span asp-validation-for="MaDd" class="text-danger"></span>
+                        </div>
+
+                        @* Số Trang *@
+                        <div class="mb-3">
+                            <label asp-for="SoTrang" class="form-label">Số Trang</label>
+                            <input asp-for="SoTrang" class="form-control" type="number" />
+                            <span asp-validation-for="SoTrang" class="text-danger"></span>
+                        </div>
+
+                        @* Khổ cỡ *@
+                        <div class="mb-3">
+                            <label asp-for="KhoCo" class="form-label">Khổ cỡ</label>
+                            <input asp-for="KhoCo" class="form-control" />
+                            <span asp-validation-for="KhoCo" class="text-danger"></span>
+                        </div>
+
+                        @* Tài khoản tạo (MaTk) *@
+                        @* Trong Create, MaTk thường được điền tự động hoặc là hidden field, 
+                           nhưng tôi giữ lại input và select để dễ kiểm tra nếu cần nhập tay *@
+                        <div class="mb-3">
+                            <label asp-for="MaTk" class="form-label">Tài khoản tạo (Người quản lý)</label>
+                            <select asp-for="MaTk" class="form-select" asp-items="ViewBag.MaTk">
+                                <option value="">-- Chọn Tài khoản --</option>
+                            </select>
+                            <span asp-validation-for="MaTk" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div> @* End card-body *@
+
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
+            <div class="card-footer border-top pt-3">
+                <div class="d-flex justify-content-start gap-3">
+
+                    @* NÚT TẠO MỚI *@
+                    <button type="submit" value="Create" class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i> Tạo mới
+                    </button>
+
+                    @* NÚT QUAY LẠI DANH SÁCH *@
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+                </div>
             </div>
         </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
- *@
-
-@model Library_Manager.Models.TTaiLieu
-
-@{
-    ViewData["Title"] = "Tạo tài liệu";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<div class="container-xxl flex-grow-1 container-p-y">
-    <h1>Tạo tài liệu</h1>
-
-    <h4>Thông tin tài liệu</h4>
-    <hr />
-
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                <div class="form-group">
-                    <label asp-for="MaTl" class="control-label">Mã tài liệu</label>
-                    <input asp-for="MaTl" class="form-control" />
-                    <span asp-validation-for="MaTl" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="TenTl" class="control-label">Tên tài liệu</label>
-                    <input asp-for="TenTl" class="form-control" />
-                    <span asp-validation-for="TenTl" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="MaNxb" class="control-label">Nhà xuất bản</label>
-                    <select asp-for="MaNxb" class="form-control" asp-items="ViewBag.MaNxb"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="MaNn" class="control-label">Ngôn ngữ</label>
-                    <select asp-for="MaNn" class="form-control" asp-items="ViewBag.MaNn"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="MaThL" class="control-label">Thể loại</label>
-                    <select asp-for="MaThL" class="form-control" asp-items="ViewBag.MaThL"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="MaDd" class="control-label">Địa điểm</label>
-                    <select asp-for="MaDd" class="form-control" asp-items="ViewBag.MaDd"></select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="LanXuatBan" class="control-label">Lần xuất bản</label>
-                    <input asp-for="LanXuatBan" class="form-control" />
-                    <span asp-validation-for="LanXuatBan" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="NamXuatBan" class="control-label">Năm xuất bản</label>
-                    <input asp-for="NamXuatBan" class="form-control" />
-                    <span asp-validation-for="NamXuatBan" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="SoTrang" class="control-label">Số trang</label>
-                    <input asp-for="SoTrang" class="form-control" />
-                    <span asp-validation-for="SoTrang" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="KhoCo" class="control-label">Khổ cỡ</label>
-                    <input asp-for="KhoCo" class="form-control" />
-                    <span asp-validation-for="KhoCo" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-3">
-                    <input type="submit" value="Tạo mới" class="btn btn-primary" />
-                    <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại</a>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+    </div> @* End card *@
+</div> @* End container-xxl *@
 
 @section Scripts {
     @{

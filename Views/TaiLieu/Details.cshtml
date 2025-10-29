@@ -1,174 +1,193 @@
-﻿@* @model Library_Manager.Models.TTaiLieu
+﻿@model Library_Manager.Models.TTaiLieu
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết Tài liệu: " + Model.TenTl;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>TTaiLieu</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TenTl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TenTl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LanXuatBan)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LanXuatBan)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NamXuatBan)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NamXuatBan)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SoTrang)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SoTrang)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.KhoCo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.KhoCo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaDdNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaDdNavigation.MaDd)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaNnNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaNnNavigation.MaNn)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaNxbNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaNxbNavigation.MaNxb)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaThLNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaThLNavigation.MaThL)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaTkNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaTkNavigation.MaTk)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MaTl">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
- *@
-
-@model Library_Manager.Models.TTaiLieu
-
 @{
-    ViewData["Title"] = "Chi tiết tài liệu";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Giả sử chỉ QTV và QLT (Quản lý Tài liệu) có thể sửa
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
+@* ========================================================================
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h2 class="mb-4 text-primary">Chi tiết tài liệu</h2>
 
-    <div class="card shadow-sm p-4">
-        <h5 class="card-title mb-3 text-secondary">Thông tin tài liệu</h5>
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <th style="width: 25%;">Mã tài liệu</th>
-                        <td>@Html.DisplayFor(model => model.MaTl)</td>
-                    </tr>
-                    <tr>
-                        <th>Tên tài liệu</th>
-                        <td>@Html.DisplayFor(model => model.TenTl)</td>
-                    </tr>
-                    <tr>
-                        <th>Lần xuất bản</th>
-                        <td>@Html.DisplayFor(model => model.LanXuatBan)</td>
-                    </tr>
-                    <tr>
-                        <th>Năm xuất bản</th>
-                        <td>@Html.DisplayFor(model => model.NamXuatBan)</td>
-                    </tr>
-                    <tr>
-                        <th>Số trang</th>
-                        <td>@Html.DisplayFor(model => model.SoTrang)</td>
-                    </tr>
-                    <tr>
-                        <th>Khổ cỡ</th>
-                        <td>@Html.DisplayFor(model => model.KhoCo)</td>
-                    </tr>
-                    <tr>
-                        <th>Nhà xuất bản</th>
-                        <td>
-                            @Html.DisplayFor(model => model.MaNxbNavigation.MaNxb)
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Ngôn ngữ</th>
-                        <td>
-                            @Html.DisplayFor(model => model.MaNnNavigation.MaNn)
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Thể loại</th>
-                        <td>
-                            @Html.DisplayFor(model => model.MaThLNavigation.MaThL)
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Địa điểm</th>
-                        <td>
-                            @Html.DisplayFor(model => model.MaDdNavigation.MaDd)
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Tài khoản tạo</th>
-                        <td>
-                            @Html.DisplayFor(model => model.MaTkNavigation.MaTk)
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-detail bxs-book-open fs-2 me-2'></i> Chi tiết Tài liệu
+    </h1>
+
+    @* --- KHỐI: CARD BAO QUANH DỮ LIỆU --- *@
+    <div class="card">
+
+        @* HEADER CỦA CARD: Hiển thị tên tài liệu và ID *@
+        <div class="card-header d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="card-title mb-0">
+                Thông tin chi tiết của <span class="text-primary fw-bold">@Model.TenTl</span>
+            </h5>
+            <small class="text-muted">Mã TL: <span class="fw-bold">@Model.MaTl</span></small>
+        </div>
+
+        @* BODY CỦA CARD: CHIA THÀNH CÁC PHẦN DÙNG GRID *@
+        <div class="card-body">
+
+            @* === 1. THÔNG SỐ XUẤT BẢN & KÍCH THƯỚC === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-file me-1'></i> Thông số xuất bản & Kích thước
+            </h6>
+            <div class="row mb-4">
+
+                @* Cột 1 (Thông tin Xuất bản) *@
+                <div class="col-md-6">
+                    @* Nhà xuất bản *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Nhà xuất bản</label>
+                        <p class="fw-semibold mb-0">@Model.MaNxbNavigation?.TenNxb</p>
+                    </div>
+                    @* Năm Xuất bản *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Năm Xuất bản</label>
+                        <p class="mb-0">@Model.NamXuatBan</p>
+                    </div>
+                </div>
+
+                @* Cột 2 (Kích thước & Số trang) *@
+                <div class="col-md-6">
+                    @* Lần Xuất bản *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Lần Xuất bản</label>
+                        <p class="mb-0">@Model.LanXuatBan</p>
+                    </div>
+                    @* Số Trang & Khổ cỡ *@
+                    <div class="d-flex gap-5">
+                        <div class="mb-3">
+                            <label class="form-label d-block text-secondary">Số Trang</label>
+                            <p class="mb-0">@Model.SoTrang</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label d-block text-secondary">Khổ cỡ</label>
+                            <p class="mb-0">@Model.KhoCo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            @* === 2. PHÂN LOẠI & TÁC GIẢ === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-category me-1'></i> Phân loại & Tác giả
+            </h6>
+            <div class="row mb-4">
+                @* Cột 1 (Phân loại) *@
+                <div class="col-md-6">
+                    @* Thể loại *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Thể loại</label>
+                        <p class="mb-0">@Model.MaThLNavigation?.TenThL</p>
+                    </div>
+                    @* Ngôn ngữ *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Ngôn ngữ</label>
+                        <p class="mb-0">@Model.MaNnNavigation?.TenNn</p>
+                    </div>
+                    @* Định dạng *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Định dạng</label>
+                        <p class="mb-0">@Model.MaDdNavigation?.TenDd</p>
+                    </div>
+                </div>
+
+                @* Cột 2 (Danh sách Tác giả) *@
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Tác giả</label>
+                        @if (Model.TTaiLieuTacGia.Any())
+                        {
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var tlTg in Model.TTaiLieuTacGia)
+                                {
+                                    <li>
+                                        <span class="fw-semibold">
+                                            @tlTg.MaTgNavigation.HoDem @tlTg.MaTgNavigation.Ten
+                                        </span>
+                                        @if (!string.IsNullOrEmpty(tlTg.VaiTro))
+                                        {
+                                            <small class="text-muted"> (@tlTg.VaiTro)</small>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Chưa có thông tin tác giả.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            @* === 3. THÔNG TIN QUẢN LÝ NỘI BỘ (Đã thêm liên kết Tài khoản) === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-id-card-alt me-1'></i> Quản lý nội bộ
+            </h6>
+            <div class="row">
+                @* Cột 1 (Thông tin Tài khoản tạo) *@
+                <div class="col-md-6">
+                    @* Tài khoản tạo (Đã thêm liên kết) *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Tài khoản tạo</label>
+                        <p class="mb-0">
+                            <span class="badge bg-label-success">@Model.MaTkNavigation?.TenDangNhap</span>
+
+                            @if (Model.MaTkNavigation != null)
+                            {
+                                @* Thêm nút liên kết đến trang chi tiết Tài khoản (Controller: TaiKhoan) *@
+                                <a asp-controller="TaiKhoan"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.MaTk"
+                                   asp-route-returnUrl="@Context.Request.Path"
+                                   class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
+                                   data-bs-toggle="tooltip" title="Xem chi tiết Tài khoản">
+                                    <i class='bx bx-link-external'></i>
+                                </a>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
+        <div class="card-footer border-top pt-3">
+            <div class="d-flex gap-3 flex-wrap">
+                @* Nút Sửa *@
+                <a asp-action="Edit" asp-route-id="@Model?.MaTl" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
+                </a>
+
+                @* Nút Quản lý Tác giả *@
+                <a asp-controller="TaiLieuTacGia" asp-action="Index" asp-route-id="@Model?.MaTl" class="btn btn-warning">
+                    <i class='bx bx-group me-1'></i> Quản lý Tác giả (@Model.TTaiLieuTacGia.Count)
+                </a>
+
+                @* Nút Xem Bản sao *@
+                <a asp-controller="BanSao" asp-action="Index" asp-route-id="@Model?.MaTl" class="btn btn-info">
+                    <i class="bx bx-copy-alt me-1"></i> Quản lý Bản sao (@Model.TBanSaos.Count)
+                </a>
+
+                @* Nút Quay lại *@
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                </a>
+            </div>
         </div>
     </div>
-
-    <div class="mt-4">
-        <a asp-action="Edit" asp-route-id="@Model?.MaTl" class="btn btn-warning me-2">
-            <i class="bx bx-edit"></i> Chỉnh sửa
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bx bx-arrow-back"></i> Quay lại danh sách
-        </a>
-        <a asp-controller="BanSao" asp-action="Index" asp-route-id="@Model?.MaTl" class="btn btn-info me-2">
-            <i class="bx bx-book-content"></i> Xem bản sao  
-        </a>
-
-    </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
