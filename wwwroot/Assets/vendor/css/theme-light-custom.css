@@ -286,18 +286,44 @@ html[data-theme="theme-light-custom"] {
             background-color: rgba(255, 62, 29, 0.15) !important; /* Slightly darker tint on hover */
         }
 
-    /* -----------------------------------------------------------------------------
- * 8. PHẦN BỔ SUNG
- * -----------------------------------------------------------------------------*/
+/* -----------------------------------------------------------------------------
+* 8. PHẦN BỔ SUNG
+* -----------------------------------------------------------------------------*/
 
-    /* 8.1. SCROLLBAR */
-    html[data-theme="theme-light-custom"] ::-webkit-scrollbar-thumb {
-        background-color: rgba(48, 52, 129, 0.2);
+/* 8.1. SCROLLBAR */
+html[data-theme="theme-light-custom"] ::-webkit-scrollbar-thumb {
+    background-color: rgba(48, 52, 129, 0.2);
+}
+
+/* 8.2. CUSTOM NAV-PILLS (_DanhMuc) */
+
+/* Default state (Chữ Xanh Đậm) */
+html[data-theme="theme-light-custom"] .nav-pills .nav-link {
+    color: var(--custom-primary-dark);
+    border: 1px solid var(--custom-border-color);
+    background-color: transparent; /* Nền trong suốt trên nền Card */
+    margin: 0.25rem; /* Khoảng cách giữa các pill */
+    border-radius: 0.5rem;
+}
+
+    /* Hover state (Nền Xanh Nhạt/Hover, Chữ Xanh Đậm) */
+    html[data-theme="theme-light-custom"] .nav-pills .nav-link:not(.active):hover {
+        color: var(--custom-primary-dark-hover);
+        background-color: var(--custom-hover-bg-light); /* Màu xám nhạt khi hover */
+        border-color: var(--custom-border-color);
     }
 
-    /* 8.3. ALERTS */
-    html[data-theme="theme-light-custom"] .alert-primary {
-        color: var(--custom-primary-dark);
-        background-color: var(--custom-primary-tint);
-        border-color: rgba(48, 52, 129, 0.2);
+    /* Active state (Nền Xanh Đậm, Chữ Vàng) */
+    html[data-theme="theme-light-custom"] .nav-pills .nav-link.active {
+        color: var(--color-high-contrast-text) !important; /* <--- MÀU VÀNG */
+        background-color: var(--custom-primary-dark) !important; /* <--- NỀN XANH ĐẬM */
+        border-color: var(--custom-primary-dark) !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(48, 52, 129, 0.2); /* Thêm bóng nhẹ cho Pill active */
     }
+
+/* 8.3. ALERTS */
+html[data-theme="theme-light-custom"] .alert-primary {
+    color: var(--custom-primary-dark);
+    background-color: var(--custom-primary-tint);
+    border-color: rgba(48, 52, 129, 0.2);
+}

@@ -1,140 +1,152 @@
-﻿@* @model Library_Manager.Models.TNhanVien
+﻿@model Library_Manager.Models.TNhanVien
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết Nhân viên: " + Model.Ten;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>TNhanVien</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoDem)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoDem)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Ten)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Ten)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NgaySinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NgaySinh)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GioiTinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GioiTinh)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DiaChi)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DiaChi)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sdt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sdt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhuTrach)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhuTrach)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MaNv">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
- *@
-
-@model Library_Manager.Models.TNhanVien
-
+@* Logic hiển thị badge Giới tính *@
 @{
-    ViewData["Title"] = "Chi tiết nhân viên";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var gioiTinh = (Model.GioiTinh == "M" ? "Nam" : Model.GioiTinh == "F" ? "Nữ" : "-");
+    var badgeClass = gioiTinh == "Nam" ? "bg-label-info" :
+                        gioiTinh == "Nữ" ? "bg-label-danger" :
+                        "bg-label-secondary";
+}
+@{
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLB");
 }
 
+@* ========================================================================
+    KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h2 class="mb-4 text-primary">Chi tiết nhân viên</h2>
 
-    <div class="card shadow-sm p-4">
-        <h5 class="card-title mb-3 text-secondary">Thông tin nhân viên</h5>
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <th style="width: 25%;">Mã nhân viên</th>
-                        <td>@Html.DisplayFor(model => model.MaNv)</td>
-                    </tr>
-                    <tr>
-                        <th>Họ đệm</th>
-                        <td>@Html.DisplayFor(model => model.HoDem)</td>
-                    </tr>
-                    <tr>
-                        <th>Tên</th>
-                        <td>@Html.DisplayFor(model => model.Ten)</td>
-                    </tr>
-                    <tr>
-                        <th>Ngày sinh</th>
-                        <td>@Html.DisplayFor(model => model.NgaySinh)</td>
-                    </tr>
-                    <tr>
-                        <th>Giới tính</th>
-                        <td>@Html.DisplayFor(model => model.GioiTinh)</td>
-                    </tr>
-                    <tr>
-                        <th>Địa chỉ</th>
-                        <td>@Html.DisplayFor(model => model.DiaChi)</td>
-                    </tr>
-                    <tr>
-                        <th>Số điện thoại</th>
-                        <td>@Html.DisplayFor(model => model.Sdt)</td>
-                    </tr>
-                    <tr>
-                        <th>Email</th>
-                        <td>@Html.DisplayFor(model => model.Email)</td>
-                    </tr>
-                    <tr>
-                        <th>Phụ trách</th>
-                        <td>@Html.DisplayFor(model => model.PhuTrach)</td>
-                    </tr>
-                </tbody>
-            </table>
+    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bxs-user-badge fs-2 me-2 border p-1 rounded-2'></i> Chi tiết Nhân viên
+    </h1>
+
+    @* --- KHỐI: CARD BAO QUANH DỮ LIỆU --- *@
+    <div class="card">
+
+        @* HEADER CỦA CARD: Hiển thị tên nhân viên và ID *@
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                Thông tin chi tiết của <span class="text-primary fw-bold">@Model.HoDem @Model.Ten</span>
+            </h5>
+            <small class="text-muted">Mã NV: <span class="fw-bold">@Model.MaNv</span></small>
         </div>
-    </div>
 
-    <div class="mt-4">
-        <a asp-action="Edit" asp-route-id="@Model?.MaNv" class="btn btn-warning me-2">
-            <i class="bx bx-edit"></i> Chỉnh sửa
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bx bx-arrow-back"></i> Quay lại danh sách
-        </a>
+        @* BODY CỦA CARD: CHIA THÀNH CÁC PHẦN DÙNG GRID (Gọn gàng 2 cột) *@
+        <div class="card-body">
+
+            @* === 1. THÔNG TIN CÁ NHÂN (CƠ BẢN) === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-user me-1'></i> Thông tin cá nhân
+            </h6>
+            <div class="row mb-4">
+
+                @* Cột 1 *@
+                <div class="col-md-6">
+                    @* Họ Đệm *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Họ Đệm</label>
+                        <p class="fw-semibold mb-0">@Model.HoDem</p>
+                    </div>
+                    @* Tên *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Tên</label>
+                        <p class="fw-semibold mb-0">@Model.Ten</p>
+                    </div>
+                    @* Ngày Sinh *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Ngày Sinh</label>
+                        <p class="mb-0">@Model.NgaySinh.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+
+                @* Cột 2 *@
+                <div class="col-md-6">
+                    @* Giới Tính *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Giới Tính</label>
+                        <p class="mb-0">
+                            <span class="badge @badgeClass fs-6">@gioiTinh</span>
+                        </p>
+                    </div>
+
+                    @* Mã Nhân viên *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Mã Nhân viên</label>
+                        <p class="text-primary fw-bold mb-0">@Model.MaNv</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            @* === 2. THÔNG TIN LIÊN HỆ === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-phone me-1'></i> Thông tin liên hệ
+            </h6>
+            <div class="row mb-4">
+                @* Cột 1 (Liên hệ) *@
+                <div class="col-md-6">
+                    @* Email *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Email</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.Email)</p>
+                    </div>
+                    @* Số Điện Thoại *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Số Điện Thoại</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.Sdt)</p>
+                    </div>
+                </div>
+
+                @* Cột 2 (Địa chỉ) *@
+                <div class="col-md-6">
+                    @* Địa Chỉ *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Địa Chỉ</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.DiaChi)</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            @* === 3. THÔNG TIN CÔNG VIỆC === *@
+            <h6 class="text-muted text-uppercase mb-3">
+                <i class='bx bx-briefcase me-1'></i> Thông tin công việc
+            </h6>
+            <div class="row">
+                <div class="col-md-6">
+                    @* Phụ Trách *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Phụ Trách</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.PhuTrach)</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
+        <div class="card-footer border-top pt-3">
+            <div class="d-flex gap-3">
+                @* Nút Sửa *@
+                <a asp-action="Edit" asp-route-id="@Model?.MaNv" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
+                </a>
+
+                @* Nút Quay lại *@
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
