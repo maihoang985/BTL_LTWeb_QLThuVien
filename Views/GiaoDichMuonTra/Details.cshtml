@@ -101,7 +101,10 @@
                             @* Link to Reader *@
                             @if (Model.MaTbdNavigation?.MaBd != null)
                             {
-                                <a asp-controller="BanDoc" asp-action="Details" asp-route-id="@Model.MaTbdNavigation.MaBd"
+                                <a asp-controller="BanDoc" 
+                                    asp-action="Details" 
+                                    asp-route-id="@Model.MaTbdNavigation.MaBd"
+                                    asp-route-returnUrl="@Context.Request.Path"
                                    class="btn btn-xs btn-outline-info ms-2" title="Xem chi tiết Bạn đọc">
                                     <i class='bx bx-user'></i>
                                 </a>
@@ -114,7 +117,10 @@
                         <p class="mb-0">
                             @Model.MaTbd
                             @* Link to Card *@
-                            <a asp-controller="TTheBanDoc" asp-action="Details" asp-route-id="@Model.MaTbd"
+                            <a asp-controller="TheBanDoc" 
+                            asp-action="Details" 
+                            asp-route-id="@Model.MaTbd"
+                            asp-route-returnUrl="@Context.Request.Path"
                                class="btn btn-xs btn-outline-info ms-2" title="Xem chi tiết Thẻ">
                                 <i class="bx bx-id-card"></i>
                             </a>
