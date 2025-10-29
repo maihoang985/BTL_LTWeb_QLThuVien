@@ -35,8 +35,9 @@ namespace Library_Manager.Controllers
         {
             //if (HttpContext.Session.GetString("UserName") == null)
             //{
-                var u = _context.TTaiKhoans.Where(x => x.TenDangNhap.Equals(user.TenDangNhap) && x.MatKhau.Equals(user.MatKhau)).FirstOrDefault();
-                if (u == null)
+            // Lấy tài khoản theo tên đăng nhập
+            var u = _context.TTaiKhoans.FirstOrDefault(x => x.TenDangNhap == user.TenDangNhap);
+            if (u == null)
                 {
                     ViewBag.Error = "Tên đăng nhập không tồn tại.";
                     return View();
