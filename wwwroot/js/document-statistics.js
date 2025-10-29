@@ -13,6 +13,12 @@ const DocumentStatistics = (function () {
     let toggleText = null;
     let isDetailVisible = false;
 
+    // MỚI: Biến cho Modal
+    let categoryDetailModalEl = null;
+    let categoryDetailModal = null;
+    let modalCategoryTitleEl = null;
+    let modalCategoryBodyEl = null;
+
     // Private methods
     function showLoadingCard(element) {
         element.innerHTML = `
@@ -98,22 +104,16 @@ const DocumentStatistics = (function () {
     }
 
     function renderSummaryCards(data) {
-        // Tổng số giáo trình
+        // ... (Giữ nguyên code)
         if (data.tongGiaoTrinh !== undefined) {
             animateNumber(totalGiaoTrinhEl, data.tongGiaoTrinh);
         }
-
-        // Tổng số tài liệu
         if (data.tongTaiLieu !== undefined) {
             animateNumber(totalTaiLieuEl, data.tongTaiLieu);
         }
-
-        // Giáo trình có sẵn
         if (data.giaoTrinhCoSan !== undefined) {
             animateNumber(availableGiaoTrinhEl, data.giaoTrinhCoSan);
         }
-
-        // Tài liệu có sẵn
         if (data.taiLieuCoSan !== undefined) {
             animateNumber(availableTaiLieuEl, data.taiLieuCoSan);
         }
@@ -125,7 +125,6 @@ const DocumentStatistics = (function () {
             return;
         }
 
-        // Danh sách đầy đủ 10 thể loại
         const allCategoriesDefinitions = [
             { code: 'GT', name: 'Sách giáo trình' },
             { code: 'TK', name: 'Sách tham khảo' },
@@ -139,32 +138,35 @@ const DocumentStatistics = (function () {
             { code: 'NB', name: 'Tài liệu nội bộ' }
         ];
 
-        // Kết hợp dữ liệu từ API và định nghĩa đầy đủ, đồng thời chuẩn bị cho việc sắp xếp
         const combinedCategories = allCategoriesDefinitions.map(catDef => {
             const cat = categories.find(c => c.tenDanhMuc === catDef.name);
             return {
                 ...catDef,
-                tongSoLuong: cat ? cat.tongSoLuong : 0, // Lấy tổng số lượng, mặc định là 0
+                tongSoLuong: cat ? cat.tongSoLuong : 0,
                 soLuongCoSan: cat ? cat.soLuongCoSan : 0,
-                // Giữ lại đối tượng gốc từ API nếu có để dễ dàng render
                 apiData: cat
             };
         });
 
-        // Sắp xếp các thể loại theo tổng số lượng (tongSoLuong) từ cao đến thấp (giảm dần)
         combinedCategories.sort((a, b) => b.tongSoLuong - a.tongSoLuong);
 
-        // Tạo các hàng (rows) cho bảng
+        // TẠO HÀNG (ROWS)
         const rows = combinedCategories.map(item => {
             const cat = item.apiData;
             const catDef = item;
+            const categoryCode = item.code; // 'GT', 'TK', etc.
+            const categoryName = item.name;
+
+            // Thêm class "category-row-clickable" và data- attributes
+            const rowClass = "class='category-row-clickable' style='cursor: pointer;'";
+            const rowData = `data-category-code="${categoryCode}" data-category-name="${categoryName}"`;
 
             if (cat) {
                 const percentage = calculatePercentage(cat.soLuongCoSan, cat.tongSoLuong);
                 const dangMuon = cat.tongSoLuong - cat.soLuongCoSan;
 
                 return `
-                    <tr>
+                    <tr ${rowClass} ${rowData}>
                         <td>
                             <div class="d-flex align-items-center">
                                 <i class="bx bx-folder me-2 text-primary"></i>
@@ -183,9 +185,8 @@ const DocumentStatistics = (function () {
                         <td>${createProgressBar(percentage)}</td>
                     </tr>`;
             } else {
-                // Thể loại không có dữ liệu (tongSoLuong = 0)
                 return `
-                    <tr>
+                    <tr ${rowClass} ${rowData}>
                         <td>
                             <div class="d-flex align-items-center">
                                 <i class="bx bx-folder me-2 text-muted"></i>
@@ -207,11 +208,98 @@ const DocumentStatistics = (function () {
         }).join('');
 
         categoryTableBody.innerHTML = rows;
+
+        // MỚI: Thêm event listeners cho các hàng vừa tạo
+        addTableClickListeners();
     }
 
-    function toggleCategoryDetail() {
-        isDetailVisible = !isDetailVisible;
+    // MỚI: Hàm thêm event listener vào các hàng
+    function addTableClickListeners() {
+        const clickableRows = categoryTableBody.querySelectorAll('.category-row-clickable');
+        clickableRows.forEach(row => {
+            row.addEventListener('click', handleCategoryRowClick);
+        });
+    }
 
+    // MỚI: Hàm xử lý khi click vào hàng
+    function handleCategoryRowClick(event) {
+        const row = event.currentTarget;
+        const code = row.dataset.categoryCode;
+        const name = row.dataset.categoryName;
+
+        if (!code || !categoryDetailModal) return;
+
+        // Cập nhật modal và hiển thị
+        modalCategoryTitleEl.textContent = `Chi tiết: ${name}`;
+        modalCategoryBodyEl.innerHTML = `
+            <div class="d-flex justify-content-center p-3">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>`;
+        categoryDetailModal.show();
+
+        // Tải dữ liệu chi tiết
+        fetchCategoryDetails(code);
+    }
+
+    // MỚI: Hàm gọi API lấy chi tiết
+    async function fetchCategoryDetails(code) {
+        try {
+            const response = await fetch(`/ThongKe/GetChiTietTheLoai?maTheLoai=${code}`);
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP ${response.status}`);
+            }
+            const data = await response.json();
+            renderCategoryDetailsTable(data);
+        } catch (error) {
+            console.error('Error fetching category details:', error);
+            modalCategoryBodyEl.innerHTML = `<div class="alert alert-danger">Không thể tải chi tiết: ${error.message}</div>`;
+        }
+    }
+
+    // MỚI: Hàm render bảng chi tiết trong Modal
+    function renderCategoryDetailsTable(details) {
+        if (!details || details.length === 0) {
+            modalCategoryBodyEl.innerHTML = `<div class="alert alert-info">Không có dữ liệu chi tiết cho thể loại này.</div>`;
+            return;
+        }
+
+        const tableRows = details.map(item => {
+            const statusBadge = item.trangThai === "Đang mượn"
+                ? `<span class="badge bg-label-warning">Đang mượn</span>`
+                : `<span class="badge bg-label-success">Có sẵn</span>`;
+
+            return `
+                <tr>
+                    <td>${item.maBanSao}</td>
+                    <td>${item.tenTaiLieu}</td>
+                    <td class="text-center">${statusBadge}</td>
+                </tr>`;
+        }).join('');
+
+        modalCategoryBodyEl.innerHTML = `
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover">
+                    <thead class="table-light" style="position: sticky; top: 0;">
+                        <tr>
+                            <th>Mã Bản Sao</th>
+                            <th>Tên Tài Liệu</th>
+                            <th class="text-center">Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    <tbody>
+                </table>
+            </div>
+        `;
+    }
+
+
+    function toggleCategoryDetail() {
+        // ... (Giữ nguyên code)
+        isDetailVisible = !isDetailVisible;
         if (isDetailVisible) {
             categoryDetail.style.display = 'block';
             toggleIcon.className = 'bx bx-chevron-up';
@@ -224,13 +312,12 @@ const DocumentStatistics = (function () {
     }
 
     async function fetchStatistics() {
+        // ... (Giữ nguyên code)
         try {
             const response = await fetch('/ThongKe/GetThongKeTaiLieu');
-
             if (!response.ok) {
                 throw new Error(`Lỗi HTTP ${response.status}`);
             }
-
             return await response.json();
         } catch (error) {
             throw error;
@@ -238,7 +325,7 @@ const DocumentStatistics = (function () {
     }
 
     function loadStatistics() {
-        // Show loading states
+        // ... (Giữ nguyên code)
         showLoadingCard(totalGiaoTrinhEl);
         showLoadingCard(totalTaiLieuEl);
         showLoadingCard(availableGiaoTrinhEl);
@@ -247,15 +334,11 @@ const DocumentStatistics = (function () {
 
         fetchStatistics()
             .then(data => {
-                // Render summary cards
                 renderSummaryCards(data);
-
-                // Render category table
                 renderCategoryTable(data.chiTietTheoDanhMuc);
             })
             .catch(error => {
                 console.error('Error loading statistics:', error);
-
                 showError(totalGiaoTrinhEl, 'Lỗi');
                 showError(totalTaiLieuEl, 'Lỗi');
                 showError(availableGiaoTrinhEl, 'Lỗi');
@@ -267,7 +350,7 @@ const DocumentStatistics = (function () {
     // Public API
     return {
         init: function () {
-            // Get DOM elements
+            // Get DOM elements (cũ)
             totalGiaoTrinhEl = document.getElementById('totalGiaoTrinh');
             totalTaiLieuEl = document.getElementById('totalTaiLieu');
             availableGiaoTrinhEl = document.getElementById('availableGiaoTrinh');
@@ -278,9 +361,21 @@ const DocumentStatistics = (function () {
             toggleIcon = document.getElementById('toggleIcon');
             toggleText = document.getElementById('toggleText');
 
+            // MỚI: Get DOM elements (của Modal)
+            categoryDetailModalEl = document.getElementById('categoryDetailModal');
+            modalCategoryTitleEl = document.getElementById('modalCategoryTitle');
+            modalCategoryBodyEl = document.getElementById('modalCategoryBody');
+
             if (!totalGiaoTrinhEl || !totalTaiLieuEl || !categoryTableBody || !toggleDetailBtn) {
                 console.error('Required DOM elements not found!');
                 return;
+            }
+
+            // MỚI: Khởi tạo đối tượng Modal của Bootstrap
+            if (categoryDetailModalEl) {
+                categoryDetailModal = new bootstrap.Modal(categoryDetailModalEl);
+            } else {
+                console.error('Category detail modal element not found!');
             }
 
             // Add event listener for toggle button
