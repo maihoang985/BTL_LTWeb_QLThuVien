@@ -150,11 +150,11 @@
                             {
                                 @* Thêm nút liên kết đến trang chi tiết Tài khoản (Controller: TaiKhoan) *@
                                 <a asp-controller="TaiKhoan"
-                                   asp-action="Details"
-                                   asp-route-id="@Model.MaTk"
-                                   asp-route-returnUrl="@Context.Request.Path"
-                                   class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
-                                   data-bs-toggle="tooltip" title="Xem chi tiết Tài khoản">
+                                                     asp-action="Details"
+                                                     asp-route-id="@Model.MaTk"
+                                                     asp-route-returnUrl="@Context.Request.Path"
+                                                     class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
+                                                     data-bs-toggle="tooltip" title="Xem chi tiết Tài khoản">
                                     <i class='bx bx-link-external'></i>
                                 </a>
                             }
@@ -173,8 +173,8 @@
                     <i class="bx bx-pencil me-1"></i> Sửa thông tin
                 </a>
 
-                @* Nút Quản lý Tác giả *@
-                <a asp-controller="TaiLieuTacGia" asp-action="Index" asp-route-id="@Model?.MaTl" class="btn btn-warning">
+                @* Nút Quản lý Tác giả - Đã sửa asp-route-id thành asp-route-MaTl *@
+                <a asp-controller="TaiLieuTacGia" asp-action="Index" **asp-route-MaTl="@Model?.MaTl" ** class="btn btn-warning">
                     <i class='bx bx-group me-1'></i> Quản lý Tác giả (@Model.TTaiLieuTacGia.Count)
                 </a>
 
