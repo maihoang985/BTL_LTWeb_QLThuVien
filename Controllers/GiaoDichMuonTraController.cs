@@ -66,8 +66,9 @@ namespace Library_Manager.Controllers
 
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras
                 .Include(t => t.MaTbdNavigation)
-                    .ThenInclude(TheBanDocController => TheBanDocController.MaBdNavigation)
+                    .ThenInclude(BanDocController => BanDocController.MaBdNavigation)
                 .Include(t => t.MaTkNavigation)
+                    .ThenInclude(NhanVienController => NhanVienController.MaNvNavigation)
                 .FirstOrDefaultAsync(m => m.MaGd == id);
             if (tGiaoDichMuonTra == null)
             {
