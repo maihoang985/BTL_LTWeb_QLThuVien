@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PagedList.Core;
+using Library_Manager.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,6 +85,9 @@ namespace Library_Manager.Controllers
         {
             if (ModelState.IsValid)
             {
+                // ✅ Băm mật khẩu trước khi lưu
+                tTaiKhoan.MatKhau = PasswordHelper.HashPassword(tTaiKhoan.TenDangNhap, tTaiKhoan.MatKhau);
+
                 _context.Add(tTaiKhoan);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -111,6 +115,8 @@ namespace Library_Manager.Controllers
             return View(tTaiKhoan);
         }
 
+
+
         // POST: TTaiKhoans/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -127,6 +133,23 @@ namespace Library_Manager.Controllers
             {
                 try
                 {
+                    var existing = await _context.TTaiKhoans.AsNoTracking()
+                                        .FirstOrDefaultAsync(x => x.MaTk == id);
+                    if (existing == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // ✅ Nếu mật khẩu thay đổi => băm lại
+                    if (tTaiKhoan.MatKhau != existing.MatKhau)
+                    {
+                        // (tùy chọn) kiểm tra chuỗi có phải Base64 hoặc đã băm chưa
+                        if (!PasswordHelper.IsBase64String(tTaiKhoan.MatKhau))
+                        {
+                            tTaiKhoan.MatKhau = PasswordHelper.HashPassword(tTaiKhoan.TenDangNhap, tTaiKhoan.MatKhau);
+                        }
+                    }
+
                     _context.Update(tTaiKhoan);
                     await _context.SaveChangesAsync();
                 }
@@ -143,10 +166,12 @@ namespace Library_Manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
             ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
             return View(tTaiKhoan);
         }
+
 
         // GET: TTaiKhoans/Delete/5
         public async Task<IActionResult> Delete(string id)
