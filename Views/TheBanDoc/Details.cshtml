@@ -23,6 +23,11 @@
     bool canEdit = (userRole == "QTV" || userRole == "QLB");
 }
 
+@{
+    // Lấy đường dẫn và query string của trang hiện tại
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
 @* ========================================================================
     KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
     ======================================================================== *@
@@ -118,7 +123,7 @@
                                 <a asp-controller="BanDoc" 
                                 asp-action="Details"
                                 asp-route-id="@Model.MaBd"
-                                asp-route-returnUrl="@Context.Request.Path"
+                                   asp-route-returnUrl="@currentUrl"
                                 class="btn btn-sm btn-outline-info">
                                     <i class="bx bx-link-external me-1"></i> Xem chi tiết
                                 </a>
