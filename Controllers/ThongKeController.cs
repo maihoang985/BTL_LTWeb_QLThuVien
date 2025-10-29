@@ -135,5 +135,52 @@ namespace Library_Manager.Controllers
                 });
             }
         }
+
+        // ==========================================================
+        // MỚI: API LẤY CHI TIẾT TÀI LIỆU THEO THỂ LOẠI
+        // ==========================================================
+        [HttpGet]
+        public IActionResult GetChiTietTheLoai(string maTheLoai)
+        {
+            if (string.IsNullOrEmpty(maTheLoai))
+            {
+                return BadRequest("Vui lòng cung cấp mã thể loại.");
+            }
+
+            try
+            {
+                // 1. Lấy danh sách MaBS đang được mượn (chưa trả)
+                var banSaoDangMuon = _context.TGiaoDichMuonTras
+                    .Where(g => g.NgayTra == null) // Giao dịch chưa trả
+                    .Join(_context.TGiaoDichBanSaos,
+                        gd => gd.MaGd,
+                        gdbs => gdbs.MaGd,
+                        (gd, gdbs) => gdbs.MaBs)
+                    .Distinct()
+                    .ToList();
+
+                // 2. Lấy chi tiết các bản sao thuộc thể loại
+                var chiTiet = _context.TBanSaos
+                    .Join(_context.TTaiLieus,
+                        bs => bs.MaTl,
+                        tl => tl.MaTl,
+                        (bs, tl) => new { bs, tl })
+                    .Where(x => x.tl.MaThL == maTheLoai) // Lọc theo thể loại
+                    .Select(x => new
+                    {
+                        MaBanSao = x.bs.MaBs,
+                        TenTaiLieu = x.tl.TenTl,
+                        TrangThai = banSaoDangMuon.Contains(x.bs.MaBs) ? "Đang mượn" : "Có sẵn"
+                    })
+                    .OrderBy(x => x.TenTaiLieu)
+                    .ToList();
+
+                return Json(chiTiet);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }
