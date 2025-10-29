@@ -1,0 +1,196 @@
+﻿@{
+    ViewData["Title"] = "Thống kê - Báo cáo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Assets/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    @* ĐÃ THÊM: Tiêu đề trang giống phong cách BanDoc *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-pie-chart-alt-2 fa-border fs-1 me-2'></i>
+        📊 Thống kê thư viện
+    </h1>
+
+    <div class="card mb-4">
+        @* ĐÃ BỎ: shadow-sm *@
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3 py-3">
+
+            @* ĐÃ SỬA: Thêm class text-primary *@
+            <h4 class="mb-0 fw-semibold text-primary">
+                <i class="bx bx-bar-chart-alt-2 me-2"></i>
+                Thống kê lượt mượn sách
+            </h4>
+
+            <div class="d-flex align-items-center gap-2">
+                <label for="yearSelector" class="form-label mb-0 text-nowrap">
+                    <i class="bx bx-calendar me-1"></i>
+                    Chọn năm:
+                </label>
+                <select id="yearSelector" class="form-select form-select-sm" style="min-width: 120px;">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div id="horizontalBarChart" class="chart-container"></div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="card">
+                @* ĐÃ BỎ: shadow-sm *@
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+
+                    @* ĐÃ SỬA: Thêm class text-primary *@
+                    <h4 class="mb-0 fw-semibold text-primary">
+                        <i class="bx bx-book-content me-2"></i>
+                        Thống kê giáo trình và tài liệu
+                    </h4>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="toggleDetailBtn">
+                        <i class="bx bx-chevron-down" id="toggleIcon"></i>
+                        <span id="toggleText">Xem chi tiết</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-label-primary">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">Giáo trình</h6>
+                                            <h3 class="mb-0" id="totalGiaoTrinh">
+                                                <div class="spinner-border spinner-border-sm" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </h3>
+                                        </div>
+                                        <div class="avatar">
+                                            <span class="avatar-initial rounded bg-primary text-white">
+                                                <i class="bx bx-book fs-3"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-label-success">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">Tài liệu</h6>
+                                            <h3 class="mb-0" id="totalTaiLieu">
+                                                <div class="spinner-border spinner-border-sm" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </h3>
+                                        </div>
+                                        <div class="avatar">
+                                            <span class="avatar-initial rounded bg-success text-white">
+                                                <i class="bx bx-file fs-3"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-label-info">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">GT có sẵn</h6>
+                                            <h3 class="mb-0" id="availableGiaoTrinh">
+                                                <div class="spinner-border spinner-border-sm" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </h3>
+                                        </div>
+                                        <div class="avatar">
+                                            <span class="avatar-initial rounded bg-info text-white">
+                                                <i class="bx bx-check-circle fs-3"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-label-warning">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">TL có sẵn</h6>
+                                            <h3 class="mb-0" id="availableTaiLieu">
+                                                <div class="spinner-border spinner-border-sm" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </h3>
+                                        </div>
+                                        <div class="avatar">
+                                            <span class="avatar-initial rounded bg-warning text-white">
+                                                <i class="bx bx-check-circle fs-3"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="categoryDetail" class="mt-4" style="display: none;">
+                        <hr>
+                        <h5 class="mb-3">
+                            <i class="bx bx-list-ul me-2"></i>
+                            Chi tiết theo thể loại
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="categoryTable">
+
+                                @* ĐÃ BỎ: class="table-light" *@
+                                <thead>
+                                    <tr>
+                                        <th>Thể loại</th>
+                                        <th class="text-center">Tổng số</th>
+                                        <th class="text-center">Có sẵn</th>
+                                        <th class="text-center">Đang mượn</th>
+                                        <th class="text-center">Tỷ lệ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <div class="spinner-border" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/Assets/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="~/js/chart-statistics.js"></script>
+    <script src="~/js/document-statistics.js"></script>
+}
