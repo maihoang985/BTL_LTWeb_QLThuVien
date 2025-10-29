@@ -5,15 +5,15 @@
 @model PagedList.Core.IPagedList<Library_Manager.Models.TBanSao>
 
 @{
-    ViewData["Title"] = "Quản lý Bản sao";
-    var maTlContext = Context.Request.Query["MaTl"];
-    var tenTaiLieu = ViewBag.TenTaiLieu;
-    
+    ViewData["Title"] = "Quản lý Bản sao";
+    var maTlContext = Context.Request.Query["MaTl"];
+    var tenTaiLieu = ViewBag.TenTaiLieu;
+
     // Giả định quyền chỉnh sửa tương tự QLT
     var userRole = Context.Session.GetString("UserRole");
-    bool canEdit = (userRole == "QTV" || userRole == "QLT"); 
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @* ========================================================================
@@ -21,65 +21,64 @@
    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
-    <h1 class="fw-bold text-primary mb-4">
-        <i class='bx bx-copy-alt fa-border fs-1 me-2'></i> 
+    @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
+    <h1 class="fw-bold text-primary mb-4">
+        <i class='bx bx-copy-alt fa-border fs-1 me-2'></i>
         Danh sách Bản sao
-    </h1>
+    </h1>
     @if (tenTaiLieu != null)
     {
         <h3 class="mb-4 text-secondary">của Tài liệu: <span class="text-primary">@tenTaiLieu</span></h3>
     }
 
-    <div class="card">
-        @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
-        <div class="card-header border-bottom">
-            <div class="d-flex justify-content-between align-items-center">
+    <div class="card">
+        @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
+        <div class="card-header border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
 
-                @* Thanh Tìm kiếm (SearchBar Partial) *@
-                <div class="flex-grow-1 me-3">
-                    <partial name="SearchBar" />
-                </div>
+                @* Thanh Tìm kiếm (SearchBar Partial) *@
+                <div class="flex-grow-1 me-3">
+                    <partial name="SearchBar" />
+                </div>
 
-                @* Nút Thêm mới - Cố định bên phải *@
-                <div class="flex-shrink-0 ">
-                    <p class="m-0">
-                        @* Nếu có MaTlContext, truyền nó vào nút Create để tự động chọn Tài liệu *@
-                        <a asp-action="Create" asp-route-MaTl="@maTlContext" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
-                            <i class="bx bx-plus me-1"></i> Thêm Bản sao mới
-                        </a>
-                    </p>
-                </div>
-            </div>
-        </div>
+                @* Nút Thêm mới - Cố định bên phải *@
+                <div class="flex-shrink-0 ">
+                    <p class="m-0">
+                        <a asp-action="Create" asp-route-MaTl="@maTlContext" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
+                            <i class="bx bx-plus me-1"></i> Thêm Bản sao mới
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
 
-        @* ========================================================================
+        @* ========================================================================
            KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
            ======================================================================== *@
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover" id="myTable">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="myTable">
 
-                @* --- PHẦN 3.1: TIÊU ĐỀ BẢNG (THEAD) --- *@
-                <thead id="myTableHead">
-                    <tr>
+                @* --- PHẦN 3.1: TIÊU ĐỀ BẢNG (THEAD) --- *@
+                <thead id="myTableHead">
+                    <tr>
                         <th>Mã Bản sao</th>
                         @if (string.IsNullOrEmpty(maTlContext))
                         {
-                            <th>Tên Tài liệu</th>
+                            <th>Tên Tài liệu</th>
                             <th>Mã Tài liệu</th>
                         }
-                        <th>Tình trạng</th>
-                        <th style="min-width: 120px;">Hành động</th>
-                    </tr>
-                </thead>
+                        <th>Tình trạng</th>
+                        <th style="min-width: 120px;">Hành động</th>
+                    </tr>
+                </thead>
 
-                @* --- PHẦN 3.2: NỘI DUNG BẢNG (TBODY) --- *@
-                <tbody>
-                    @if (Model.Any())
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
+                @* --- PHẦN 3.2: NỘI DUNG BẢNG (TBODY) --- *@
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
                                 <td style="white-space: nowrap;">**@item.MaBs**</td>
 
                                 @* Cột Tài liệu (Chỉ hiển thị trong Index tổng thể) *@
@@ -88,8 +87,8 @@
                                     <td>@item.MaTlNavigation?.TenTl</td>
                                     <td>@item.MaTl</td>
                                 }
-                                
-                                <td style="white-space: nowrap;">
+
+                                <td style="white-space: nowrap;">
                                     @{
                                         var tinhTrang = item.TinhTrang;
                                         var badgeClass = tinhTrang switch
@@ -100,59 +99,56 @@
                                             _ => "bg-label-secondary",
                                         };
                                     }
-                                    <span class="badge @badgeClass">@tinhTrang</span>
+                                    <span class="badge @badgeClass">@tinhTrang</span>
                                 </td>
 
-                                @* Cột Hành động (Sử dụng MaBs làm khóa chính) *@
-                                <td>
-                                    <div class="d-flex w-100 justify-content-around">
+                                @* Cột Hành động (Sử dụng MaBs làm khóa chính) *@
+                                <td>
+                                    <div class="d-flex w-100 justify-content-around">
 
-                                        @* 1. Chi tiết (Details) *@
-                                        <a asp-action="Details" asp-route-id="@item.MaBs"
-                                           class="btn btn-icon btn-label-info waves-effect "
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
-                                            <i class='bx bx-detail'></i>
-                                        </a>
+                                        @* 1. Chi tiết (Details) *@
+                                        <a asp-action="Details" asp-route-id="@item.MaBs"
+                                                                 class="btn btn-icon btn-label-info waves-effect "
+                                                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
+                                            <i class='bx bx-detail'></i>
+                                        </a>
 
-                                        @* 2. Sửa (Edit) *@
-                                        <a asp-action="Edit" asp-route-id="@item.MaBs"
-                                           class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
-                                            <i class='bx bx-pencil'></i>
-                                        </a>
+                                        @* 2. Sửa (Edit) *@
+                                        <a asp-action="Edit" asp-route-id="@item.MaBs"
+                                                                 class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
+                                                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
+                                            <i class='bx bx-pencil'></i>
+                                        </a>
 
-                                        @* 3. Xóa (Delete) *@
-                                        <a asp-action="Delete" asp-route-id="@item.MaBs"
-                                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
-                                            <i class='bx bx-trash'></i>
-                                        </a>
-                                    </div>
-                                </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    @{
-                        int totalColumns = string.IsNullOrEmpty(maTlContext) ? 5 : 3;
+                                        @* 3. Xóa (Delete) *@
+                                        <a asp-action="Delete" asp-route-id="@item.MaBs"
+                                                                 class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
+                                                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+                                            <i class='bx bx-trash'></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
-                    <tr>
-                        <td colspan="@totalColumns" class="text-center text-muted py-5">
-                            <i class='bx bx-info-circle me-1'></i> Không có bản sao nào được tìm thấy.
-                        </td>
-                    </tr>
-                }
-                @* Đã điều chỉnh colspan để khớp với số cột hiển thị *@
-                </tbody>
-            </table>
-        </div>
+                    else
+                    {
+                        @* SỬ DỤNG CÚ PHÁP TERNARY TRONG INLINE CODE *@
+                        <tr>
+                            <td colspan="@(string.IsNullOrEmpty(maTlContext) ? 5 : 3)" class="text-center text-muted py-5">
+                                <i class='bx bx-info-circle me-1'></i> Không có bản sao nào được tìm thấy.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-        @* --- PHẦN 3.3: PHÂN TRANG (PAGINATION) --- *@
-        <div class="card-footer pt-0">
-            <partial name="_Pagination" />
-        </div>
-        
+        @* --- PHẦN 3.3: PHÂN TRANG (PAGINATION) --- *@
+        <div class="card-footer pt-0">
+            <partial name="_Pagination" />
+        </div>
+
         @* Nút Quay lại Context (Chỉ hiển thị nếu là Contextual Index) *@
         @if (tenTaiLieu != null)
         {
@@ -162,5 +158,5 @@
                 </a>
             </div>
         }
-    </div>
+    </div>
 </div>
