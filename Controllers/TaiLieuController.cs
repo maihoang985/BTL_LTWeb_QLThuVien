@@ -85,17 +85,17 @@ namespace Library_Manager.Controllers
         [Authorization("QLT")]
         public IActionResult Create()
         {
-            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "MaDd");
-            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "MaNn");
-            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "MaNxb");
-            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "MaThL");
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk");
+            // ĐIỀU CHỈNH: Hiện thị Tên thay vì Mã
+            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "TenDd");
+            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "TenNn");
+            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "TenNxb");
+            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "TenThL");
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk"); // Giữ MaTk nếu không có tên hiển thị
+
             return View();
         }
 
         // POST: TaiLieu/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorization("QLT")]
@@ -107,11 +107,12 @@ namespace Library_Manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "MaDd", tTaiLieu.MaDd);
-            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "MaNn", tTaiLieu.MaNn);
-            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "MaNxb", tTaiLieu.MaNxb);
-            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "MaThL", tTaiLieu.MaThL);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu.MaTk);
+            // ĐIỀU CHỈNH: Hiện thị Tên thay vì Mã khi Validation thất bại
+            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "TenDd", tTaiLieu.MaDd);
+            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "TenNn", tTaiLieu.MaNn);
+            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "TenNxb", tTaiLieu.MaNxb);
+            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "TenThL", tTaiLieu.MaThL);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu.MaTk); // Giữ MaTk nếu không có tên hiển thị
             return View(tTaiLieu);
         }
 
@@ -129,17 +130,16 @@ namespace Library_Manager.Controllers
             {
                 return NotFound();
             }
-            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "MaDd", tTaiLieu.MaDd);
-            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "MaNn", tTaiLieu.MaNn);
-            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "MaNxb", tTaiLieu.MaNxb);
-            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "MaThL", tTaiLieu.MaThL);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu.MaTk);
+            // ĐIỀU CHỈNH: Hiện thị Tên thay vì Mã
+            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "TenDd", tTaiLieu.MaDd);
+            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "TenNn", tTaiLieu.MaNn);
+            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "TenNxb", tTaiLieu.MaNxb);
+            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "TenThL", tTaiLieu.MaThL);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu.MaTk); // Giữ MaTk nếu không có tên hiển thị
             return View(tTaiLieu);
         }
 
         // POST: TaiLieu/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorization("QLT")]
@@ -170,11 +170,12 @@ namespace Library_Manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "MaDd", tTaiLieu.MaDd);
-            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "MaNn", tTaiLieu.MaNn);
-            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "MaNxb", tTaiLieu.MaNxb);
-            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "MaThL", tTaiLieu.MaThL);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu.MaTk);
+            // ĐIỀU CHỈNH: Hiện thị Tên thay vì Mã khi Validation thất bại
+            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "TenDd", tTaiLieu.MaDd);
+            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "TenNn", tTaiLieu.MaNn);
+            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "TenNxb", tTaiLieu.MaNxb);
+            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "TenThL", tTaiLieu.MaThL);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu.MaTk); // Giữ MaTk nếu không có tên hiển thị
             return View(tTaiLieu);
         }
 
