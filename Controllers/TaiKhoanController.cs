@@ -23,7 +23,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TTaiKhoans
-        public IActionResult Index(int? page, string searchString)
+        public IActionResult Index(int? page, string searchString, string roleFilter)
         {
             var pageNumber = page ?? 1;
             var pageSize = 6;
@@ -40,11 +40,20 @@ namespace Library_Manager.Controllers
                     tk.MaNv.Contains(searchString));
             }
 
+            // 2. MỚI: Lọc theo vai trò (Role Filter)
+            if (!string.IsNullOrEmpty(roleFilter))
+            {
+                taiKhoans = taiKhoans.Where(tk => tk.MaVt == roleFilter);
+            }
+
             taiKhoans = taiKhoans.OrderBy(tk => tk.MaTk);
 
             var pagedTaiKhoans = new PagedList<TTaiKhoan>(taiKhoans, pageNumber, pageSize);
 
             ViewBag.CurrentFilter = searchString;
+            ViewBag.CurrentRoleFilter = roleFilter; // Gửi vai trò đang được chọn về View
+            ViewBag.VaiTros = _context.TVaiTros.ToList(); // Gửi danh sách vai trò về View
+
             return View(pagedTaiKhoans);
         }
 
