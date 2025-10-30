@@ -49,8 +49,13 @@ namespace Library_Manager.Controllers
         {
             if (id == null) { return NotFound(); }
             var tTaiLieu = await _context.TTaiLieus
-                .Include(t => t.MaDdNavigation).Include(t => t.MaNnNavigation).Include(t => t.MaNxbNavigation)
-                .Include(t => t.MaThLNavigation).Include(t => t.MaTkNavigation)
+                .Include(t => t.MaDdNavigation)
+                .Include(t => t.MaNnNavigation)
+                .Include(t => t.MaNxbNavigation)
+                .Include(t => t.MaThLNavigation)
+                .Include(t => t.MaTkNavigation)
+                .Include(t => t.TTaiLieuTacGia)
+                .Include(t => t.TBanSaos)
                 .FirstOrDefaultAsync(m => m.MaTl == id);
             if (tTaiLieu == null) { return NotFound(); }
             return View(tTaiLieu);
@@ -73,7 +78,7 @@ namespace Library_Manager.Controllers
 
         // GET: TaiLieu/Edit/5
         [Authorization("QLT")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
             var tTaiLieu = await _context.TTaiLieus
@@ -83,6 +88,7 @@ namespace Library_Manager.Controllers
 
             if (tTaiLieu == null) { return NotFound(); }
             PopulateSelectList(tTaiLieu);
+            ViewBag.ReturnUrl = returnUrl;
             return View(tTaiLieu);
         }
 
@@ -203,7 +209,7 @@ namespace Library_Manager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorization("QLT")]
-        public async Task<IActionResult> Edit(string id,
+        public async Task<IActionResult> Edit(string id, 
             [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
             ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
         {
@@ -242,6 +248,7 @@ namespace Library_Manager.Controllers
                         .Include(t => t.TTaiLieuTacGia).ThenInclude(ttg => ttg.MaTgNavigation).FirstOrDefaultAsync(m => m.MaTl == id);
 
                     PopulateSelectList(originalTaiLieu);
+                    
                     return View(originalTaiLieu);
 
                     // Hoặc uncomment dòng dưới nếu bạn muốn về Index:
@@ -267,6 +274,7 @@ namespace Library_Manager.Controllers
                 tTaiLieu = tTaiLieuDisplay;
             }
             PopulateSelectList(tTaiLieu);
+            
             return View(tTaiLieu);
         }
 

@@ -114,7 +114,7 @@
                                         </a>
 
                                         @* 2. Sửa (Edit) *@
-                                        <a asp-action="Edit" asp-route-id="@item.MaBs"
+                                        <a asp-action="Edit" asp-route-id="@item.MaBs" asp-route-returnUrl="@Context.Request.Path"
                                                                  class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
                                                                  data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
                                             <i class='bx bx-pencil'></i>
