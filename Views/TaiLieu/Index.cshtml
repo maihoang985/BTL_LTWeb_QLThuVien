@@ -1,19 +1,19 @@
 ﻿@* ========================================================================
-   KHỐI 1: KHAI BÁO MODEL VÀ VIEWDATA
-   ======================================================================== *@
+    KHỐI 1: KHAI BÁO MODEL VÀ VIEWDATA
+    ======================================================================== *@
 @using PagedList.Core.Mvc
 @model PagedList.Core.IPagedList<Library_Manager.Models.TTaiLieu>
 
 @{
     ViewData["Title"] = "Quản lý Tài liệu"; // Tiêu đề trang
-    var userRole = Context.Session.GetString("UserRole"); // Lấy vai trò người dùng từ Session
-    bool canEdit = (userRole == "QTV" || userRole == "QLT"); // Ví dụ: QLT là Quản lý Tài liệu
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userRole = Context.Session.GetString("UserRole"); // Lấy vai trò người dùng từ Session
+    bool canEdit = (userRole == "QTV" || userRole == "QLT"); // Ví dụ: QLT là Quản lý Tài liệu
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @* ========================================================================
-   KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+    KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
@@ -43,21 +43,19 @@
         </div>
 
         @* ========================================================================
-           KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
-           ======================================================================== *@
+            KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
+            ======================================================================== *@
         <div class="table-responsive">
-            @* Đã xóa class text-nowrap khỏi table để Tên Tài liệu có thể xuống dòng *@
             <table class="table table-bordered table-hover" id="myTable">
 
                 @* --- PHẦN 3.1: TIÊU ĐỀ BẢNG (THEAD) --- *@
                 <thead id="myTableHead">
                     <tr>
                         <th style="min-width: 250px;">Tên tài liệu</th>
-                        <th style="white-space: nowrap;">Thể loại</th>
-                        <th style="white-space: nowrap;">Nhà xuất bản</th>
-                        <th style="white-space: nowrap;">Ngôn ngữ</th>
-                        <th style="white-space: nowrap;">Định dạng</th>
-                        <th style="min-width: 120px;">Hành động</th>
+                        <th style="width: 250px; white-space: nowrap;">Thể loại</th>
+                        <th style="width: 250px; white-space: nowrap;">Nhà xuất bản</th>
+                        <th style="width: 100px; white-space: nowrap;">Ngôn ngữ</th>
+                        <th style="width: 120px; white-space: nowrap;">Hành động</th>
                     </tr>
                 </thead>
 
@@ -68,34 +66,29 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                @* Cột Tên tài liệu: Cho phép xuống dòng *@
                                 <td>@Html.DisplayFor(modelItem => item.TenTl)</td>
-                                @* Các cột khác: Thêm lại style="white-space: nowrap;" để giữ 1 dòng *@
-                                <td style="white-space: nowrap;">@item.MaThLNavigation?.TenThL</td>
-                                <td style="white-space: nowrap;">@item.MaNxbNavigation?.TenNxb</td>
-                                <td style="white-space: nowrap;">@item.MaNnNavigation?.TenNn</td>
-                                <td style="white-space: nowrap;">@item.MaDdNavigation?.TenDd</td>
-                                <td>
-                                    <div class="d-flex w-100 justify-content-around">
 
-                                        @* 1. Chi tiết (Details) *@
+                                <td style="width: 250px; white-space: nowrap;">@item.MaThLNavigation?.TenThL</td>
+                                <td style="width: 250px; white-space: nowrap;">@item.MaNxbNavigation?.TenNxb</td>
+                                <td style="width: 100px; white-space: nowrap;">@item.MaNnNavigation?.TenNn</td>
+
+                                <td style="width: 120px; white-space: nowrap;">
+                                    <div class="d-flex w-100 justify-content-around">
                                         <a asp-action="Details" asp-route-id="@item.MaTl"
-                                                                            class="btn btn-icon btn-label-info waves-effect "
-                                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
+                                           class="btn btn-icon btn-label-info waves-effect "
+                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
                                             <i class='bx bx-detail'></i>
                                         </a>
 
-                                        @* 2. Sửa (Edit) *@
                                         <a asp-action="Edit" asp-route-id="@item.MaTl"
-                                                                            class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
-                                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
+                                           class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
+                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
                                             <i class='bx bx-pencil'></i>
                                         </a>
 
-                                        @* 3. Xóa (Delete) *@
                                         <a asp-action="Delete" asp-route-id="@item.MaTl"
-                                                                            class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
-                                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+                                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
+                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
                                             <i class='bx bx-trash'></i>
                                         </a>
                                     </div>
