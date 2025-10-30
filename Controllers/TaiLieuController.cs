@@ -278,6 +278,36 @@ namespace Library_Manager.Controllers
             return View(tTaiLieu);
         }
 
+        // GET: TaiLieu/Delete/5
+        [Authorization("QLT")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            // 1. Kiểm tra ID
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // 2. Truy vấn tài liệu và các thông tin liên quan cần thiết cho View xác nhận
+            var tTaiLieu = await _context.TTaiLieus
+                .Include(t => t.MaNxbNavigation)
+                .Include(t => t.MaThLNavigation)
+                .Include(t => t.MaNnNavigation)
+                .Include(t => t.MaDdNavigation)
+                .Include(t => t.MaTkNavigation)
+                .Include(t => t.TBanSaos) // Cần include TBanSaos để đếm số lượng bản sao hiển thị trên trang Delete
+                .FirstOrDefaultAsync(m => m.MaTl == id);
+
+            // 3. Kiểm tra tài liệu tồn tại
+            if (tTaiLieu == null)
+            {
+                return NotFound();
+            }
+
+            // 4. Trả về View Delete.cshtml
+            return View(tTaiLieu);
+        }
+
         #region Code giữ nguyên cho AJAX Actions
         // 1. Tác giả
         [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewTacGiaAjax([FromBody] TacGiaModel model) { if (string.IsNullOrEmpty(model.HoDem) || string.IsNullOrEmpty(model.Ten)) { return Json(new { success = false, message = "Họ đệm và Tên không được để trống." }); } var newMaTg = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newTacGia = new TTacGia { MaTg = newMaTg, HoDem = model.HoDem, Ten = model.Ten }; try { _context.TTacGia.Add(newTacGia); await _context.SaveChangesAsync(); return Json(new { success = true, maTg = newTacGia.MaTg, hoDem = newTacGia.HoDem, ten = newTacGia.Ten, fullName = newTacGia.HoDem + " " + newTacGia.Ten }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
