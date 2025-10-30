@@ -1,8 +1,198 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@* File: Views/Home/Index.cshtml (Phiên bản đã tối ưu) *@
+
+@{
+    ViewData["Title"] = "Tổng Quan Hệ Thống";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo dùng Layout của Sneat
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+
+        <div class="col-lg-12 mb-4 order-0">
+            <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Dashboard /</span> Tổng Quan Quản Trị (Admin)</h4>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title d-flex align-items-start justify-content-between">
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-primary"><i class='bx bxs-user-detail'></i></span>
+                        </div>
+                    </div>
+                    <span class="fw-semibold d-block mb-1">Tổng Độc giả</span>
+                    <h3 class="card-title mb-2">@ViewBag.TotalReaders</h3>
+                    <small class="text-muted">Độc giả mới: +5</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title d-flex align-items-start justify-content-between">
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-success"><i class='bx bxs-badge-check'></i></span>
+                        </div>
+                    </div>
+                    <span class="fw-semibold d-block mb-1">Bản sách Sẵn sàng</span>
+                    <h3 class="card-title mb-2">@ViewBag.AvailableCopies / @ViewBag.TotalCopies</h3>
+                    <small class="text-success fw-semibold">Tỷ lệ có sẵn</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title d-flex align-items-start justify-content-between">
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-warning"><i class='bx bxs-check-shield'></i></span>
+                        </div>
+                    </div>
+                    <span class="fw-semibold d-block mb-1">Tổng Sách Đang Mượn</span>
+                    <h3 class="card-title mb-2">@ViewBag.TotalLoans</h3>
+                    <small class="text-warning fw-semibold">GD trong ngày: +@ViewBag.LoansToday</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title d-flex align-items-start justify-content-between">
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-danger"><i class='bx bxs-error-alt'></i></span>
+                        </div>
+                    </div>
+                    <span class="fw-semibold d-block mb-1">SÁCH CẦN XỬ LÝ GẤP</span>
+                    <h3 class="card-title text-danger mb-2">@ViewBag.OverdueLoans</h3>
+                    <small class="text-danger fw-semibold">Quá hạn > 7 ngày</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 order-2 order-md-1">
+            <div class="row">
+
+                <div class="col-md-4 col-12 mb-4">
+                    <div class="card bg-label-secondary">
+                        <div class="card-body">
+                            <h5 class="card-title m-0 me-2 text-primary">⚡ Hành Động Nhanh</h5>
+                            <hr class="my-3" />
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Create", "BanDoc")" class="btn btn-sm btn-outline-primary"><i class='bx bx-user-plus me-1'></i> Thêm Độc giả mới</a>
+                                <a href="@Url.Action("Create", "TaiLieu")" class="btn btn-sm btn-outline-info"><i class='bx bx-book-add me-1'></i> Nhập Tài liệu mới</a>
+                                <a href="@Url.Action("Scan", "MuonTra")" class="btn btn-sm btn-success"><i class='bx bx-barcode-reader me-1'></i> Xử lý Mượn/Trả sách</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8 col-12 mb-4">
+                    <div class="card">
+                        <h5 class="card-header text-warning">📦 Cảnh Báo Tồn Kho Thấp</h5>
+                        <div class="table-responsive text-nowrap">
+                            <table class="table card-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mã TL</th>
+                                        <th>Tên Tài liệu</th>
+                                        <th>Tồn Kho Sẵn Sàng</th>
+                                        <th>Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-border-bottom-0">
+                                    @* Lặp qua ViewBag.LowStockList *@
+                                    <tr>
+                                        <td>TL0034</td>
+                                        <td>**Thiết Kế Database Cơ Bản**</td>
+                                        <td><span class="badge bg-label-warning me-1">2 bản</span></td>
+                                        <td><a href="#" class="text-primary">Nhập thêm</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>TL0012</td>
+                                        <td>**Lịch Sử Việt Nam**</td>
+                                        <td><span class="badge bg-label-danger me-1">0 bản</span></td>
+                                        <td><a href="#" class="text-primary">Đã hết</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 order-3">
+            <div class="row">
+
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <h5 class="card-header text-danger">🚨 Chi Tiết 5 Giao Dịch Quá Hạn Lâu Nhất</h5>
+                        <div class="table-responsive text-nowrap">
+                            <table class="table card-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tên Sách</th>
+                                        <th>Mã BD/Tên Độc giả</th>
+                                        <th>Ngày Hẹn Trả</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-border-bottom-0">
+                                    @* Dùng @foreach để lặp qua ViewBag.OverdueList *@
+                                    <tr>
+                                        <td>**Lập Trình C# Cơ Bản**</td>
+                                        <td>BD001 - Văn A</td>
+                                        <td><span class="badge bg-label-danger me-1">20/10/2025</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class='bx bxs-book-open me-2'></i> **Mật Mã Da Vinci**</td>
+                                        <td>BD005 - Thị B</td>
+                                        <td><span class="badge bg-label-danger me-1">25/10/2025</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <h5 class="card-header">📋 10 Giao Dịch Mượn/Trả Gần Nhất</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-border-bottom-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã GD</th>
+                                        <th>Loại</th>
+                                        <th>Độc giả</th>
+                                        <th>Thời gian</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @* Dùng @foreach để lặp qua ViewBag.RecentTransactions *@
+                                    <tr>
+                                        <td>GD0123</td>
+                                        <td><span class="badge bg-success">Trả</span></td>
+                                        <td>Lê Văn C</td>
+                                        <td>10:05 AM</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GD0124</td>
+                                        <td><span class="badge bg-primary">Mượn</span></td>
+                                        <td>Phạm Thị D</td>
+                                        <td>09:40 AM</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+}
