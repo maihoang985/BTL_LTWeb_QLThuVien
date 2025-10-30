@@ -5,6 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@{
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+
 @* ========================================================================
     KHỐI 1: LOGIC PHÂN QUYỀN VÀ BADGE
     ======================================================================== *@
@@ -112,7 +117,7 @@
                                 <a asp-controller="NhanVien" 
                                 asp-action="Details" 
                                 asp-route-id="@Model.MaNv"
-                                asp-route-returnUrl="@Context.Request.Path"
+                                asp-route-returnUrl="@currentUrl"
                                    class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
                                    data-bs-toggle="tooltip" title="Xem chi tiết Nhân viên">
                                     <i class='bx bx-link-external'></i>
@@ -139,9 +144,23 @@
                 </a>
 
                 @* Nút Quay lại *@
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                </a>
+                <div>
+                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        // Nếu có returnUrl, quay lại trang đó
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại
+                        </a>
+                    }
+                    else
+                    {
+                        // Nếu không, quay về trang Index mặc định của BanDoc
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                        </a>
+                    }
+                </div>
+
             </div>
         </div>
 

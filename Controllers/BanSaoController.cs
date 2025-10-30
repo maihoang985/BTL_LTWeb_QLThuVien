@@ -36,7 +36,11 @@ namespace Library_Manager.Controllers
                     .Where(t => t.MaTl == id)
                     .Select(t => t.TenTl)
                     .FirstOrDefault();
+
+                ViewBag.MaTl = id;
             }
+
+
 
             // Nếu có từ khóa tìm kiếm
             if (!string.IsNullOrEmpty(searchString))

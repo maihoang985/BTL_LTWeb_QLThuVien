@@ -11,6 +11,11 @@
     bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
+@{
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+
 @* ========================================================================
    KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
    ======================================================================== *@
@@ -106,7 +111,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label d-block text-secondary">Tác giả</label>
-                        @if (Model.TTaiLieuTacGia.Any())
+                       @*  @if (Model.TTaiLieuTacGia.Any())
                         {
                             <ul class="list-unstyled mb-0">
                                 @foreach (var tlTg in Model.TTaiLieuTacGia)
@@ -126,7 +131,15 @@
                         else
                         {
                             <p class="text-muted">Chưa có thông tin tác giả.</p>
-                        }
+                        } *@
+                        @* Nút Quản lý Tác giả - Đã sửa asp-route-id thành asp-route-MaTl *@
+                        <a asp-controller="TaiLieu_TacGia"
+                           asp-action="Details"
+                           asp-route-id="@Model?.MaTl"
+                           asp-route-returnUrl="@Context.Request.Path"
+                           ** class="btn btn-warning">
+                            <i class='bx bx-group me-1'></i> Xem Tác giả (@Model.TTaiLieuTacGia.Count)
+                        </a>
                     </div>
                 </div>
             </div>
@@ -152,7 +165,7 @@
                                 <a asp-controller="TaiKhoan"
                                                      asp-action="Details"
                                                      asp-route-id="@Model.MaTk"
-                                                     asp-route-returnUrl="@Context.Request.Path"
+                                                     asp-route-returnUrl="@currentUrl"
                                                      class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
                                                      data-bs-toggle="tooltip" title="Xem chi tiết Tài khoản">
                                     <i class='bx bx-link-external'></i>
@@ -169,13 +182,11 @@
         <div class="card-footer border-top pt-3">
             <div class="d-flex gap-3 flex-wrap">
                 @* Nút Sửa *@
-                <a asp-action="Edit" asp-route-id="@Model?.MaTl" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                <a asp-action="Edit" 
+                asp-route-id="@Model?.MaTl"
+                asp-route-returnUrl="@Context.Request.Path"
+                class="btn btn-primary @(canEdit ? "" : "disabled")">
                     <i class="bx bx-pencil me-1"></i> Sửa thông tin
-                </a>
-
-                @* Nút Quản lý Tác giả - Đã sửa asp-route-id thành asp-route-MaTl *@
-                <a asp-controller="TaiLieuTacGia" asp-action="Index" **asp-route-MaTl="@Model?.MaTl" ** class="btn btn-warning">
-                    <i class='bx bx-group me-1'></i> Quản lý Tác giả (@Model.TTaiLieuTacGia.Count)
                 </a>
 
                 @* Nút Xem Bản sao *@
