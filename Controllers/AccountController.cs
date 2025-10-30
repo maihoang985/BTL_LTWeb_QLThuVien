@@ -93,6 +93,9 @@ namespace Library_Manager.Controllers
                 HttpContext.Session.SetString("UserRole", taiKhoan.MaVt.ToString()); // Mã vai trò (QTV, QLB...)
                 HttpContext.Session.SetString("MaNv", taiKhoan.MaNv);
 
+                // Lưu tài khoản vào TempData để sử dụng trong HomeController (nếu cần)
+                HttpContext.Session.SetString("MaTk", taiKhoan.MaTk);
+
                 // Chuyển về trang chủ
                 return RedirectToAction("Index", "Home");
             }
