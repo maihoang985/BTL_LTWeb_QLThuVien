@@ -1,6 +1,48 @@
-﻿@{
-    // Lấy vai trò của người dùng từ Session
+﻿@using Microsoft.AspNetCore.Http
+@using System.Linq
+@using System.Text.RegularExpressions
+
+@{
+    // Lấy vai trò của người dùng từ Session (Giữ nguyên cách làm của bạn)
     var userRole = Context.Session.GetString("UserRole");
+
+    // 1. LẤY THÔNG TIN ROUTE HIỆN TẠI
+    // Lấy Controller và Action từ ViewContext.RouteData
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+
+    // 2. XÂY DỰNG CÁC HÀM KIỂM TRA
+
+    // Hàm kiểm tra mục menu con (liên kết trực tiếp)
+    // Trả về "active" nếu Controller và Action khớp với Route hiện tại
+    string IsActive(string controllerName, string actionName = "Index")
+    {
+        if (currentController != null && currentAction != null)
+        {
+            if (currentController.Equals(controllerName, StringComparison.OrdinalIgnoreCase) &&
+                currentAction.Equals(actionName, StringComparison.OrdinalIgnoreCase))
+            {
+                return "active";
+            }
+        }
+        return "";
+    }
+
+    // Hàm kiểm tra mục menu cha (menu-toggle)
+    // Trả về "active open" nếu Controller hiện tại nằm trong danh sách Controller con.
+    string IsParentActive(params string[] controllerNames)
+    {
+        if (currentController != null)
+        {
+            var isActive = controllerNames.Any(c => c.Equals(currentController, StringComparison.OrdinalIgnoreCase));
+            return isActive ? "active open" : ""; // "open" là class để mở menu thả xuống
+        }
+        return "";
+    }
+
+    // Hàm kiểm tra quyền truy cập (giữ lại logic ban đầu của bạn)
+    bool CanAccess(params string[] roles) => roles.Contains(userRole);
 }
 
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
@@ -22,101 +64,80 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <!-- Dashboard -->
-        <li class="menu-item active">
+
+        <!-- 1. Dashboard - Trang chủ -->
+        <li class="menu-item @IsActive("Home", "Index")">
             <a href="/Home/Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div>Trang chủ</div>
             </a>
         </li>
 
-        <!-- Quản lý bạn đọc -->
-        @* @{
-            // Kiểm tra xem người dùng có quyền không (QTV hoặc QLB)
-            bool canAccessBanDoc = (userRole == "QTV" || userRole == "QLB");
-        } *@
-        <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
+
+        <!-- 2. Quản lý bạn đọc (Menu cha) -->
+        <li class="menu-item @IsParentActive("TheBanDoc", "BanDoc")">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user"></i>
                 <div>Quản lý bạn đọc</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item" >
+                <li class="menu-item @IsActive("TheBanDoc", "Index")">
                     <a class="menu-link" asp-controller="TheBanDoc" asp-action="Index">
-                    @* <a href="/BanDoc/TheBanDoc" class="menu-link"> *@
                         <div>Quản lý thẻ bạn đọc</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item @IsActive("BanDoc", "Index")">
                     <a class="menu-link" asp-controller="BanDoc" asp-action="Index">
-                        @* <a href="/BanDoc/ThongTin" class="menu-link"> *@
                         <div>Quản lý thông tin bạn đọc</div>
                     </a>
                 </li>
             </ul>
         </li>
-        
 
-        <!-- Quản lý tài liệu -->
-        @* @if (userRole == "QTV" || userRole == "QLT")
-        { *@
-        @* @{
-            bool canAccessTaiLieu = (userRole == "QTV" || userRole == "QLT");
-        } *@
-        <li class="menu-item @* @(canAccessTaiLieu ? "" : "disabled") *@">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
+
+        <!-- 3. Quản lý tài liệu (Menu cha) -->
+        <li class="menu-item @IsParentActive("TacGia", "TaiLieu")">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-book"></i>
                 <div>Quản lý tài liệu</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
-                    @* <a href="/TaiLieu/DanhMuc" class="menu-link"> *@
+                <li class="menu-item @IsActive("TacGia", "Index")">
                     <a class="menu-link" asp-controller="TacGia" asp-action="Index">
                         <div>Danh mục tài liệu</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item @IsActive("TaiLieu", "Index")">
                     <a class="menu-link" asp-controller="TaiLieu" asp-action="Index">
-                    @* <a href="/TaiLieu/QuanLy" class="menu-link"> *@
                         <div>Quản lý tài liệu</div>
                     </a>
                 </li>
             </ul>
         </li>
-        
 
-        <!-- Quản lý mượn trả -->
-        @* @if (userRole == "QTV" || userRole == "QLM")
-        { *@
-      @*   @{
-            bool canAccessMuonTra = (userRole == "QTV" || userRole == "QLM");
-        } *@
-        <li class="menu-item @* @(canAccessMuonTra ? "" : "disabled") *@">
-                @* <a href="/MuonTra/Index" class="menu-link"> *@
-                <a class="menu-link" asp-controller="GiaoDichMuonTra" asp-action="Index">
-                    <i class="menu-icon tf-icons bx bx-transfer"></i>
-                    <div>Quản lý mượn trả</div>
-                </a>
-            </li>
 
-            <!-- Quản lý phân quyền -->
-        @{
-            bool canAccessPhanQuyen = (userRole == "QTV");
-        }
-            <li class="menu-item ">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <!-- 4. Quản lý mượn trả (Mục đơn) -->
+        <li class="menu-item @IsActive("GiaoDichMuonTra", "Index")">
+            <a class="menu-link" asp-controller="GiaoDichMuonTra" asp-action="Index">
+                <i class="menu-icon tf-icons bx bx-transfer"></i>
+                <div>Quản lý mượn trả</div>
+            </a>
+        </li>
+
+
+        <!-- 5. Quản lý phân quyền (Menu cha) -->
+        <li class="menu-item @IsParentActive("TaiKhoan", "NhanVien")">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
                 <div>Quản lý phân quyền</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item @(canAccessPhanQuyen ? "" : "disabled")">
-                    @* <a href="/PhanQuyen/TaiKhoan" class="menu-link"> *@
-                        <a class="menu-link" asp-controller="TaiKhoan" asp-action="Index">
+                <li class="menu-item @IsActive("TaiKhoan", "Index") @(CanAccess("QTV") ? "" : "disabled")">
+                    <a class="menu-link" asp-controller="TaiKhoan" asp-action="Index">
                         <div>Quản lý tài khoản</div>
                     </a>
                 </li>
-                <li class="menu-item">      
-                   @*  <a href="/PhanQuyen/NhanVien" class="menu-link"> *@
+                <li class="menu-item @IsActive("NhanVien", "Index")">
                     <a class="menu-link" asp-controller="NhanVien" asp-action="Index">
                         <div>Thông tin nhân viên</div>
                     </a>
@@ -124,9 +145,9 @@
             </ul>
         </li>
 
-        <!-- Thống kê - Báo cáo -->
-        <li class="menu-item">
-            @* <a href="/ThongKe/Index" class="menu-link"> *@
+
+        <!-- 6. Thống kê - Báo cáo (Mục đơn) -->
+        <li class="menu-item @IsActive("ThongKe", "Index")">
             <a class="menu-link" asp-controller="ThongKe" asp-action="Index">
                 <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
                 <div>Thống kê - Báo cáo</div>
