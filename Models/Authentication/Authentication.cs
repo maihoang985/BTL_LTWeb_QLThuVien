@@ -7,7 +7,9 @@ namespace Library_Manager.Models.Authentication
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.HttpContext.Session.GetString("UserName") == null)
+            // SỬA ĐỔI: Kiểm tra Session "MaTk" (Mã Tài khoản)
+            // Nếu MaTk không tồn tại, tức là chưa đăng nhập, chuyển hướng về Login.
+            if (context.HttpContext.Session.GetString("MaTk") == null)
             {
                 context.Result = new RedirectToRouteResult(
                     new RouteValueDictionary
@@ -20,4 +22,3 @@ namespace Library_Manager.Models.Authentication
         }
     }
 }
-
