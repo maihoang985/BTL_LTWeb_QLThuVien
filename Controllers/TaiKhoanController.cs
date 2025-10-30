@@ -49,7 +49,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TTaiKhoans/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null)
             {
@@ -64,6 +64,8 @@ namespace Library_Manager.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.ReturnUrl = returnUrl;
 
             return View(tTaiKhoan);
         }

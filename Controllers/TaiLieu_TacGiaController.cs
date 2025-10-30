@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Library_Manager.Models;
+using PagedList.Core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
@@ -19,14 +20,41 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu_TacGia
-        public async Task<IActionResult> Index()
+        public IActionResult Index(int? page, string searchString)
         {
-            var qlthuVienContext = _context.TTaiLieuTacGia.Include(t => t.MaTgNavigation).Include(t => t.MaTlNavigation);
-            return View(await qlthuVienContext.ToListAsync());
+            int pageNumber = page ?? 1;
+            int pageSize = 6;
+
+            // 1. Giữ IQueryable để có thể kết hợp điều kiện và phân trang
+            IQueryable<TTaiLieuTacGia> query = _context.TTaiLieuTacGia
+                .Include(t => t.MaTgNavigation)
+                .Include(t => t.MaTlNavigation);
+
+            // 2. Nếu có chuỗi tìm kiếm
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(t =>
+                    t.MaTlNavigation.TenTl.Contains(searchString) ||    // tên tài liệu
+                    t.MaTgNavigation.Ten.Contains(searchString) ||    // tên tác giả
+                    t.MaTgNavigation.HoDem.Contains(searchString) ||  // họ đệm tác giả
+                    t.MaTl.Contains(searchString) ||                    // mã tài liệu
+                    t.MaTg.Contains(searchString));                     // mã tác giả
+            }
+
+            // 3. Sắp xếp
+            query = query.OrderBy(t => t.MaTl);
+
+            // 4. Chuyển sang PagedList
+            var pagedList = new PagedList<TTaiLieuTacGia>(query, pageNumber, pageSize);
+
+            // 5. Lưu giá trị tìm kiếm để hiển thị lại trên View
+            ViewBag.CurrentFilter = searchString;
+
+            return View(pagedList);
         }
 
         // GET: TaiLieu_TacGia/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null)
             {
@@ -34,13 +62,17 @@ namespace Library_Manager.Controllers
             }
 
             var tTaiLieuTacGia = await _context.TTaiLieuTacGia
+                .Where(t => t.MaTl == id)
                 .Include(t => t.MaTgNavigation)
                 .Include(t => t.MaTlNavigation)
-                .FirstOrDefaultAsync(m => m.MaTl == id);
+                .ToListAsync();
+
             if (tTaiLieuTacGia == null)
             {
                 return NotFound();
             }
+
+            ViewBag.ReturnUrl = returnUrl;
 
             return View(tTaiLieuTacGia);
         }
@@ -138,6 +170,7 @@ namespace Library_Manager.Controllers
                 .Include(t => t.MaTgNavigation)
                 .Include(t => t.MaTlNavigation)
                 .FirstOrDefaultAsync(m => m.MaTl == id);
+             
             if (tTaiLieuTacGia == null)
             {
                 return NotFound();

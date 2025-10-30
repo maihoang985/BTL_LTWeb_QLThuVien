@@ -6,7 +6,7 @@
 
 @{
     ViewData["Title"] = "Quản lý Bản sao";
-    var maTlContext = Context.Request.Query["MaTl"];
+    var maTlContext = ViewBag.MaTl; // lấy MaTl từ ViewBag
     var tenTaiLieu = ViewBag.TenTaiLieu;
 
     // Giả định quyền chỉnh sửa tương tự QLT
