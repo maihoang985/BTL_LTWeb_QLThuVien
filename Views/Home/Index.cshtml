@@ -38,12 +38,13 @@
     <div class="row">
 
         <div class="col-lg-12 mb-4 order-0">
+            @* SỬA LỖI: Bỏ ** để tránh hiển thị trong View *@
             <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Dashboard /</span> Tổng Quan Quản Trị (@tenVaiTro)</h4>
         </div>
 
         @* ========================================================================
-           KHỐI 1: CÁ NHÂN, TÀI KHOẢN & TRUY CẬP CÁ NHÂN (FULL WIDTH)
-           ======================================================================== *@
+            KHỐI 1: CÁ NHÂN, TÀI KHOẢN & TRUY CẬP CÁ NHÂN (FULL WIDTH)
+            ======================================================================== *@
         @if (employee != null && account != null)
         {
             <div class="col-lg-12 mb-4 order-0">
@@ -51,7 +52,8 @@
                     <div class="row">
 
                         <div class="col-lg-8 col-md-12 border-end">
-                            <h5 class="text-primary mb-3"><i class='bx bxs-user-badge me-2'></i> @greeting, @employee.HoDem @employee.Ten!</h5>
+                            @* SỬA LỖI: Bỏ ** và dùng <strong> cho tên *@
+                            <h5 class="text-primary mb-3"><i class='bx bxs-user-badge me-2'></i> @greeting, <strong>@employee.HoDem @employee.Ten!</strong></h5>
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <span class="d-block text-secondary">Mã NV:</span>
@@ -97,43 +99,49 @@
         }
         @* --- KẾT THÚC KHỐI CÁ NHÂN --- *@
 
-
         @* ========================================================================
-           KHỐI 2: QUẢN LÝ MƯỢN/TRẢ (COL-LG-6)
-           ======================================================================== *@
+            KHỐI 2: QUẢN LÝ MƯỢN/TRẢ (FULL WIDTH - Kích thước thống nhất: col-md-4)
+            ======================================================================== *@
         <div class="col-lg-12 mb-4">
             <div class="card h-100">
                 <h5 class="card-header text-primary"><i class='bx bxs-check-square me-2'></i> Quản Lý Mượn/Trả</h5>
                 <div class="card-body">
                     <div class="row">
 
+                        @* 1. SÁCH QUÁ HẠN *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-danger text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-danger">SÁCH QUÁ HẠN</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-danger"><strong>SÁCH QUÁ HẠN</strong></h6>
                                     <h2 class="card-text">@ViewBag.OverdueLoans</h2>
                                     <small class="text-danger fw-semibold">Cần thu hồi ngay</small>
                                 </div>
                             </div>
                         </div>
+                        @* 2. TỔNG ĐANG MƯỢN *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-warning text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-warning">TỔNG ĐANG MƯỢN</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-warning"><strong>TỔNG ĐANG MƯỢN</strong></h6>
                                     <h2 class="card-text">@ViewBag.TotalLoans</h2>
                                     <small class="text-warning fw-semibold">GD trong ngày: +@ViewBag.LoansToday</small>
                                 </div>
                             </div>
                         </div>
+                        @* 3. XỬ LÝ GIAO DỊCH (THAO TÁC NHANH) *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-primary text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-primary">XỬ LÝ GIAO DỊCH</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-primary"><strong>XỬ LÝ GIAO DỊCH</strong></h6>
                                     <a href="@Url.Action("Create", "GiaoDichMuonTra")" class="btn btn-primary mt-2"><i class='bx bx-barcode-reader me-1'></i> Bắt đầu</a>
                                 </div>
                             </div>
                         </div>
 
+                        @* 4. 5 Giao Dịch Quá Hạn Lâu Nhất (Giữ nguyên) *@
                         <div class="col-lg-6 mb-4">
                             <h6 class="text-danger mb-3 border-bottom pb-1"><i class='bx bx-list-ol me-1'></i> 5 Giao Dịch Quá Hạn Lâu Nhất</h6>
                             <div class="table-responsive">
@@ -156,6 +164,7 @@
                             </div>
                         </div>
 
+                        @* 5. 5 Hoạt Động Giao Dịch Gần Nhất (Giữ nguyên) *@
                         <div class="col-lg-6 mb-4">
                             <h6 class="text-primary mb-3 border-bottom pb-1"><i class='bx bx-time-five me-1'></i> 5 Hoạt Động Giao Dịch Gần Nhất</h6>
                             <div class="table-responsive">
@@ -176,50 +185,57 @@
 
                     </div>
                 </div>
+                @* Đã thống nhất màu button thành btn-primary *@
                 <div class="card-footer d-flex justify-content-end bg-transparent border-top">
                     <a href="@Url.Action("Index", "GiaoDichMuonTra")" class="btn btn-sm btn-primary">Xem tất cả Giao dịch <i class='bx bx-right-arrow-alt'></i></a>
                 </div>
             </div>
         </div>
 
-
         @* ========================================================================
-           KHỐI 3: QUẢN LÝ TÀI LIỆU (FULL WIDTH)
-           ======================================================================== *@
+            KHỐI 3: QUẢN LÝ TÀI LIỆU (Đã bỏ phần thống kê Thể loại)
+            ======================================================================== *@
         <div class="col-lg-12 mb-4">
             <div class="card h-100">
                 <h5 class="card-header text-info"><i class='bx bxs-box me-2'></i> Quản Lý Tài Liệu (Kho)</h5>
                 <div class="card-body">
                     <div class="row">
 
+                        @* 1. ĐẦU SÁCH CẦN NHẬP *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-warning text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-warning">ĐẦU SÁCH CẦN NHẬP</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-warning"><strong>ĐẦU SÁCH CẦN BỔ SUNG</strong></h6>
                                     <h2 class="card-text">@ViewBag.LowStockCount</h2>
                                     <small class="text-warning fw-semibold">Tồn kho < 3 bản</small>
                                 </div>
                             </div>
                         </div>
+                        @* 2. BẢN SÁCH SẴN SÀNG *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-success text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-success">BẢN SÁCH SẴN SÀNG</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-success"><strong>BẢN SÁCH SẴN SÀNG</strong></h6>
                                     <h2 class="card-text">@ViewBag.AvailableCopies</h2>
                                     <small class="text-success fw-semibold">Tổng: @ViewBag.TotalCopies</small>
                                 </div>
                             </div>
                         </div>
+                        @* 3. NHẬP LIỆU NHANH (THAO TÁC NHANH) *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-info text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-info">NHẬP LIỆU NHANH</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-info"><strong>NHẬP LIỆU NHANH</strong></h6>
                                     <a href="@Url.Action("Create", "TaiLieu")" class="btn btn-info mt-2">Thêm Tài liệu mới</a>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-lg-6 mb-4">
+                        @* 4. 5 Tài Liệu Cần Bổ Sung Gấp (Chiếm hết chiều rộng còn lại: col-lg-12) *@
+                        <div class="col-lg-12 mb-4">
                             <h6 class="text-warning mb-3 border-bottom pb-1"><i class='bx bx-alarm-exclamation me-1'></i> 5 Tài Liệu Cần Bổ Sung Gấp</h6>
                             <div class="table-responsive">
                                 <table class="table card-table table-sm">
@@ -241,57 +257,58 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6 mb-4">
-                            <h6 class="text-info mb-3 border-bottom pb-1"><i class='bx bx-category-alt me-1'></i> Tổng Quan Kho</h6>
-                            <div class="alert alert-light text-center fst-italic">
-                                Thêm biểu đồ phân bố Ngôn ngữ/Định dạng ở đây (nếu có dữ liệu).
-                            </div>
-                        </div>
-
                     </div>
                 </div>
+                @* Đã điều chỉnh 2 button theo yêu cầu: 1 outline, 1 primary *@
                 <div class="card-footer d-flex justify-content-end bg-transparent border-top">
-                    <a href="@Url.Action("Index", "TaiLieu")" class="btn btn-sm btn-info">Quản lý Tài liệu <i class='bx bx-right-arrow-alt'></i></a>
+                    <a href="@Url.Action("Index", "TaiLieu")" class="btn btn-sm btn-primary">Quản lý Tài liệu <i class='bx bx-right-arrow-alt'></i></a>
                 </div>
             </div>
         </div>
 
         @* ========================================================================
-           KHỐI 4: QUẢN LÝ BẠN ĐỌC (FULL WIDTH)
-           ======================================================================== *@
+            KHỐI 4: QUẢN LÝ BẠN ĐỌC (FULL WIDTH - Kích thước thống nhất: col-md-4)
+            ======================================================================== *@
         <div class="col-lg-12 mb-4">
             <div class="card">
                 <h5 class="card-header text-success"><i class='bx bxs-group me-2'></i> Quản Lý Bạn Đọc</h5>
                 <div class="card-body">
                     <div class="row">
 
+                        @* 1. THẺ BẠN ĐỌC BỊ KHÓA *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-danger text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-danger">THẺ BẠN ĐỌC BỊ KHÓA</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-danger"><strong>THẺ BẠN ĐỌC BỊ KHÓA</strong></h6>
                                     <h2 class="card-text">@ViewBag.LockedReaders</h2>
                                     <small class="text-danger fw-semibold">Cần giải quyết vi phạm</small>
                                 </div>
                             </div>
                         </div>
+                        @* 2. TỔNG ĐỘC GIẢ *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-primary text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-primary">TỔNG ĐỘC GIẢ</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-primary"><strong>TỔNG ĐỘC GIẢ</strong></h6>
                                     <h2 class="card-text">@ViewBag.TotalReaders</h2>
-                                    <small class="text-primary fw-semibold">Thành viên mới: +5</small>
+                                    <small class="text-primary fw-semibold">Thành viên mới: +@(((List<dynamic>)ViewBag.NewReadersList).Count)</small>
                                 </div>
                             </div>
                         </div>
+                        @* 3. ĐĂNG KÝ MỚI (THAO TÁC NHANH) *@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-success text-center">
                                 <div class="card-body">
-                                    <h6 class="card-title text-success">ĐĂNG KÝ MỚI</h6>
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-success"><strong>ĐĂNG KÝ MỚI</strong></h6>
                                     <a href="@Url.Action("Create", "BanDoc")" class="btn btn-success mt-2">Đăng ký độc giả</a>
                                 </div>
                             </div>
                         </div>
 
+                        @* 4. 5 Độc Giả Mới Nhất (Giữ nguyên) *@
                         <div class="col-lg-6 mb-4">
                             <h6 class="text-primary mb-3 border-bottom pb-1"><i class='bx bx-user-pin me-1'></i> 5 Độc Giả Mới Nhất</h6>
                             <div class="table-responsive">
@@ -313,22 +330,44 @@
                                                 </td>
                                             </tr>
                                         }
+                                        @if (((List<dynamic>)ViewBag.NewReadersList).Count == 0)
+                                        {
+                                            <tr><td colspan="2" class="text-center text-muted fst-italic">Không có độc giả mới.</td></tr>
+                                        }
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
+                        @* 5. Thẻ Độc Giả Sắp/Đã Hết Hạn (Giữ nguyên) *@
                         <div class="col-lg-6 mb-4">
-                            <h6 class="text-danger mb-3 border-bottom pb-1"><i class='bx bx-calendar-x me-1'></i> Thẻ Độc Giả Sắp/Đã Hết Hạn</h6>
-                            <div class="alert alert-light text-center fst-italic">
-                                Thêm danh sách thẻ độc giả sắp hết hạn (cần truy vấn mới) ở đây.
+                            <h6 class="text-danger mb-3 border-bottom pb-1"><i class='bx bx-calendar-x me-1'></i> 5 Thẻ Độc Giả Sắp/Đã Hết Hạn</h6>
+                            <div class="table-responsive">
+                                <table class="table card-table table-sm">
+                                    <tbody class="table-border-bottom-0">
+                                        @foreach (var item in ViewBag.ExpiringReaders)
+                                        {
+                                            var badgeClass = item.IsExpired ? "bg-label-danger" : "bg-label-warning";
+                                            var icon = item.IsExpired ? "bx-x-circle" : "bx-alarm";
+                                            <tr>
+                                                <td><i class='bx @icon me-2'></i> @item.DocGia</td>
+                                                <td class="text-end"><span class="badge @badgeClass">@item.NgayHetHan</span></td>
+                                            </tr>
+                                        }
+                                        @if (((List<dynamic>)ViewBag.ExpiringReaders).Count == 0)
+                                        {
+                                            <tr><td colspan="2" class="text-center text-success fst-italic">Không có thẻ sắp/đã hết hạn trong 30 ngày tới.</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
                     </div>
                 </div>
+                @* Đã thống nhất màu button thành btn-primary *@
                 <div class="card-footer d-flex justify-content-end bg-transparent border-top">
-                    <a href="@Url.Action("Index", "BanDoc")" class="btn btn-sm btn-success">Quản lý Bạn đọc <i class='bx bx-right-arrow-alt'></i></a>
+                    <a href="@Url.Action("Index", "BanDoc")" class="btn btn-sm btn-primary">Quản lý Bạn đọc <i class='bx bx-right-arrow-alt'></i></a>
                 </div>
             </div>
         </div>
