@@ -5,38 +5,28 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
         <i class='bx bx-pencil fs-2 me-2 border p-1 rounded-2'></i> Chỉnh sửa thông tin Tài liệu
     </h1>
 
-    @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
-    <div class="card">
+    <div id="alertPlaceholder"></div>
 
-        @* HEADER CỦA CARD: Tên biểu mẫu đang chỉnh sửa *@
+    <div class="card">
         <div class="card-header border-bottom">
             <h5 class="card-title mb-0">Chỉnh sửa thông tin cho: <span class="text-info fw-bold">@Model.TenTl</span></h5>
         </div>
 
-        <form asp-action="Edit">
-            @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
+        <form asp-action="Edit" id="editTaiLieuForm">
             <div class="card-body">
 
-                @* Phần hiển thị lỗi tổng thể *@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-                @* Mã Tài liệu (Hidden Field) - Cần thiết cho việc chỉnh sửa *@
                 <input type="hidden" asp-for="MaTl" />
 
-                @* TÁI CẤU TRÚC: CHIA BIỂU MẪU THÀNH 2 CỘT & CHIA NHÓM THÔNG TIN *@
                 <div class="row">
 
-                    @* --- CỘT 1: THÔNG TIN CƠ BẢN & XUẤT BẢN (6/12) --- *@
                     <div class="col-md-6 pt-3">
                         <h6 class="text-muted text-uppercase mb-3 mt-0">
                             <i class='bx bx-book me-1'></i> Thông tin cơ bản
@@ -49,12 +39,18 @@
                             <span asp-validation-for="TenTl" class="text-danger"></span>
                         </div>
 
-                        @* Nhà xuất bản (Select) *@
+                        @* Nhà xuất bản (Select) + Nút thêm mới *@
                         <div class="mb-3">
                             <label asp-for="MaNxb" class="form-label">Nhà xuất bản</label>
-                            <select asp-for="MaNxb" class="form-select" asp-items="ViewBag.MaNxb"></select>
+                            <div class="input-group">
+                                <select asp-for="MaNxb" id="selectNxb" class="form-select" asp-items="ViewBag.MaNxb"></select>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addNewNxbModal" title="Thêm Nhà xuất bản mới">
+                                    <i class="bx bx-plus"></i>
+                                </button>
+                            </div>
                             <span asp-validation-for="MaNxb" class="text-danger"></span>
                         </div>
+
 
                         @* Lần Xuất bản *@
                         <div class="mb-3">
@@ -69,32 +65,53 @@
                             <input asp-for="NamXuatBan" class="form-control" type="number" />
                             <span asp-validation-for="NamXuatBan" class="text-danger"></span>
                         </div>
+
+                        @* Khổ cỡ *@
+                        <div class="mb-3">
+                            <label asp-for="KhoCo" class="form-label">Khổ cỡ</label>
+                            <input asp-for="KhoCo" class="form-control" />
+                            <span asp-validation-for="KhoCo" class="text-danger"></span>
+                        </div>
                     </div>
 
-                    @* --- CỘT 2: PHÂN LOẠI & KÍCH THƯỚC (6/12) --- *@
                     <div class="col-md-6 pt-3">
                         <h6 class="text-muted text-uppercase mb-3 mt-0">
-                            <i class='bx bx-category me-1'></i> Phân loại & Kích thước
+                            <i class='bx bx-category me-1'></i> Phân loại & Tác giả
                         </h6>
 
-                        @* Thể loại (Select) *@
+                        @* Thể loại (Select) + Nút thêm mới *@
                         <div class="mb-3">
                             <label asp-for="MaThL" class="form-label">Thể loại</label>
-                            <select asp-for="MaThL" class="form-select" asp-items="ViewBag.MaThL"></select>
+                            <div class="input-group">
+                                <select asp-for="MaThL" id="selectThL" class="form-select" asp-items="ViewBag.MaThL"></select>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addNewThLModal" title="Thêm Thể loại mới">
+                                    <i class="bx bx-plus"></i>
+                                </button>
+                            </div>
                             <span asp-validation-for="MaThL" class="text-danger"></span>
                         </div>
 
-                        @* Ngôn ngữ (Select) *@
+                        @* Ngôn ngữ (Select) + Nút thêm mới *@
                         <div class="mb-3">
                             <label asp-for="MaNn" class="form-label">Ngôn ngữ</label>
-                            <select asp-for="MaNn" class="form-select" asp-items="ViewBag.MaNn"></select>
+                            <div class="input-group">
+                                <select asp-for="MaNn" id="selectNn" class="form-select" asp-items="ViewBag.MaNn"></select>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addNewNnModal" title="Thêm Ngôn ngữ mới">
+                                    <i class="bx bx-plus"></i>
+                                </button>
+                            </div>
                             <span asp-validation-for="MaNn" class="text-danger"></span>
                         </div>
 
-                        @* Định dạng (MaDd) (Select) *@
+                        @* Định dạng (MaDd) (Select) + Nút thêm mới *@
                         <div class="mb-3">
                             <label asp-for="MaDd" class="form-label">Định dạng</label>
-                            <select asp-for="MaDd" class="form-select" asp-items="ViewBag.MaDd"></select>
+                            <div class="input-group">
+                                <select asp-for="MaDd" id="selectDd" class="form-select" asp-items="ViewBag.MaDd"></select>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addNewDdModal" title="Thêm Định dạng mới">
+                                    <i class="bx bx-plus"></i>
+                                </button>
+                            </div>
                             <span asp-validation-for="MaDd" class="text-danger"></span>
                         </div>
 
@@ -105,42 +122,89 @@
                             <span asp-validation-for="SoTrang" class="text-danger"></span>
                         </div>
 
-                        @* Khổ cỡ *@
-                        <div class="mb-3">
-                            <label asp-for="KhoCo" class="form-label">Khổ cỡ</label>
-                            <input asp-for="KhoCo" class="form-control" />
-                            <span asp-validation-for="KhoCo" class="text-danger"></span>
-                        </div>
-
                         @* Tài khoản tạo (Select) *@
                         <div class="mb-3">
                             <label asp-for="MaTk" class="form-label">Tài khoản tạo (Người quản lý)</label>
                             <select asp-for="MaTk" class="form-select" asp-items="ViewBag.MaTk"></select>
                             <span asp-validation-for="MaTk" class="text-danger"></span>
                         </div>
-
                     </div>
                 </div>
-            </div> @* End card-body *@
 
-            @* FOOTER CỦA CARD: Nút Lưu, Quay lại và Chi tiết *@
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6 class="text-muted text-uppercase mb-3">
+                            <i class='bx bx-user-pin me-1'></i> Quản lý Tác giả
+                        </h6>
+
+                        <div class="input-group mb-3">
+                            <select id="selectTacGia" class="form-select" aria-label="Chọn Tác giả" asp-items="ViewBag.TacGiaList">
+                                <option value="" selected disabled>Chọn Tác giả...</option>
+                            </select>
+
+                            <input type="text" id="inputVaiTro" class="form-control" placeholder="Vai trò (VD: Tác giả chính, Biên tập)">
+
+                            <button class="btn btn-outline-success" type="button" id="btnAddTacGia">
+                                <i class="bx bx-plus"></i> Thêm
+                            </button>
+
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#addNewTacGiaModal" title="Thêm Tác giả mới vào hệ thống">
+                                <i class="bx bx-user-plus"></i>
+                            </button>
+                        </div>
+                        <p id="tacGiaError" class="text-danger small"></p>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%;">Tác giả</th>
+                                        <th style="width: 40%;">Vai trò</th>
+                                        <th style="width: 20%;" class="text-center">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tacGiaListBody">
+                                    @if (Model.TTaiLieuTacGia != null)
+                                    {
+                                        int index = 0;
+                                        foreach (var item in Model.TTaiLieuTacGia)
+                                        {
+                                            <tr data-ma-tg="@item.MaTg">
+                                                <td>@item.MaTgNavigation?.HoDem @item.MaTgNavigation?.Ten</td>
+                                                <td>@item.VaiTro</td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-label-danger btn-icon waves-effect remove-tacgia-btn" title="Xóa">
+                                                        <i class="bx bx-trash"></i>
+                                                    </button>
+                                                </td>
+                                                <input type="hidden" name="TTaiLieuTacGia[@index].MaTg" value="@item.MaTg" />
+                                                <input type="hidden" name="TTaiLieuTacGia[@index].VaiTro" value="@item.VaiTro" />
+                                                <input type="hidden" name="TTaiLieuTacGia[@index].MaTl" value="@Model.MaTl" />
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
             <div class="card-footer border-top pt-3">
                 <div class="d-flex justify-content-between">
 
-                    @* KHỐI NÚT TRÁI (Quay lại) *@
                     <a asp-action="Index" class="btn btn-secondary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 
-                    @* KHỐI NÚT PHẢI (Lưu và Chi tiết) *@
                     <div class="d-flex gap-2">
 
-                        @* NÚT LƯU *@
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="submitButton">
                             <i class="bx bx-save me-1"></i> Lưu thay đổi
                         </button>
 
-                        @* NÚT CHUYỂN QUA CHI TIẾT *@
                         <a asp-action="Details" asp-route-id="@Model?.MaTl" class="btn btn-success">
                             <i class="bx bx-detail me-1"></i> Xem chi tiết Tài liệu
                         </a>
@@ -150,10 +214,391 @@
             </div>
 
         </form>
-    </div> @* End card *@
-</div> @* End container-xxl *@
+    </div>
+</div>
+
+{{-- MODALS CƠ BẢN --}}
+@* Modals giữ nguyên *@
+<div class="modal fade" id="addNewNxbModal" tabindex="-1" aria-labelledby="addNewNxbModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white" id="addNewNxbModalLabel"><i class='bx bx-building-house me-1'></i> Thêm Nhà xuất bản</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCreateNxb">
+                    <div class="mb-3">
+                        <label for="TenNxbInput" class="form-label">Tên Nhà xuất bản</label>
+                        <input type="text" class="form-control" id="TenNxbInput" name="TenNxb" required>
+                    </div>
+                    <div id="NxbAlert" class="alert alert-danger d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="formCreateNxb" class="btn btn-primary" id="btnSaveNxb">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNewThLModal" tabindex="-1" aria-labelledby="addNewThLModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white" id="addNewThLModalLabel"><i class='bx bx-bookmark me-1'></i> Thêm Thể loại</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCreateThL">
+                    <div class="mb-3">
+                        <label for="TenThLInput" class="form-label">Tên Thể loại</label>
+                        <input type="text" class="form-control" id="TenThLInput" name="TenThL" required>
+                    </div>
+                    <div id="ThLAlert" class="alert alert-danger d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="formCreateThL" class="btn btn-primary" id="btnSaveThL">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNewNnModal" tabindex="-1" aria-labelledby="addNewNnModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white" id="addNewNnModalLabel"><i class='bx bx-world me-1'></i> Thêm Ngôn ngữ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCreateNn">
+                    <div class="mb-3">
+                        <label for="TenNnInput" class="form-label">Tên Ngôn ngữ</label>
+                        <input type="text" class="form-control" id="TenNnInput" name="TenNn" required>
+                    </div>
+                    <div id="NnAlert" class="alert alert-danger d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="formCreateNn" class="btn btn-primary" id="btnSaveNn">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNewDdModal" tabindex="-1" aria-labelledby="addNewDdModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white" id="addNewDdModalLabel"><i class='bx bx-file me-1'></i> Thêm Định dạng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCreateDd">
+                    <div class="mb-3">
+                        <label for="TenDdInput" class="form-label">Tên Định dạng</label>
+                        <input type="text" class="form-control" id="TenDdInput" name="TenDd" required>
+                    </div>
+                    <div id="DdAlert" class="alert alert-danger d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="formCreateDd" class="btn btn-primary" id="btnSaveDd">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNewTacGiaModal" tabindex="-1" aria-labelledby="addNewTacGiaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title text-white" id="addNewTacGiaModalLabel"><i class='bx bx-user-plus me-1'></i> Thêm Tác giả</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCreateTacGia">
+                    <div class="mb-3">
+                        <label for="HoDemInput" class="form-label">Họ đệm</label>
+                        <input type="text" class="form-control" id="HoDemInput" name="HoDem" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="TenInput" class="form-label">Tên</label>
+                        <input type="text" class="form-control" id="TenInput" name="Ten" required>
+                    </div>
+                    <div id="TacGiaAlert" class="alert alert-danger d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="formCreateTacGia" class="btn btn-primary" id="btnSaveTacGia">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
+    <script>
+        // Hàm hiển thị thông báo (Toast)
+        function showToast(message, type = 'success') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            alertPlaceholder.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('');
+
+            alertPlaceholder.appendChild(wrapper);
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                $(wrapper).alert('close');
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ==========================================================
+            // LOGIC FORM SUBMIT (Kiểm tra và báo cáo kết quả)
+            // ==========================================================
+            const editForm = document.getElementById('editTaiLieuForm');
+            const submitButton = document.getElementById('submitButton');
+
+            // 1. Logic chặn submit và đổi text nút
+            editForm.addEventListener('submit', function(e) {
+                // Kiểm tra validation client-side (do _ValidationScriptsPartial cung cấp)
+                if ($(editForm).valid()) {
+                    // Vô hiệu hóa nút Submit
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...';
+                }
+            });
+
+            // 2. Logic hiển thị thông báo từ TempData
+            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
+            {
+                    <text>
+                        setTimeout(function() {
+                            showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+
+                            // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                            if ('@TempData["StatusMessage"]' === 'danger') {
+                                submitButton.disabled = false;
+                                submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
+                            }
+
+                        }, 10);
+                    </text>
+            }
+
+
+            // Hàm Helper để xử lý AJAX chung cho các danh mục đơn lẻ
+            function handleAjaxCreation(formId, apiUrl, inputId, selectId, alertId, nameKey, maKey, modalId, additionalFields = []) {
+                const form = document.getElementById(formId);
+                const btnSave = document.getElementById(`btnSave${selectId.substring(6)}`);
+                const alertBox = document.getElementById(alertId);
+                const selectElement = document.getElementById(selectId);
+                const inputElement = document.getElementById(inputId);
+                const modalElement = document.getElementById(modalId);
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    alertBox.classList.add('d-none');
+                    btnSave.disabled = true;
+                    btnSave.textContent = 'Đang xử lý...';
+
+                    const payload = {};
+                    payload[nameKey] = inputElement.value;
+
+                    additionalFields.forEach(field => {
+                        payload[field.key] = document.getElementById(field.id).value;
+                    });
+
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const displayText = data.fullName || data[nameKey];
+                            const newOption = new Option(displayText, data[maKey], true, true);
+                            selectElement.appendChild(newOption);
+
+                            modal.hide();
+                            inputElement.value = '';
+
+                            additionalFields.forEach(field => {
+                                document.getElementById(field.id).value = '';
+                            });
+
+                            showToast(`Đã thêm ${displayText} thành công!`, 'info');
+
+                        } else {
+                            alertBox.textContent = data.message || 'Lỗi không xác định khi thêm mới.';
+                            alertBox.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi AJAX:', error);
+                        alertBox.textContent = 'Lỗi kết nối Server.';
+                        alertBox.classList.remove('d-none');
+                    })
+                    .finally(() => {
+                        btnSave.disabled = false;
+                        btnSave.textContent = 'Lưu';
+                    });
+                });
+            }
+
+            // ------------------------------------------------------------------------------------------------
+            // Khởi tạo AJAX cho 5 Danh mục (Giữ nguyên)
+            // ------------------------------------------------------------------------------------------------
+
+            // 1. TÁC GIẢ
+            handleAjaxCreation(
+                'formCreateTacGia', '/TaiLieu/CreateNewTacGiaAjax', 'TenInput', 'selectTacGia', 'TacGiaAlert',
+                'fullName', 'maTg', 'addNewTacGiaModal',
+                [ { key: 'HoDem', id: 'HoDemInput' }, { key: 'Ten', id: 'TenInput' }]
+            );
+
+            // 2. NHÀ XUẤT BẢN
+            handleAjaxCreation(
+                'formCreateNxb', '/TaiLieu/CreateNewNxbAjax', 'TenNxbInput', 'selectNxb', 'NxbAlert',
+                'tenNxb', 'maNxb', 'addNewNxbModal'
+            );
+
+            // 3. THỂ LOẠI
+            handleAjaxCreation(
+                'formCreateThL', '/TaiLieu/CreateNewTheLoaiAjax', 'TenThLInput', 'selectThL', 'ThLAlert',
+                'tenThL', 'maThL', 'addNewThLModal'
+            );
+
+            // 4. NGÔN NGỮ
+            handleAjaxCreation(
+                'formCreateNn', '/TaiLieu/CreateNewNgonNguAjax', 'TenNnInput', 'selectNn', 'NnAlert',
+                'tenNn', 'maNn', 'addNewNnModal'
+            );
+
+            // 5. ĐỊNH DẠNG
+            handleAjaxCreation(
+                'formCreateDd', '/TaiLieu/CreateNewDinhDangAjax', 'TenDdInput', 'selectDd', 'DdAlert',
+                'tenDd', 'maDd', 'addNewDdModal'
+            );
+
+            // ==========================================================
+            // LOGIC QUẢN LÝ TÁC GIẢ (Thêm/Xóa khỏi bảng) (Giữ nguyên)
+            // ==========================================================
+            const tableBody = document.getElementById('tacGiaListBody');
+            const btnAdd = document.getElementById('btnAddTacGia');
+            const selectTacGia = document.getElementById('selectTacGia');
+            const inputVaiTro = document.getElementById('inputVaiTro');
+            const errorElement = document.getElementById('tacGiaError');
+
+            function getNextIndex() {
+                return tableBody.rows.length;
+            }
+
+            // XÓA
+            tableBody.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-tacgia-btn')) {
+                    const row = e.target.closest('tr');
+                    row.remove();
+                    reindexRows();
+                }
+            });
+
+            // THÊM
+            btnAdd.addEventListener('click', function() {
+                const maTg = selectTacGia.value;
+                const tenTacGia = selectTacGia.options[selectTacGia.selectedIndex].text;
+                const vaiTro = inputVaiTro.value.trim();
+                const maTl = document.querySelector('input[name="MaTl"]').value;
+
+                errorElement.textContent = '';
+
+                if (!maTg) {
+                    errorElement.textContent = 'Vui lòng chọn Tác giả.';
+                    return;
+                }
+
+                if (!vaiTro) {
+                    errorElement.textContent = 'Vui lòng nhập Vai trò.';
+                    return;
+                }
+
+                if (document.querySelector(`tr[data-ma-tg="${maTg}"]`)) {
+                    errorElement.textContent = 'Tác giả này đã được thêm.';
+                    return;
+                }
+
+                const index = getNextIndex();
+
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-ma-tg', maTg);
+                newRow.innerHTML = `
+                    <td>${tenTacGia}</td>
+                    <td>${vaiTro}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-label-danger btn-icon waves-effect remove-tacgia-btn" title="Xóa">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </td>
+                `;
+
+                // TẠO CÁC INPUT HIDDEN VÀ GẮN VÀO HÀNG (QUAN TRỌNG)
+                const inputMaTg = document.createElement('input');
+                inputMaTg.type = 'hidden';
+                inputMaTg.name = `TTaiLieuTacGia[${index}].MaTg`;
+                inputMaTg.value = maTg;
+                newRow.appendChild(inputMaTg);
+
+                const inputVaiTroHidden = document.createElement('input');
+                inputVaiTroHidden.type = 'hidden';
+                inputVaiTroHidden.name = `TTaiLieuTacGia[${index}].VaiTro`;
+                inputVaiTroHidden.value = vaiTro;
+                newRow.appendChild(inputVaiTroHidden);
+
+                const inputMaTlHidden = document.createElement('input');
+                inputMaTlHidden.type = 'hidden';
+                inputMaTlHidden.name = `TTaiLieuTacGia[${index}].MaTl`;
+                inputMaTlHidden.value = maTl;
+                newRow.appendChild(inputMaTlHidden);
+
+                tableBody.appendChild(newRow);
+
+                selectTacGia.value = "";
+                inputVaiTro.value = "";
+            });
+
+            // Re-index
+            function reindexRows() {
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach((row, newIndex) => {
+                    const hiddenInputs = row.querySelectorAll('input[type="hidden"]');
+                    hiddenInputs.forEach(input => {
+                        const name = input.name.replace(/\[\d+\]/, `[${newIndex}]`);
+                        input.name = name;
+                    });
+                });
+            }
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

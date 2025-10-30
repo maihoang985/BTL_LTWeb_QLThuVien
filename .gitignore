@@ -444,3 +444,4 @@ appsettings.Local.json
 
 # Ignore launchsettings.json which contains local debug environment variables
 Properties/launchSettings.json
+appsettings.Development.json
