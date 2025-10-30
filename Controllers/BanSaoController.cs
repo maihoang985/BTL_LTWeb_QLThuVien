@@ -108,7 +108,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: BanSao/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(string id, string returnUrl)
         {
             if (id == null)
             {
@@ -121,6 +121,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
             ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tBanSao.MaTl);
+            ViewBag.ReturnUrl = returnUrl;
             return View(tBanSao);
         }
 

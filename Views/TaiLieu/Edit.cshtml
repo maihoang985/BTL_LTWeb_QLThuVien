@@ -195,9 +195,23 @@
             <div class="card-footer border-top pt-3">
                 <div class="d-flex justify-content-between">
 
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                    </a>
+                    <div>
+                        @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                        {
+                            // Nếu có returnUrl, quay lại trang đó
+                            <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                                <i class="bx bx-arrow-back me-1"></i> Quay lại
+                            </a>
+                        }
+                        else
+                        {
+                            // Nếu không, quay về trang Index mặc định
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                            </a>
+                        }
+                    </div>
+
 
                     <div class="d-flex gap-2">
 
@@ -217,7 +231,7 @@
     </div>
 </div>
 
-{{-- MODALS CƠ BẢN --}}
+@* {{-- MODALS CƠ BẢN --}} *@
 @* Modals giữ nguyên *@
 <div class="modal fade" id="addNewNxbModal" tabindex="-1" aria-labelledby="addNewNxbModalLabel" aria-hidden="true">
     <div class="modal-dialog">
