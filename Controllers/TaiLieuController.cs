@@ -45,7 +45,7 @@ namespace Library_Manager.Controllers
 
         // GET: TaiLieu/Details/5
         [Authorization("QLT")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
             var tTaiLieu = await _context.TTaiLieus
@@ -58,6 +58,7 @@ namespace Library_Manager.Controllers
                 .Include(t => t.TBanSaos)
                 .FirstOrDefaultAsync(m => m.MaTl == id);
             if (tTaiLieu == null) { return NotFound(); }
+            ViewBag.ReturnUrl = returnUrl;
             return View(tTaiLieu);
         }
 
