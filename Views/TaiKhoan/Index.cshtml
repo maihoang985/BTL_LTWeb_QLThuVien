@@ -20,17 +20,31 @@
         <i class='bx bxs-user-account fa-border fs-1 me-2'></i> @ViewData["Title"]
     </h1>
 
+    @* Dropdown Lọc theo Vai trò *@
+   @*  <div class="flex-shrink-0 me-2" style="min-width: 200px;">
+        <select name="maVt" class="form-select" onchange="this.form.submit()">
+          
+            @if (ViewBag.VaiTros != null)
+            {
+                foreach (var item in (SelectList)ViewBag.VaiTros)
+                {
+                    <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                }
+            }
+        </select>
+    </div> *@
+
     <div class="card">
         @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
-        <div class="card-header border-bottom">
+        @* <div class="card-header border-bottom">
             <div class="d-flex justify-content-between align-items-center">
 
-                @* Thanh Tìm kiếm (SearchBar Partial) *@
+                
                 <div class="flex-grow-1 me-3">
                     <partial name="SearchBar" />
                 </div>
 
-                @* Nút Thêm mới *@
+                
                 <div class="flex-shrink-0 ">
                     <p class="m-0">
                         <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
@@ -39,7 +53,62 @@
                     </p>
                 </div>
             </div>
+        </div> *@
+
+        @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
+        <div class="card-header border-bottom">
+
+            @* MỚI: Bọc thanh tác vụ trong một form để gửi dữ liệu lọc và tìm kiếm *@
+            <form asp-action="Index" method="get" class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center flex-grow-1">
+
+                    @* 1. Thanh Tìm kiếm *@
+                    <div class="flex-grow-1 me-3">
+                        @* Đảm bảo partial view SearchBar của bạn có input với name="searchString" *@
+                        <partial name="SearchBar" />
+                    </div>
+
+                    @* 2. MỚI: Dropdown Lọc theo Vai trò *@
+                    <div class="flex-shrink-0 me-3" style="min-width: 180px;">
+                        <select name="roleFilter" class="form-select">
+                            <option value="">Tất cả vai trò</option>
+                            @if (ViewBag.VaiTros != null)
+                            {
+                                foreach (var role in ViewBag.VaiTros)
+                                {
+                                    // Giữ lại giá trị đã chọn khi tải lại trang
+                                    if (role.MaVt == ViewBag.CurrentRoleFilter)
+                                    {
+                                        <option value="@role.MaVt" selected>@role.TenVt</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@role.MaVt">@role.TenVt</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    @* 3. MỚI: Nút để thực hiện Lọc/Tìm kiếm *@
+                    <div class="flex-shrink-0 me-3">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class='bx bx-filter-alt me-1'></i> Lọc
+                        </button>
+                    </div>
+                </div>
+
+                @* 4. Nút Thêm mới (giữ nguyên) *@
+                <div class="flex-shrink-0">
+                    <p class="m-0">
+                        <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
+                            <i class="bx bx-plus me-1"></i> Thêm Tài khoản
+                        </a>
+                    </p>
+                </div>
+            </form>
         </div>
+
 
         @* ========================================================================
             KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
