@@ -108,8 +108,6 @@ namespace Library_Manager.Controllers
         }
 
         // POST: NhaXuatBan/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("MaNxb,TenNxb")] TNhaXuatBan tNhaXuatBan)
@@ -125,6 +123,10 @@ namespace Library_Manager.Controllers
                 {
                     _context.Update(tNhaXuatBan);
                     await _context.SaveChangesAsync();
+
+                    // THÀNH CÔNG: Set TempData
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = "Thông tin Nhà Xuất Bản đã được cập nhật thành công.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -134,11 +136,28 @@ namespace Library_Manager.Controllers
                     }
                     else
                     {
-                        throw;
+                        // LỖI XUNG ĐỘT: Set TempData
+                        TempData["StatusMessage"] = "danger";
+                        TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng thử lại.";
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    // LỖI HỆ THỐNG: Set TempData
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi hệ thống khi lưu: " + ex.Message;
+                }
             }
+            else
+            {
+                // LỖI VALIDATION: Set TempData
+                TempData["StatusMessage"] = "danger";
+                var errors = ModelState.Where(x => x.Value.Errors.Any())
+                   .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+            }
+
+            // LUÔN LUÔN: Return View để hiển thị thông báo
             return View(tNhaXuatBan);
         }
 

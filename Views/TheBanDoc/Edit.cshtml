@@ -14,6 +14,9 @@
         <i class='bx bx-pencil fs-2 me-2 border p-1 rounded-2'></i> Chỉnh sửa thông tin thẻ
     </h1>
 
+    @* Vị trí hiển thị thông báo (Toast/Alert) *@
+    <div id="alertPlaceholder"></div>
+
     @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
     <div class="card">
 
@@ -22,14 +25,15 @@
             <h5 class="card-title mb-0">Chỉnh sửa thông tin cho thẻ: <span class="text-info fw-bold">@Model.MaTbd</span></h5>
         </div>
 
-        <form asp-action="Edit">
+        @* ID "editTheBanDocForm" cho form *@
+        <form asp-action="Edit" id="editTheBanDocForm">
             @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
             <div class="card-body">
 
                 @* Phần hiển thị lỗi tổng thể *@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-                @* Mã Thẻ (Hidden Field) - Cần thiết cho việc chỉnh sửa *@
+                @* Mã Thẻ (Hidden Field) *@
                 <input type="hidden" asp-for="MaTbd" />
 
                 @* TÁI CẤU TRÚC: CHIA BIỂU MẪU THÀNH 2 CỘT *@
@@ -41,11 +45,11 @@
                             <i class='bx bx-info-circle me-1'></i> Thông tin thẻ
                         </h6>
 
-                        @* Mã Bạn đọc (Dropdown) *@
+                        @* Mã Bạn đọc (Readonly) *@
                         <div class="mb-3">
                             <label asp-for="MaBd" class="form-label">Bạn đọc</label>
-                            <select asp-for="MaBd" class="form-select" asp-items="ViewBag.MaBd"></select>
-                            <span asp-validation-for="MaBd" class="text-danger"></span>
+                            <input type="hidden" asp-for="MaBd" />
+                            <input type="text" class="form-control" value="@ViewBag.HoTenBanDoc" readonly />
                         </div>
 
                         @* Trạng Thái (Dropdown) *@
@@ -94,8 +98,8 @@
                     @* KHỐI NÚT PHẢI (Lưu và Chi tiết) *@
                     <div class="d-flex gap-2">
 
-                        @* NÚT LƯU *@
-                        <button type="submit" class="btn btn-primary">
+                        @* ID "submitButton" cho nút Lưu *@
+                        <button type="submit" class="btn btn-primary" id="submitButton">
                             <i class="bx bx-save me-1"></i> Lưu thay đổi
                         </button>
 
@@ -112,8 +116,77 @@
     </div> @* End card *@
 </div> @* End container-xxl *@
 
+@* ========================================================================
+    PHẦN SCRIPT (ĐÃ ĐƯỢC TÙY BIẾN THEO LOGIC CỦA TAI LIEU)
+    ======================================================================== *@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // 1. HÀM SHOWTOAST (Giữ nguyên từ TaiLieu)
+        // Hàm hiển thị thông báo (Toast)
+        function showToast(message, type = 'success') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            alertPlaceholder.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `  <div>${message}</div>`,
+                '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('');
+
+            alertPlaceholder.appendChild(wrapper);
+            // Tự động ẩn sau 5 giây (Yêu cầu jQuery để .alert('close') hoạt động)
+            setTimeout(() => {
+                $(wrapper).alert('close');
+            }, 5000);
+        }
+
+        // 2. LOGIC XỬ LÝ FORM (Giữ nguyên từ TaiLieu)
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ==========================================================
+            // LOGIC FORM SUBMIT (Kiểm tra và báo cáo kết quả)
+            // ==========================================================
+
+            // Trỏ tới ID của form TheBanDoc
+            const editForm = document.getElementById('editTheBanDocForm');
+            const submitButton = document.getElementById('submitButton');
+
+            // 1. Logic chặn submit và đổi text nút
+            if (editForm && submitButton) {
+                editForm.addEventListener('submit', function (e) {
+                    // Kiểm tra validation client-side
+                    if ($(editForm).valid()) {
+                        // Vô hiệu hóa nút Submit
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...';
+                    }
+                });
+            }
+
+            // 2. Logic hiển thị thông báo từ TempData (CHUẨN HÓA - Giống hệt TaiLieu)
+            // (Đã loại bỏ khối $(document).ready() kiểm tra SuccessMessage/ErrorMessage riêng lẻ)
+            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
+            {
+                    <text>
+                        setTimeout(function() {
+                            // Hiển thị toast với nội dung và kiểu (success/danger) từ Controller
+                            showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+
+                            // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                            if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
+                                submitButton.disabled = false;
+                                submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
+                            }
+
+                        }, 10);
+                    </text>
+            }
+        });
+    </script>
 }

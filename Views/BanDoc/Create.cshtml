@@ -6,14 +6,16 @@
 }
 
 @* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+    KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
         <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới thông tin bạn đọc
     </h1>
+
+    <div id="alertPlaceholder"></div>
 
     @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
     <div class="card">
@@ -111,10 +113,10 @@
             @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
             <div class="card-footer border-top pt-3">
                 <div class="d-flex justify-content-start gap-3">
-                    @* Dùng justify-content-start vì chỉ có 2 nút * @
-                    
-                    @* NÚT TẠO MỚI *@
-                    <button type="submit" value="Create" class="btn btn-primary">
+                    @* Dùng justify-content-start vì chỉ có 2 nút *@
+
+                    @* NÚT TẠO MỚI (Thêm id="submitButton") *@
+                    <button type="submit" value="Create" class="btn btn-primary" id="submitButton">
                         <i class="bx bx-plus me-1"></i> Tạo mới
                     </button>
 
@@ -132,4 +134,39 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[asp-action="Create"]');
+            const submitButton = document.getElementById('submitButton');
+
+            // 1. Logic vô hiệu hóa nút khi submit
+            if (form && submitButton) {
+                form.addEventListener('submit', function() {
+                    // Chỉ vô hiệu hóa nếu form hợp lệ (theo validation cơ bản của trình duyệt)
+                    if (form.checkValidity()) {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+                    }
+                });
+            }
+
+            // 2. Logic hiển thị thông báo từ TempData (mã của bạn)
+            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
+            {
+                    <text>
+                    setTimeout(function() {
+                        // Hiển thị toast
+                        showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+
+                        // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                        if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
+                            submitButton.disabled = false;
+                            submitButton.innerHTML = '<i class="bx bx-plus me-1"></i> Tạo mới';
+                        }
+                    }, 10);
+                    </text>
+            }
+        });
+    </script>
 }

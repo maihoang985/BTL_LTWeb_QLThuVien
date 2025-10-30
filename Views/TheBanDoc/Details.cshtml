@@ -115,6 +115,13 @@
 
                 @* Cột 2 (Hành động) *@
                 <div class="col-md-6">
+                    @* Xem Chi tiết Người tạo Thẻ Bạn đọc *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Người tạo</label>
+                            <p class="fw-semibold mb-0">
+                                @(Model.MaTkNavigation?.MaNvNavigation != null ? (Model.MaTkNavigation.MaNvNavigation.HoDem + " " + Model.MaTkNavigation.MaNvNavigation.Ten) : "(Không rõ)")
+                            </p>
+                    </div>
                     @* Xem Chi tiết Bạn đọc *@
                     <div class="mb-3">
                         <label class="form-label d-block text-secondary">
@@ -130,6 +137,7 @@
                             </p>
                     </div>
                 </div>
+
             </div>
 
         </div>

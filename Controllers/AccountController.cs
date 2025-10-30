@@ -82,6 +82,10 @@ namespace Library_Manager.Controllers
                 HttpContext.Session.SetString("tenVaiTro", tenVaiTro);               // Tên vai trò (cho Navbar)
                 // ==============================================
 
+                // Lưu tài khoản vào TempData để sử dụng trong HomeController (nếu cần)
+                HttpContext.Session.SetString("MaTk", taiKhoan.MaTk);
+
+                // Chuyển về trang chủ
                 return RedirectToAction("Index", "Home");
             }
 

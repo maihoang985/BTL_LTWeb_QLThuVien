@@ -142,6 +142,13 @@ namespace Library_Manager.Controllers
                 {
                     _context.Update(tBanDoc);
                     await _context.SaveChangesAsync();
+
+                    // THAY ĐỔI: Sử dụng TempData và return View
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = "Thông tin Bạn đọc đã được lưu thành công.";
+
+                    return View(tBanDoc);
+                    // return RedirectToAction(nameof(Index)); // Bỏ dòng này
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -151,10 +158,25 @@ namespace Library_Manager.Controllers
                     }
                     else
                     {
-                        throw;
+                        // THAY ĐỔI: Thêm TempData cho lỗi xung đột
+                        TempData["StatusMessage"] = "danger";
+                        TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng tải lại trang và thử lại.";
+                        // throw; // Bỏ dòng này
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                // THAY ĐỔI: Thêm catch tổng quát
+                catch (Exception ex)
+                {
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: " + ex.Message;
+                }
+            }
+            // THAY ĐỔI: Thêm TempData cho lỗi validation
+            else
+            {
+                TempData["StatusMessage"] = "danger";
+                var errors = ModelState.Where(x => x.Value.Errors.Any()).Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
             }
             return View(tBanDoc);
         }
