@@ -1,196 +1,377 @@
-﻿@* File: Views/Home/Index.cshtml (Phiên bản đã tối ưu) *@
+﻿@* File: Views/Home/Index.cshtml (Thiết kế Gộp Khối và Tách Card mới) *@
+@using Library_Manager.Models;
+@using Microsoft.AspNetCore.Http;
 
 @{
     ViewData["Title"] = "Tổng Quan Hệ Thống";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo dùng Layout của Sneat
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // 1. KHAI BÁO & ÉP KIỂU TỪ VIEWBAG
+    var account = ViewBag.CurrentAccount as TTaiKhoan;
+    var employee = ViewBag.CurrentEmployee as TNhanVien;
+
+    // Logic Lời chào theo thời gian
+    string greeting = "Xin chào";
+    int hour = DateTime.Now.Hour;
+    if (hour >= 5 && hour < 11) { greeting = "Chào buổi sáng"; }
+    else if (hour >= 11 && hour < 14) { greeting = "Chào buổi trưa"; }
+    else if (hour >= 14 && hour < 18) { greeting = "Chào buổi chiều"; }
+    else { greeting = "Chào buổi tối"; }
+
+    // Logic cho Badge Vai Trò
+    var vaiTro = account?.MaVtNavigation?.MaVt;
+    var tenVaiTro = account?.MaVtNavigation?.TenVt;
+    var badgeVaiTroClass = "bg-label-secondary";
+    if (vaiTro == "QTV") { badgeVaiTroClass = "bg-label-primary"; }
+    else if (vaiTro == "QLB") { badgeVaiTroClass = "bg-label-info"; }
+    else if (vaiTro == "QLT") { badgeVaiTroClass = "bg-label-success"; }
+    else if (vaiTro == "QLM") { badgeVaiTroClass = "bg-label-warning"; }
+
+    // Logic cho Badge Giới tính
+    var gioiTinh = (employee?.GioiTinh == "M" ? "Nam" : employee?.GioiTinh == "F" ? "Nữ" : "-");
+    var badgeGioiTinhClass = gioiTinh == "Nam" ? "bg-label-info" :
+                             gioiTinh == "Nữ" ? "bg-label-danger" :
+                             "bg-label-secondary";
 }
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
 
         <div class="col-lg-12 mb-4 order-0">
-            <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Dashboard /</span> Tổng Quan Quản Trị (Admin)</h4>
+            @* SỬA LỖI: Bỏ ** để tránh hiển thị trong View *@
+            <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Dashboard /</span> Tổng Quan Quản Trị (@tenVaiTro)</h4>
         </div>
 
-        <div class="col-lg-3 col-md-6 col-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title d-flex align-items-start justify-content-between">
-                        <div class="avatar flex-shrink-0">
-                            <span class="avatar-initial rounded bg-label-primary"><i class='bx bxs-user-detail'></i></span>
+        @* ========================================================================
+            KHỐI 1: CÁ NHÂN, TÀI KHOẢN & TRUY CẬP CÁ NHÂN (FULL WIDTH)
+            ======================================================================== *@
+        @if (employee != null && account != null)
+        {
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card p-3">
+                    <div class="row">
+
+                        <div class="col-lg-8 col-md-12 border-end">
+                            @* SỬA LỖI: Bỏ ** và dùng <strong> cho tên *@
+                            <h5 class="text-primary mb-3"><i class='bx bxs-user-badge me-2'></i> @greeting, <strong>@employee.HoDem @employee.Ten!</strong></h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <span class="d-block text-secondary">Mã NV:</span>
+                                    <p class="fw-bold mb-0">@employee.MaNv</p>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <span class="d-block text-secondary">Phụ trách:</span>
+                                    <p class="fw-bold mb-0">@employee.PhuTrach</p>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <span class="d-block text-secondary">Email:</span>
+                                    <p class="mb-0">@employee.Email</p>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <span class="d-block text-secondary">Giới tính:</span>
+                                    <span class="badge @badgeGioiTinhClass">@gioiTinh</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <span class="fw-semibold d-block mb-1">Tổng Độc giả</span>
-                    <h3 class="card-title mb-2">@ViewBag.TotalReaders</h3>
-                    <small class="text-muted">Độc giả mới: +5</small>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-lg-3 col-md-6 col-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title d-flex align-items-start justify-content-between">
-                        <div class="avatar flex-shrink-0">
-                            <span class="avatar-initial rounded bg-label-success"><i class='bx bxs-badge-check'></i></span>
-                        </div>
-                    </div>
-                    <span class="fw-semibold d-block mb-1">Bản sách Sẵn sàng</span>
-                    <h3 class="card-title mb-2">@ViewBag.AvailableCopies / @ViewBag.TotalCopies</h3>
-                    <small class="text-success fw-semibold">Tỷ lệ có sẵn</small>
-                </div>
-            </div>
-        </div>
+                        <div class="col-lg-4 col-md-12 ps-lg-4 mt-md-3 mt-lg-0">
+                            <h5 class="text-muted mb-3"><i class='bx bxs-key me-2'></i> Quyền truy cập</h5>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <span class="d-block text-secondary">Tên Đăng nhập:</span>
+                                    <p class="fw-bold mb-0">@account.TenDangNhap</p>
+                                </div>
+                                <div class="col-6">
+                                    <span class="d-block text-secondary">Vai trò:</span>
+                                    <span class="badge @badgeVaiTroClass fs-6">@tenVaiTro</span>
+                                </div>
+                            </div>
 
-        <div class="col-lg-3 col-md-6 col-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title d-flex align-items-start justify-content-between">
-                        <div class="avatar flex-shrink-0">
-                            <span class="avatar-initial rounded bg-label-warning"><i class='bx bxs-check-shield'></i></span>
-                        </div>
-                    </div>
-                    <span class="fw-semibold d-block mb-1">Tổng Sách Đang Mượn</span>
-                    <h3 class="card-title mb-2">@ViewBag.TotalLoans</h3>
-                    <small class="text-warning fw-semibold">GD trong ngày: +@ViewBag.LoansToday</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 col-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title d-flex align-items-start justify-content-between">
-                        <div class="avatar flex-shrink-0">
-                            <span class="avatar-initial rounded bg-label-danger"><i class='bx bxs-error-alt'></i></span>
-                        </div>
-                    </div>
-                    <span class="fw-semibold d-block mb-1">SÁCH CẦN XỬ LÝ GẤP</span>
-                    <h3 class="card-title text-danger mb-2">@ViewBag.OverdueLoans</h3>
-                    <small class="text-danger fw-semibold">Quá hạn > 7 ngày</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-12 order-2 order-md-1">
-            <div class="row">
-
-                <div class="col-md-4 col-12 mb-4">
-                    <div class="card bg-label-secondary">
-                        <div class="card-body">
-                            <h5 class="card-title m-0 me-2 text-primary">⚡ Hành Động Nhanh</h5>
-                            <hr class="my-3" />
-                            <div class="d-grid gap-2">
-                                <a href="@Url.Action("Create", "BanDoc")" class="btn btn-sm btn-outline-primary"><i class='bx bx-user-plus me-1'></i> Thêm Độc giả mới</a>
-                                <a href="@Url.Action("Create", "TaiLieu")" class="btn btn-sm btn-outline-info"><i class='bx bx-book-add me-1'></i> Nhập Tài liệu mới</a>
-                                <a href="@Url.Action("Scan", "MuonTra")" class="btn btn-sm btn-success"><i class='bx bx-barcode-reader me-1'></i> Xử lý Mượn/Trả sách</a>
+                            <div class="d-grid">
+                                <a href="@Url.Action("Details", "TaiKhoan", new { id = account.MaTk })" class="btn btn-sm btn-outline-secondary">
+                                    <i class='bx bx-detail me-1'></i> Xem chi tiết Tài khoản
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        }
+        @* --- KẾT THÚC KHỐI CÁ NHÂN --- *@
 
-                <div class="col-md-8 col-12 mb-4">
-                    <div class="card">
-                        <h5 class="card-header text-warning">📦 Cảnh Báo Tồn Kho Thấp</h5>
-                        <div class="table-responsive text-nowrap">
-                            <table class="table card-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mã TL</th>
-                                        <th>Tên Tài liệu</th>
-                                        <th>Tồn Kho Sẵn Sàng</th>
-                                        <th>Hành Động</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-border-bottom-0">
-                                    @* Lặp qua ViewBag.LowStockList *@
-                                    <tr>
-                                        <td>TL0034</td>
-                                        <td>**Thiết Kế Database Cơ Bản**</td>
-                                        <td><span class="badge bg-label-warning me-1">2 bản</span></td>
-                                        <td><a href="#" class="text-primary">Nhập thêm</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>TL0012</td>
-                                        <td>**Lịch Sử Việt Nam**</td>
-                                        <td><span class="badge bg-label-danger me-1">0 bản</span></td>
-                                        <td><a href="#" class="text-primary">Đã hết</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+        @* ========================================================================
+            KHỐI 2: QUẢN LÝ MƯỢN/TRẢ (FULL WIDTH - Kích thước thống nhất: col-md-4)
+            ======================================================================== *@
+        <div class="col-lg-12 mb-4">
+            <div class="card h-100">
+                <h5 class="card-header text-primary"><i class='bx bxs-check-square me-2'></i> Quản Lý Mượn/Trả</h5>
+                <div class="card-body">
+                    <div class="row">
+
+                        @* 1. SÁCH QUÁ HẠN *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-danger text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-danger"><strong>SÁCH QUÁ HẠN</strong></h6>
+                                    <h2 class="card-text">@ViewBag.OverdueLoans</h2>
+                                    <small class="text-danger fw-semibold">Cần thu hồi ngay</small>
+                                </div>
+                            </div>
                         </div>
+                        @* 2. TỔNG ĐANG MƯỢN *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-warning text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-warning"><strong>TỔNG ĐANG MƯỢN</strong></h6>
+                                    <h2 class="card-text">@ViewBag.TotalLoans</h2>
+                                    <small class="text-warning fw-semibold">GD trong ngày: +@ViewBag.LoansToday</small>
+                                </div>
+                            </div>
+                        </div>
+                        @* 3. XỬ LÝ GIAO DỊCH (THAO TÁC NHANH) *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-primary text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-primary"><strong>XỬ LÝ GIAO DỊCH</strong></h6>
+                                    <a href="@Url.Action("Create", "GiaoDichMuonTra")" class="btn btn-primary mt-2"><i class='bx bx-barcode-reader me-1'></i> Bắt đầu</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* 4. 5 Giao Dịch Quá Hạn Lâu Nhất (Giữ nguyên) *@
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="text-danger mb-3 border-bottom pb-1"><i class='bx bx-list-ol me-1'></i> 5 Giao Dịch Quá Hạn Lâu Nhất</h6>
+                            <div class="table-responsive">
+                                <table class="table card-table table-sm">
+                                    <tbody class="table-border-bottom-0">
+                                        @foreach (var item in ViewBag.OverdueList)
+                                        {
+                                            <tr>
+                                                <td><i class='bx bxs-book-reader me-2'></i> @item.TenSach</td>
+                                                <td class="text-muted">@item.DocGia</td>
+                                                <td class="text-end"><span class="badge bg-label-danger">@item.NgayHenTra</span></td>
+                                            </tr>
+                                        }
+                                        @if (((List<dynamic>)ViewBag.OverdueList).Count == 0)
+                                        {
+                                            <tr><td colspan="3" class="text-center text-success fst-italic">Không có sách quá hạn.</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        @* 5. 5 Hoạt Động Giao Dịch Gần Nhất (Giữ nguyên) *@
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="text-primary mb-3 border-bottom pb-1"><i class='bx bx-time-five me-1'></i> 5 Hoạt Động Giao Dịch Gần Nhất</h6>
+                            <div class="table-responsive">
+                                <table class="table card-table table-sm">
+                                    <tbody class="table-border-bottom-0">
+                                        @foreach (var item in ViewBag.RecentTransactions)
+                                        {
+                                            var badgeClass = item.Loai == "Trả" ? "bg-label-success" : "bg-label-primary";
+                                            <tr>
+                                                <td><span class="badge @badgeClass me-2">@item.Loai</span> @item.DocGia</td>
+                                                <td class="text-end text-muted">@item.ThoiGian</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
+                </div>
+                @* Đã thống nhất màu button thành btn-primary *@
+                <div class="card-footer d-flex justify-content-end bg-transparent border-top">
+                    <a href="@Url.Action("Index", "GiaoDichMuonTra")" class="btn btn-sm btn-primary">Xem tất cả Giao dịch <i class='bx bx-right-arrow-alt'></i></a>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 order-3">
-            <div class="row">
+        @* ========================================================================
+            KHỐI 3: QUẢN LÝ TÀI LIỆU (Đã bỏ phần thống kê Thể loại)
+            ======================================================================== *@
+        <div class="col-lg-12 mb-4">
+            <div class="card h-100">
+                <h5 class="card-header text-info"><i class='bx bxs-box me-2'></i> Quản Lý Tài Liệu (Kho)</h5>
+                <div class="card-body">
+                    <div class="row">
 
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
-                        <h5 class="card-header text-danger">🚨 Chi Tiết 5 Giao Dịch Quá Hạn Lâu Nhất</h5>
-                        <div class="table-responsive text-nowrap">
-                            <table class="table card-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tên Sách</th>
-                                        <th>Mã BD/Tên Độc giả</th>
-                                        <th>Ngày Hẹn Trả</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-border-bottom-0">
-                                    @* Dùng @foreach để lặp qua ViewBag.OverdueList *@
-                                    <tr>
-                                        <td>**Lập Trình C# Cơ Bản**</td>
-                                        <td>BD001 - Văn A</td>
-                                        <td><span class="badge bg-label-danger me-1">20/10/2025</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class='bx bxs-book-open me-2'></i> **Mật Mã Da Vinci**</td>
-                                        <td>BD005 - Thị B</td>
-                                        <td><span class="badge bg-label-danger me-1">25/10/2025</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        @* 1. ĐẦU SÁCH CẦN NHẬP *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-warning text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-warning"><strong>ĐẦU SÁCH CẦN BỔ SUNG</strong></h6>
+                                    <h2 class="card-text">@ViewBag.LowStockCount</h2>
+                                    <small class="text-warning fw-semibold">Tồn kho < 3 bản</small>
+                                </div>
+                            </div>
                         </div>
+                        @* 2. BẢN SÁCH SẴN SÀNG *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-success text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-success"><strong>BẢN SÁCH SẴN SÀNG</strong></h6>
+                                    <h2 class="card-text">@ViewBag.AvailableCopies</h2>
+                                    <small class="text-success fw-semibold">Tổng: @ViewBag.TotalCopies</small>
+                                </div>
+                            </div>
+                        </div>
+                        @* 3. NHẬP LIỆU NHANH (THAO TÁC NHANH) *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-info text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-info"><strong>NHẬP LIỆU NHANH</strong></h6>
+                                    <a href="@Url.Action("Create", "TaiLieu")" class="btn btn-info mt-2">Thêm Tài liệu mới</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* 4. 5 Tài Liệu Cần Bổ Sung Gấp (Chiếm hết chiều rộng còn lại: col-lg-12) *@
+                        <div class="col-lg-12 mb-4">
+                            <h6 class="text-warning mb-3 border-bottom pb-1"><i class='bx bx-alarm-exclamation me-1'></i> 5 Tài Liệu Cần Bổ Sung Gấp</h6>
+                            <div class="table-responsive">
+                                <table class="table card-table table-sm">
+                                    <tbody class="table-border-bottom-0">
+                                        @foreach (var item in ViewBag.LowStockList)
+                                        {
+                                            <tr>
+                                                <td><i class='bx bx-book me-2'></i> @item.TenTl</td>
+                                                <td><span class="badge @(item.SoBanSanSang == 0 ? "bg-label-danger" : "bg-label-warning") me-1">@item.SoBanSanSang bản</span></td>
+                                                <td class="text-end"><a href="@Url.Action("Edit", "TaiLieu", new { id = item.MaTl })" class="text-primary">Xem / Nhập</a></td>
+                                            </tr>
+                                        }
+                                        @if (((List<dynamic>)ViewBag.LowStockList).Count == 0)
+                                        {
+                                            <tr><td colspan="3" class="text-center text-success fst-italic">Tất cả tài liệu đều đủ tồn kho.</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
-                        <h5 class="card-header">📋 10 Giao Dịch Mượn/Trả Gần Nhất</h5>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-border-bottom-0">
-                                <thead>
-                                    <tr>
-                                        <th>Mã GD</th>
-                                        <th>Loại</th>
-                                        <th>Độc giả</th>
-                                        <th>Thời gian</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @* Dùng @foreach để lặp qua ViewBag.RecentTransactions *@
-                                    <tr>
-                                        <td>GD0123</td>
-                                        <td><span class="badge bg-success">Trả</span></td>
-                                        <td>Lê Văn C</td>
-                                        <td>10:05 AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>GD0124</td>
-                                        <td><span class="badge bg-primary">Mượn</span></td>
-                                        <td>Phạm Thị D</td>
-                                        <td>09:40 AM</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                @* Đã điều chỉnh 2 button theo yêu cầu: 1 outline, 1 primary *@
+                <div class="card-footer d-flex justify-content-end bg-transparent border-top">
+                    <a href="@Url.Action("Index", "TaiLieu")" class="btn btn-sm btn-primary">Quản lý Tài liệu <i class='bx bx-right-arrow-alt'></i></a>
                 </div>
             </div>
         </div>
+
+        @* ========================================================================
+            KHỐI 4: QUẢN LÝ BẠN ĐỌC (FULL WIDTH - Kích thước thống nhất: col-md-4)
+            ======================================================================== *@
+        <div class="col-lg-12 mb-4">
+            <div class="card">
+                <h5 class="card-header text-success"><i class='bx bxs-group me-2'></i> Quản Lý Bạn Đọc</h5>
+                <div class="card-body">
+                    <div class="row">
+
+                        @* 1. THẺ BẠN ĐỌC BỊ KHÓA *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-danger text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-danger"><strong>THẺ BẠN ĐỌC BỊ KHÓA</strong></h6>
+                                    <h2 class="card-text">@ViewBag.LockedReaders</h2>
+                                    <small class="text-danger fw-semibold">Cần giải quyết vi phạm</small>
+                                </div>
+                            </div>
+                        </div>
+                        @* 2. TỔNG ĐỘC GIẢ *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-primary text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-primary"><strong>TỔNG ĐỘC GIẢ</strong></h6>
+                                    <h2 class="card-text">@ViewBag.TotalReaders</h2>
+                                    <small class="text-primary fw-semibold">Thành viên mới: +@(((List<dynamic>)ViewBag.NewReadersList).Count)</small>
+                                </div>
+                            </div>
+                        </div>
+                        @* 3. ĐĂNG KÝ MỚI (THAO TÁC NHANH) *@
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-label-success text-center">
+                                <div class="card-body">
+                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
+                                    <h6 class="card-title text-success"><strong>ĐĂNG KÝ MỚI</strong></h6>
+                                    <a href="@Url.Action("Create", "BanDoc")" class="btn btn-success mt-2">Đăng ký độc giả</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* 4. 5 Độc Giả Mới Nhất (Giữ nguyên) *@
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="text-primary mb-3 border-bottom pb-1"><i class='bx bx-user-pin me-1'></i> 5 Độc Giả Mới Nhất</h6>
+                            <div class="table-responsive">
+                                <table class="table card-table table-sm">
+                                    <tbody class="table-border-bottom-0">
+                                        @foreach (var item in ViewBag.NewReadersList)
+                                        {
+                                            <tr>
+                                                <td><i class='bx bx-user me-2'></i> @item.Ten</td>
+                                                <td class="text-end text-muted">
+                                                    @if (item.NgayTao != null)
+                                                    {
+                                                        @(((DateTime)item.NgayTao).ToString("dd/MM/yyyy"))
+                                                    }
+                                                    else
+                                                    {
+                                                        @:N/A
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (((List<dynamic>)ViewBag.NewReadersList).Count == 0)
+                                        {
+                                            <tr><td colspan="2" class="text-center text-muted fst-italic">Không có độc giả mới.</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        @* 5. Thẻ Độc Giả Sắp/Đã Hết Hạn (Giữ nguyên) *@
+                        <div class="col-lg-6 mb-4">
+                            <h6 class="text-danger mb-3 border-bottom pb-1"><i class='bx bx-calendar-x me-1'></i> 5 Thẻ Độc Giả Sắp/Đã Hết Hạn</h6>
+                            <div class="table-responsive">
+                                <table class="table card-table table-sm">
+                                    <tbody class="table-border-bottom-0">
+                                        @foreach (var item in ViewBag.ExpiringReaders)
+                                        {
+                                            var badgeClass = item.IsExpired ? "bg-label-danger" : "bg-label-warning";
+                                            var icon = item.IsExpired ? "bx-x-circle" : "bx-alarm";
+                                            <tr>
+                                                <td><i class='bx @icon me-2'></i> @item.DocGia</td>
+                                                <td class="text-end"><span class="badge @badgeClass">@item.NgayHetHan</span></td>
+                                            </tr>
+                                        }
+                                        @if (((List<dynamic>)ViewBag.ExpiringReaders).Count == 0)
+                                        {
+                                            <tr><td colspan="2" class="text-center text-success fst-italic">Không có thẻ sắp/đã hết hạn trong 30 ngày tới.</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                @* Đã thống nhất màu button thành btn-primary *@
+                <div class="card-footer d-flex justify-content-end bg-transparent border-top">
+                    <a href="@Url.Action("Index", "BanDoc")" class="btn btn-sm btn-primary">Quản lý Bạn đọc <i class='bx bx-right-arrow-alt'></i></a>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

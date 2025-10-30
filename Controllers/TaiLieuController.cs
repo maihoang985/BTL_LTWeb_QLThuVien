@@ -45,7 +45,7 @@ namespace Library_Manager.Controllers
 
         // GET: TaiLieu/Details/5
         [Authorization("QLT")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
             var tTaiLieu = await _context.TTaiLieus
@@ -58,6 +58,7 @@ namespace Library_Manager.Controllers
                 .Include(t => t.TBanSaos)
                 .FirstOrDefaultAsync(m => m.MaTl == id);
             if (tTaiLieu == null) { return NotFound(); }
+            ViewBag.ReturnUrl = returnUrl;
             return View(tTaiLieu);
         }
 
@@ -275,6 +276,36 @@ namespace Library_Manager.Controllers
             }
             PopulateSelectList(tTaiLieu);
             
+            return View(tTaiLieu);
+        }
+
+        // GET: TaiLieu/Delete/5
+        [Authorization("QLT")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            // 1. Kiểm tra ID
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // 2. Truy vấn tài liệu và các thông tin liên quan cần thiết cho View xác nhận
+            var tTaiLieu = await _context.TTaiLieus
+                .Include(t => t.MaNxbNavigation)
+                .Include(t => t.MaThLNavigation)
+                .Include(t => t.MaNnNavigation)
+                .Include(t => t.MaDdNavigation)
+                .Include(t => t.MaTkNavigation)
+                .Include(t => t.TBanSaos) // Cần include TBanSaos để đếm số lượng bản sao hiển thị trên trang Delete
+                .FirstOrDefaultAsync(m => m.MaTl == id);
+
+            // 3. Kiểm tra tài liệu tồn tại
+            if (tTaiLieu == null)
+            {
+                return NotFound();
+            }
+
+            // 4. Trả về View Delete.cshtml
             return View(tTaiLieu);
         }
 
