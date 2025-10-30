@@ -136,7 +136,7 @@
                         <a asp-controller="TaiLieu_TacGia"
                            asp-action="Details"
                            asp-route-id="@Model?.MaTl"
-                           asp-route-returnUrl="@Context.Request.Path"
+                           asp-route-returnUrl="@currentUrl"
                            ** class="btn btn-warning">
                             <i class='bx bx-group me-1'></i> Xem Tác giả (@Model.TTaiLieuTacGia.Count)
                         </a>
@@ -195,9 +195,22 @@
                 </a>
 
                 @* Nút Quay lại *@
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                </a>
+                <div>
+                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        // Nếu có returnUrl, quay lại trang đó
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại
+                        </a>
+                    }
+                    else
+                    {
+                        // Nếu không, quay về trang Index mặc định 
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                        </a>
+                    }
+                </div>
             </div>
         </div>
     </div>

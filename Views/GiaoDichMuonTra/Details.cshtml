@@ -63,6 +63,17 @@
                         <label class="form-label d-block text-secondary">Trạng Thái</label>
                         <p class="mb-0"><span class="badge @badgeClass fs-6">@trangThai</span></p>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Tài liệu mượn</label>
+                        <a asp-controller="GiaoDich_BanSao"
+                           asp-action="Details"
+                           asp-route-id="@Model?.MaGd"
+                           asp-route-returnUrl="@Context.Request.Path"
+                           ** class="btn btn-warning">
+                            <i class='bx bx-group me-1'></i> Xem danh sách (@Model.TGiaoDichBanSaos.Count)
+                        </a>
+                    </div>
                 </div>
 
                 @* Cột 2 *@
