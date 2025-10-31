@@ -35,7 +35,8 @@ namespace Library_Manager.Controllers
                     t.MaTbd.Contains(searchString) ||
                     t.MaBd.Contains(searchString) ||
                     t.MaBdNavigation.HoDem.ToLower().Contains(searchString.ToLower()) ||
-                    t.MaBdNavigation.Ten.ToLower().Contains(searchString.ToLower()));
+                    t.MaBdNavigation.Ten.ToLower().Contains(searchString.ToLower()) ||
+                    t.TrangThai.Contains(searchString));
             }
 
             theBanDocs = theBanDocs.OrderBy(t => t.MaTbd);
