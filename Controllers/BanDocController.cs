@@ -24,10 +24,6 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TBanDoc
-        //public async Task<IActionResult> Index()
-        //{
-        //    return View(await _context.TBanDocs.ToListAsync());
-        //}
         
         public IActionResult Index(int? page, string searchString) // Bỏ async và await
         {
@@ -39,10 +35,15 @@ namespace Library_Manager.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                banDocs = banDocs.Where(bd =>
-                    bd.Ten.ToLower().Contains(searchString.ToLower()) ||
-                    bd.HoDem.ToLower().Contains(searchString.ToLower()) ||
-                    bd.MaBd.Contains(searchString));
+                banDocs = banDocs.Where(t =>
+                t.Ten.ToLower().Contains(searchString) ||
+                t.HoDem.ToLower().Contains(searchString) ||
+                t.MaBd.ToLower().Contains(searchString) ||
+                t.Email.ToLower().Contains(searchString) ||
+                (t.GioiTinh == "M" && "nam".Contains(searchString)) ||
+                (t.GioiTinh == "F" && "nữ".Contains(searchString)) ||
+                (t.GioiTinh != "M" && t.GioiTinh != "F" && "khác".Contains(searchString)) ||
+                EF.Functions.Like(t.NgaySinh.Year.ToString(), $"%{searchString}%"));
             }
 
             // Sắp xếp

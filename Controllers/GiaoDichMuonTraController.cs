@@ -33,13 +33,25 @@ namespace Library_Manager.Controllers
                     .ThenInclude(TheBanDocController => TheBanDocController.MaBdNavigation)
                 .Include(t => t.MaTkNavigation);
 
-            // 2. Nếu có tìm kiếm theo Mã giao dịch hoặc Mã bạn đọc
+            // 2. Nếu có tìm kiếm
             if (!string.IsNullOrEmpty(searchString))
             {
+                var searchLower = searchString.ToLower();
+
                 giaoDiches = giaoDiches.Where(gd =>
-                    gd.MaTbdNavigation.MaBd.ToLower().Contains(searchString.ToLower()) ||
-                    //gd.MaTbdNavigation.HoDem.ToLower().Contains(searchString.ToLower()) ||
-                    gd.MaTbd.Contains(searchString)
+                    gd.MaTbd.ToLower().Contains(searchLower) ||
+                    gd.MaGd.ToLower().Contains(searchLower) ||
+                    (gd.TrangThai != null && gd.TrangThai.ToLower().Contains(searchLower)) ||
+                    EF.Functions.Like(gd.NgayMuon.Year.ToString(), $"%{searchString}%") ||
+                    (
+                        gd.MaTbdNavigation != null &&
+                        gd.MaTbdNavigation.MaBdNavigation != null &&
+                        (
+                            gd.MaTbdNavigation.MaBdNavigation.Ten.ToLower().Contains(searchLower) ||
+                            gd.MaTbdNavigation.MaBdNavigation.HoDem.ToLower().Contains(searchLower) ||
+                            gd.MaTbdNavigation.MaBdNavigation.MaBd.ToLower().Contains(searchLower)
+                        )
+                    )
                 );
             }
 
