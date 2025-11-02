@@ -11,6 +11,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/Assets/css/custom-filter.css" />
+}
+
 @* ========================================================================
     KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
     ======================================================================== *@
@@ -52,58 +56,96 @@
                 <thead id="myTableHead">
                     <tr>
                         <th style="min-width: 250px;">Tên tài liệu</th>
-                        <th style="width: 250px; white-space: nowrap;">Thể loại</th>
-                        <th style="width: 250px; white-space: nowrap;">Nhà xuất bản</th>
-                        <th style="width: 100px; white-space: nowrap;">Ngôn ngữ</th>
+
+                        <th class="filterable-header" data-filter="category">
+                            Thể loại
+                            @if (!string.IsNullOrEmpty(ViewBag.SelectedCategory))
+                            {
+                                <span class="filter-active-badge"></span>
+                            }
+                            <div class="filter-dropdown">
+                                <div class="filter-dropdown-header">Lọc theo Thể loại</div>
+                                <div class="filter-options">
+                                    <div class="filter-option @(string.IsNullOrEmpty(ViewBag.SelectedCategory) ? "selected" : "")" data-value="">
+                                        <div class="filter-option-checkbox"></div>
+                                        <span>Tất cả</span>
+                                    </div>
+                                    @if (ViewBag.Categories != null)
+                                    {
+                                        foreach (var c in ViewBag.Categories as List<string>)
+                                        {
+                                            <div class="filter-option @(ViewBag.SelectedCategory == c ? "selected" : "")" data-value="@c">
+                                                <div class="filter-option-checkbox"></div>
+                                                <span>@c</span>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </th>
+                        
+                        <th class="filterable-header" data-filter="publisher" style="width: 250px; white-space: nowrap;">
+                            Nhà xuất bản
+                            @if (!string.IsNullOrEmpty(ViewBag.SelectedPublisher))
+                            {
+                                <span class="filter-active-badge"></span>
+                            }
+                            <div class="filter-dropdown">
+                                <div class="filter-dropdown-header">Lọc theo Nhà xuất bản</div>
+                                <div class="filter-options">
+                                    <div class="filter-option @(string.IsNullOrEmpty(ViewBag.SelectedPublisher) ? "selected" : "")" data-value="">
+                                        <div class="filter-option-checkbox"></div>
+                                        <span>Tất cả</span>
+                                    </div>
+                                    @if (ViewBag.Publishers != null)
+                                    {
+                                        foreach (var p in ViewBag.Publishers as List<string>)
+                                        {
+                                            <div class="filter-option @(ViewBag.SelectedPublisher == p ? "selected" : "")" data-value="@p">
+                                                <div class="filter-option-checkbox"></div>
+                                                <span>@p</span>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </th>
+
+
+                        <th class="filterable-header" data-filter="language" style="width: 120px; white-space: nowrap;">
+                            Ngôn ngữ
+                            @if (!string.IsNullOrEmpty(ViewBag.SelectedLanguage))
+                            {
+                                <span class="filter-active-badge"></span>
+                            }
+                            <div class="filter-dropdown">
+                                <div class="filter-dropdown-header">Lọc theo Ngôn ngữ</div>
+                                <div class="filter-options">
+                                    <div class="filter-option @(string.IsNullOrEmpty(ViewBag.SelectedLanguage) ? "selected" : "")" data-value="">
+                                        <div class="filter-option-checkbox"></div>
+                                        <span>Tất cả</span>
+                                    </div>
+                                    @if (ViewBag.Languages != null)
+                                    {
+                                        foreach (var l in ViewBag.Languages as List<string>)
+                                        {
+                                            <div class="filter-option @(ViewBag.SelectedLanguage == l ? "selected" : "")" data-value="@l">
+                                                <div class="filter-option-checkbox"></div>
+                                                <span>@l</span>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </th>
+                            
                         <th style="width: 120px; white-space: nowrap;">Hành động</th>
                     </tr>
                 </thead>
 
-                @* --- PHẦN 3.2: NỘI DUNG BẢNG (TBODY) --- *@
-                <tbody>
-                    @if (Model.Any())
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@Html.DisplayFor(modelItem => item.TenTl)</td>
-
-                                <td style="width: 250px; white-space: nowrap;">@item.MaThLNavigation?.TenThL</td>
-                                <td style="width: 250px; white-space: nowrap;">@item.MaNxbNavigation?.TenNxb</td>
-                                <td style="width: 100px; white-space: nowrap;">@item.MaNnNavigation?.TenNn</td>
-
-                                <td style="width: 120px; white-space: nowrap;">
-                                    <div class="d-flex w-100 justify-content-around">
-                                        <a asp-action="Details" asp-route-id="@item.MaTl"
-                                           class="btn btn-icon btn-label-info waves-effect "
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
-                                            <i class='bx bx-detail'></i>
-                                        </a>
-
-                                        <a asp-action="Edit" asp-route-id="@item.MaTl"
-                                           class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
-                                            <i class='bx bx-pencil'></i>
-                                        </a>
-
-                                        <a asp-action="Delete" asp-route-id="@item.MaTl"
-                                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
-                                            <i class='bx bx-trash'></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-5">
-                                <i class='bx bx-info-circle me-1'></i> Không tìm thấy tài liệu nào.
-                            </td>
-                        </tr>
-                    }
+                @* --- PHẦN 3.2: NỘI DUNG BẢNG (TBODY) -- *@
+                <tbody id="tableBodyContainer">
+                    @Html.Partial("_FilterTable", Model)
                 </tbody>
             </table>
         </div>
@@ -114,3 +156,50 @@
         </div>
     </div>
 </div>
+
+@* <script>
+    function applyFilter(filterName, filterValue) {
+        const url = new URL(window.location.href);
+        if (filterValue) {
+            url.searchParams.set(filterName, filterValue);
+        } else {
+            url.searchParams.delete(filterName);
+        }
+        url.searchParams.delete("page"); // Quay lại trang đầu khi thay đổi lọc
+        window.location.href = url.toString();
+    }
+</script> *@
+
+@section Scripts {
+    <script src="~/Assets/js/custom-filter.js"></script>
+
+    <script>
+        function filterTaiLieu() {
+            const searchString = $('#searchString').val();
+            const category = $('#category').val();
+            const publisher = $('#publisher').val();
+            const language = $('#language').val();
+
+            $.ajax({
+                url: '/TaiLieu/FilterTaiLieu',
+                type: 'GET',
+                data: {
+                    searchString: searchString,
+                    category: category,
+                    publisher: publisher,
+                    language: language
+                },
+                success: function (result) {
+                    $('#tableBodyContainer').html(result);
+                }
+            });
+        }
+
+        // Gọi filter khi chọn dropdown hoặc nhấn tìm kiếm
+        $('.filter-option').click(function () {
+            filterTaiLieu();
+        });
+    </script>
+}
+
+
