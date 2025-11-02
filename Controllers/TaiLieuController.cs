@@ -22,13 +22,15 @@ namespace Library_Manager.Controllers
 
         #region Các chức năng cơ bản (Index, Details, PopulateSelectList, Delete)
         // GET: TaiLieu
-        public IActionResult Index(int? page, string searchString)
+        public IActionResult Index(int? page, string searchString, string category, string publisher, string language)
         {
             var pageNumber = page ?? 1;
             var pageSize = 6;
+
             IQueryable<TTaiLieu> taiLieus = _context.TTaiLieus
                 .Include(t => t.MaDdNavigation).Include(t => t.MaNnNavigation).Include(t => t.MaNxbNavigation)
                 .Include(t => t.MaThLNavigation).Include(t => t.MaTkNavigation);
+
             if (!string.IsNullOrEmpty(searchString))
             {
                 taiLieus = taiLieus.Where(tl =>
@@ -37,9 +39,30 @@ namespace Library_Manager.Controllers
                     (tl.MaNxbNavigation != null && tl.MaNxbNavigation.TenNxb.ToLower().Contains(searchString.ToLower())) ||
                     (tl.MaThLNavigation != null && tl.MaThLNavigation.TenThL.ToLower().Contains(searchString.ToLower())));
             }
+
+            if (!string.IsNullOrEmpty(category))
+                taiLieus = taiLieus.Where(tl => tl.MaThLNavigation.TenThL == category);
+
+            if (!string.IsNullOrEmpty(publisher))
+                taiLieus = taiLieus.Where(tl => tl.MaNxbNavigation.TenNxb == publisher);
+
+            if (!string.IsNullOrEmpty(language))
+                taiLieus = taiLieus.Where(tl => tl.MaNnNavigation.TenNn == language);
+
             taiLieus = taiLieus.OrderBy(tl => tl.MaTl);
+
             var pagedTaiLieus = new PagedList.Core.PagedList<TTaiLieu>(taiLieus, pageNumber, pageSize);
+
             ViewBag.CurrentFilter = searchString;
+
+            ViewBag.Categories = _context.TTheLoais.Select(c => c.TenThL).Distinct().ToList();
+            ViewBag.Publishers = _context.TNhaXuatBans.Select(p => p.TenNxb).Distinct().ToList();
+            ViewBag.Languages = _context.TNgonNgus.Select(l => l.TenNn).Distinct().ToList();
+
+            ViewBag.SelectedCategory = category;
+            ViewBag.SelectedPublisher = publisher;
+            ViewBag.SelectedLanguage = language;
+
             return View(pagedTaiLieus);
         }
 
