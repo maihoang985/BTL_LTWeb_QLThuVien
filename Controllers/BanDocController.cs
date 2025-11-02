@@ -25,7 +25,7 @@ namespace Library_Manager.Controllers
 
         // GET: TBanDoc
         
-        public IActionResult Index(int? page, string searchString) // Bỏ async và await
+        public IActionResult Index(int? page, string searchString, string returnUrl) // Bỏ async và await
         {
             var pageNumber = page ?? 1;
             var pageSize = 6;
@@ -58,6 +58,8 @@ namespace Library_Manager.Controllers
             // Truyền lại giá trị tìm kiếm để hiển thị lại trong View
             ViewBag.CurrentFilter = searchString;
 
+            ViewBag.ReturnUrl = returnUrl;
+
             return View(pagedBanDocs);
         }
 
@@ -85,8 +87,9 @@ namespace Library_Manager.Controllers
 
         //[Authorization("QLB")]
         // GET: TBanDoc/Create
-        public IActionResult Create()
+        public IActionResult Create(string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 

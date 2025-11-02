@@ -22,7 +22,7 @@ namespace Library_Manager.Controllers
 
         #region Các chức năng cơ bản (Index, Details, PopulateSelectList, Delete)
         // GET: TaiLieu
-        public IActionResult Index(int? page, string searchString, string category, string publisher, string language)
+        public IActionResult Index(int? page, string searchString, string category, string publisher, string language, string returnUrl)
         {
             var pageNumber = page ?? 1;
             var pageSize = 6;
@@ -62,6 +62,8 @@ namespace Library_Manager.Controllers
             ViewBag.SelectedCategory = category;
             ViewBag.SelectedPublisher = publisher;
             ViewBag.SelectedLanguage = language;
+
+            ViewBag.ReturnUrl = returnUrl;
 
             return View(pagedTaiLieus);
         }
@@ -138,9 +140,10 @@ namespace Library_Manager.Controllers
         // GET: TaiLieu/Create
         // ------------------------------------------------------------------------------------------------
         [Authorization("QLT")]
-        public IActionResult Create()
+        public IActionResult Create(string returnUrl)
         {
             PopulateSelectList();
+            ViewBag.ReturnUrl = returnUrl;
             // Khởi tạo Model rỗng để View không bị lỗi NullReferenceException
             return View(new TTaiLieu());
         }
