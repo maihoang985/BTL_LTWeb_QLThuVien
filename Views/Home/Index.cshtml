@@ -88,10 +88,15 @@
                             </div>
 
                             <div class="d-grid">
-                                <a href="@Url.Action("Details", "TaiKhoan", new { id = account.MaTk })" class="btn btn-sm btn-outline-secondary">
-                                    <i class='bx bx-detail me-1'></i> Xem chi tiết Tài khoản
+                                <a asp-controller="TaiKhoan"
+                                   asp-action="Details"
+                                   asp-route-id="@account.MaTk"
+                                   asp-route-returnUrl="@Context.Request.Path"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    <i class="bx bx-detail me-1"></i> Xem chi tiết Tài khoản
                                 </a>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -134,10 +139,15 @@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-primary text-center">
                                 <div class="card-body">
-                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
                                     <h6 class="card-title text-primary"><strong>XỬ LÝ GIAO DỊCH</strong></h6>
-                                    <a href="@Url.Action("Create", "GiaoDichMuonTra")" class="btn btn-primary mt-2"><i class='bx bx-barcode-reader me-1'></i> Bắt đầu</a>
+                                    <a asp-controller="GiaoDichMuonTra"
+                                       asp-action="Create"
+                                       asp-route-returnUrl="@Context.Request.Path"
+                                       class="btn btn-primary mt-2">
+                                        <i class='bx bx-barcode-reader me-1'></i> Bắt đầu
+                                    </a>
                                 </div>
+
                             </div>
                         </div>
 
@@ -187,8 +197,14 @@
                 </div>
                 @* Đã thống nhất màu button thành btn-primary *@
                 <div class="card-footer d-flex justify-content-end bg-transparent border-top">
-                    <a href="@Url.Action("Index", "GiaoDichMuonTra")" class="btn btn-sm btn-primary">Xem tất cả Giao dịch <i class='bx bx-right-arrow-alt'></i></a>
+                    <a asp-controller="GiaoDichMuonTra"
+                       asp-action="Index"
+                       asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-sm btn-primary">
+                        Xem tất cả Giao dịch <i class='bx bx-right-arrow-alt'></i>
+                    </a>
                 </div>
+
             </div>
         </div>
 
@@ -227,10 +243,15 @@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-info text-center">
                                 <div class="card-body">
-                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
                                     <h6 class="card-title text-info"><strong>NHẬP LIỆU NHANH</strong></h6>
-                                    <a href="@Url.Action("Create", "TaiLieu")" class="btn btn-info mt-2">Thêm Tài liệu mới</a>
+                                    <a asp-controller="TaiLieu"
+                                       asp-action="Create"
+                                       asp-route-returnUrl="@Context.Request.Path"
+                                       class="btn btn-info mt-2">
+                                        Thêm Tài liệu mới
+                                    </a>
                                 </div>
+
                             </div>
                         </div>
 
@@ -245,7 +266,16 @@
                                             <tr>
                                                 <td><i class='bx bx-book me-2'></i> @item.TenTl</td>
                                                 <td><span class="badge @(item.SoBanSanSang == 0 ? "bg-label-danger" : "bg-label-warning") me-1">@item.SoBanSanSang bản</span></td>
-                                                <td class="text-end"><a href="@Url.Action("Edit", "TaiLieu", new { id = item.MaTl })" class="text-primary">Xem / Nhập</a></td>
+                                                <td class="text-end">
+                                                    <a asp-controller="TaiLieu"
+                                                       asp-action="Edit"
+                                                       asp-route-id="@item.MaTl"
+                                                       asp-route-returnUrl="@Context.Request.Path"
+                                                       class="text-primary">
+                                                        Xem / Nhập
+                                                    </a>
+                                                </td>
+
                                             </tr>
                                         }
                                         @if (((List<dynamic>)ViewBag.LowStockList).Count == 0)
@@ -261,8 +291,14 @@
                 </div>
                 @* Đã điều chỉnh 2 button theo yêu cầu: 1 outline, 1 primary *@
                 <div class="card-footer d-flex justify-content-end bg-transparent border-top">
-                    <a href="@Url.Action("Index", "TaiLieu")" class="btn btn-sm btn-primary">Quản lý Tài liệu <i class='bx bx-right-arrow-alt'></i></a>
+                    <a asp-controller="TaiLieu"
+                       asp-action="Index"
+                       asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-sm btn-primary">
+                        Quản lý Tài liệu <i class='bx bx-right-arrow-alt'></i>
+                    </a>
                 </div>
+
             </div>
         </div>
 
@@ -301,10 +337,15 @@
                         <div class="col-md-4 mb-4">
                             <div class="card bg-label-success text-center">
                                 <div class="card-body">
-                                    @* SỬA LỖI: Dùng <strong> hoặc class fw-bold *@
                                     <h6 class="card-title text-success"><strong>ĐĂNG KÝ MỚI</strong></h6>
-                                    <a href="@Url.Action("Create", "BanDoc")" class="btn btn-success mt-2">Đăng ký độc giả</a>
+                                    <a asp-controller="BanDoc"
+                                       asp-action="Create"
+                                       asp-route-returnUrl="@Context.Request.Path"
+                                       class="btn btn-success mt-2">
+                                        Đăng ký độc giả
+                                    </a>
                                 </div>
+
                             </div>
                         </div>
 
@@ -367,8 +408,14 @@
                 </div>
                 @* Đã thống nhất màu button thành btn-primary *@
                 <div class="card-footer d-flex justify-content-end bg-transparent border-top">
-                    <a href="@Url.Action("Index", "BanDoc")" class="btn btn-sm btn-primary">Quản lý Bạn đọc <i class='bx bx-right-arrow-alt'></i></a>
+                    <a asp-controller="BanDoc"
+                       asp-action="Index"
+                       asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-sm btn-primary">
+                        Quản lý Bạn đọc <i class='bx bx-right-arrow-alt'></i>
+                    </a>
                 </div>
+
             </div>
         </div>
 

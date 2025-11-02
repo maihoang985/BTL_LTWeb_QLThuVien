@@ -22,7 +22,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichMuonTra
-        public IActionResult Index(int? page, string searchString)
+        public IActionResult Index(int? page, string searchString, string returnUrl)
         {
             var pageNumber = page ?? 1;
             var pageSize = 6;
@@ -64,6 +64,8 @@ namespace Library_Manager.Controllers
             // 5. Truyền lại giá trị tìm kiếm để hiển thị trong View
             ViewBag.CurrentFilter = searchString;
 
+            ViewBag.ReturnUrl = returnUrl;
+
             return View(pagedGiaoDiches);
         }
 
@@ -87,16 +89,18 @@ namespace Library_Manager.Controllers
             {
                 return NotFound();
             }
+            
 
             return View(tGiaoDichMuonTra);
         }
 
         [Authorization("QLM")]
         // GET: GiaoDichMuonTra/Create
-        public IActionResult Create()
+        public IActionResult Create(string returnUrl)
         {
             ViewData["MaTbd"] = new SelectList(_context.TTheBanDocs, "MaTbd", "MaTbd");
             ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk");
+            ViewBag.ReturnUrl = returnUrl;  
             return View();
         }
 

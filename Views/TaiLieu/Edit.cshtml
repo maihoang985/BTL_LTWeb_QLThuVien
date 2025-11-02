@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Chỉnh sửa Tài liệu";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
 }
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -219,7 +220,10 @@
                             <i class="bx bx-save me-1"></i> Lưu thay đổi
                         </button>
 
-                        <a asp-action="Details" asp-route-id="@Model?.MaTl" class="btn btn-success">
+                        <a asp-action="Details" 
+                        asp-route-id="@Model?.MaTl" 
+                        asp-route-returnUrl="@currentUrl"
+                        class="btn btn-success">
                             <i class="bx bx-detail me-1"></i> Xem chi tiết Tài liệu
                         </a>
                     </div>
