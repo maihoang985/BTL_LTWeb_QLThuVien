@@ -26,7 +26,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // Giữ ở dạng IQueryable
-            IQueryable<TNgonNgu> ngonNgus = _context.TNgonNgus;
+            IQueryable<TNgonNgu> ngonNgus = _context.TNgonNgu;
 
             // Tìm kiếm
             if (!string.IsNullOrEmpty(searchString))
@@ -58,7 +58,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNgonNgu = await _context.TNgonNgus
+            var tNgonNgu = await _context.TNgonNgu
                 .FirstOrDefaultAsync(m => m.MaNn == id);
             if (tNgonNgu == null)
             {
@@ -98,7 +98,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNgonNgu = await _context.TNgonNgus.FindAsync(id);
+            var tNgonNgu = await _context.TNgonNgu.FindAsync(id);
             if (tNgonNgu == null)
             {
                 return NotFound();
@@ -168,7 +168,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNgonNgu = await _context.TNgonNgus
+            var tNgonNgu = await _context.TNgonNgu
                 .FirstOrDefaultAsync(m => m.MaNn == id);
             if (tNgonNgu == null)
             {
@@ -183,10 +183,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tNgonNgu = await _context.TNgonNgus.FindAsync(id);
+            var tNgonNgu = await _context.TNgonNgu.FindAsync(id);
             if (tNgonNgu != null)
             {
-                _context.TNgonNgus.Remove(tNgonNgu);
+                _context.TNgonNgu.Remove(tNgonNgu);
             }
 
             await _context.SaveChangesAsync();
@@ -195,7 +195,7 @@ namespace Library_Manager.Controllers
 
         private bool TNgonNguExists(string id)
         {
-            return _context.TNgonNgus.Any(e => e.MaNn == id);
+            return _context.TNgonNgu.Any(e => e.MaNn == id);
         }
     }
 }

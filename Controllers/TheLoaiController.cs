@@ -26,7 +26,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // Giữ ở dạng IQueryable để linh hoạt lọc và sắp xếp
-            IQueryable<TTheLoai> theLoais = _context.TTheLoais;
+            IQueryable<TTheLoai> theLoais = _context.TTheLoai;
 
             // Tìm kiếm theo mã hoặc tên thể loại
             if (!string.IsNullOrEmpty(searchString))
@@ -56,7 +56,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tTheLoai = await _context.TTheLoais
+            var tTheLoai = await _context.TTheLoai
                 .FirstOrDefaultAsync(m => m.MaThL == id);
             if (tTheLoai == null)
             {
@@ -96,7 +96,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tTheLoai = await _context.TTheLoais.FindAsync(id);
+            var tTheLoai = await _context.TTheLoai.FindAsync(id);
             if (tTheLoai == null)
             {
                 return NotFound();
@@ -166,7 +166,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tTheLoai = await _context.TTheLoais
+            var tTheLoai = await _context.TTheLoai
                 .FirstOrDefaultAsync(m => m.MaThL == id);
             if (tTheLoai == null)
             {
@@ -181,10 +181,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tTheLoai = await _context.TTheLoais.FindAsync(id);
+            var tTheLoai = await _context.TTheLoai.FindAsync(id);
             if (tTheLoai != null)
             {
-                _context.TTheLoais.Remove(tTheLoai);
+                _context.TTheLoai.Remove(tTheLoai);
             }
 
             await _context.SaveChangesAsync();
@@ -193,7 +193,7 @@ namespace Library_Manager.Controllers
 
         private bool TTheLoaiExists(string id)
         {
-            return _context.TTheLoais.Any(e => e.MaThL == id);
+            return _context.TTheLoai.Any(e => e.MaThL == id);
         }
     }
 }

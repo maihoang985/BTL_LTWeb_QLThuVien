@@ -34,5 +34,5 @@ public partial class TBanDoc
 
     public string Email { get; set; } = null!;
 
-    public virtual ICollection<TTheBanDoc> TTheBanDocs { get; set; } = new List<TTheBanDoc>();
+    public virtual ICollection<TTheBanDoc> TTheBanDoc { get; set; } = new List<TTheBanDoc>();
 }

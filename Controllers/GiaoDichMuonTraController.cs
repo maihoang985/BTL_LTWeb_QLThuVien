@@ -28,7 +28,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // 1. Giữ ở dạng IQueryable, include các navigation property
-            IQueryable<TGiaoDichMuonTra> giaoDiches = _context.TGiaoDichMuonTras
+            IQueryable<TGiaoDichMuonTra> giaoDiches = _context.TGiaoDichMuonTra
                 .Include(t => t.MaTbdNavigation)    
                     .ThenInclude(TheBanDocController => TheBanDocController.MaBdNavigation)
                 .Include(t => t.MaTkNavigation);
@@ -78,12 +78,12 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras
+            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra
                 .Include(t => t.MaTbdNavigation)
                     .ThenInclude(BanDocController => BanDocController.MaBdNavigation)
                 .Include(t => t.MaTkNavigation)
                     .ThenInclude(NhanVienController => NhanVienController.MaNvNavigation)   
-                .Include(t => t.TGiaoDichBanSaos)
+                .Include(t => t.TGiaoDichBanSao)
                 .FirstOrDefaultAsync(m => m.MaGd == id);
             if (tGiaoDichMuonTra == null)
             {
@@ -98,8 +98,8 @@ namespace Library_Manager.Controllers
         // GET: GiaoDichMuonTra/Create
         public IActionResult Create(string returnUrl)
         {
-            ViewData["MaTbd"] = new SelectList(_context.TTheBanDocs, "MaTbd", "MaTbd");
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk");
+            ViewData["MaTbd"] = new SelectList(_context.TTheBanDoc, "MaTbd", "MaTbd");
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk");
             ViewBag.ReturnUrl = returnUrl;  
             return View();
         }
@@ -117,8 +117,8 @@ namespace Library_Manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaTbd"] = new SelectList(_context.TTheBanDocs, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
+            ViewData["MaTbd"] = new SelectList(_context.TTheBanDoc, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
             return View(tGiaoDichMuonTra);
         }
 
@@ -131,13 +131,13 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras.FindAsync(id);
+            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra.FindAsync(id);
             if (tGiaoDichMuonTra == null)
             {
                 return NotFound();
             }
-            ViewData["MaTbd"] = new SelectList(_context.TTheBanDocs, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
+            ViewData["MaTbd"] = new SelectList(_context.TTheBanDoc, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
             return View(tGiaoDichMuonTra);
         }
 
@@ -173,8 +173,8 @@ namespace Library_Manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaTbd"] = new SelectList(_context.TTheBanDocs, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
+            ViewData["MaTbd"] = new SelectList(_context.TTheBanDoc, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
             return View(tGiaoDichMuonTra);
         }
 
@@ -186,7 +186,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras
+            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra
                 .Include(t => t.MaTbdNavigation)
                 .Include(t => t.MaTkNavigation)
                 .FirstOrDefaultAsync(m => m.MaGd == id);
@@ -203,10 +203,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras.FindAsync(id);
+            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra.FindAsync(id);
             if (tGiaoDichMuonTra != null)
             {
-                _context.TGiaoDichMuonTras.Remove(tGiaoDichMuonTra);
+                _context.TGiaoDichMuonTra.Remove(tGiaoDichMuonTra);
             }
 
             await _context.SaveChangesAsync();
@@ -215,7 +215,7 @@ namespace Library_Manager.Controllers
 
         private bool TGiaoDichMuonTraExists(string id)
         {
-            return _context.TGiaoDichMuonTras.Any(e => e.MaGd == id);
+            return _context.TGiaoDichMuonTra.Any(e => e.MaGd == id);
         }
     }
 }

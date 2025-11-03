@@ -9,5 +9,5 @@ public partial class TDinhDang
 
     public string TenDd { get; set; } = null!;
 
-    public virtual ICollection<TTaiLieu> TTaiLieus { get; set; } = new List<TTaiLieu>();
+    public virtual ICollection<TTaiLieu> TTaiLieu { get; set; } = new List<TTaiLieu>();
 }

@@ -31,7 +31,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // 1. Giữ ở dạng IQueryable (Không dùng ToList() hoặc ToListAsync())
-            IQueryable<TBanDoc> banDocs = _context.TBanDocs;
+            IQueryable<TBanDoc> banDocs = _context.TBanDoc;
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -72,7 +72,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tBanDoc = await _context.TBanDocs
+            var tBanDoc = await _context.TBanDoc
                 .FirstOrDefaultAsync(m => m.MaBd == id);
             if (tBanDoc == null)
             {
@@ -119,7 +119,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tBanDoc = await _context.TBanDocs.FindAsync(id);
+            var tBanDoc = await _context.TBanDoc.FindAsync(id);
             if (tBanDoc == null)
             {
                 return NotFound();
@@ -194,7 +194,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tBanDoc = await _context.TBanDocs
+            var tBanDoc = await _context.TBanDoc
                 .FirstOrDefaultAsync(m => m.MaBd == id);
             if (tBanDoc == null)
             {
@@ -210,10 +210,10 @@ namespace Library_Manager.Controllers
         //[Authorization("QLB")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tBanDoc = await _context.TBanDocs.FindAsync(id);
+            var tBanDoc = await _context.TBanDoc.FindAsync(id);
             if (tBanDoc != null)
             {
-                _context.TBanDocs.Remove(tBanDoc);
+                _context.TBanDoc.Remove(tBanDoc);
             }
 
             await _context.SaveChangesAsync();
@@ -222,7 +222,7 @@ namespace Library_Manager.Controllers
 
         private bool TBanDocExists(string id)
         {
-            return _context.TBanDocs.Any(e => e.MaBd == id);
+            return _context.TBanDoc.Any(e => e.MaBd == id);
         }
     }
 }

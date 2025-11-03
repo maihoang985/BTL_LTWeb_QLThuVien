@@ -9,9 +9,7 @@ public partial class TGiaoDichBanSao
 
     public string MaBs { get; set; } = null!;
 
-    public string? TinhTrangMuon { get; set; }
-
-    public string? TinhTrangTra { get; set; }
+    public bool TinhTrang { get; set; }
 
     public virtual TBanSao MaBsNavigation { get; set; } = null!;
 

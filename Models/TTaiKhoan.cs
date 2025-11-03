@@ -23,9 +23,9 @@ public partial class TTaiKhoan
 
     public virtual TVaiTro MaVtNavigation { get; set; } = null!;
 
-    public virtual ICollection<TGiaoDichMuonTra> TGiaoDichMuonTras { get; set; } = new List<TGiaoDichMuonTra>();
+    public virtual ICollection<TGiaoDichMuonTra> TGiaoDichMuonTra { get; set; } = new List<TGiaoDichMuonTra>();
 
-    public virtual ICollection<TTaiLieu> TTaiLieus { get; set; } = new List<TTaiLieu>();
+    public virtual ICollection<TTaiLieu> TTaiLieu { get; set; } = new List<TTaiLieu>();
 
-    public virtual ICollection<TTheBanDoc> TTheBanDocs { get; set; } = new List<TTheBanDoc>();
+    public virtual ICollection<TTheBanDoc> TTheBanDoc { get; set; } = new List<TTheBanDoc>();
 }

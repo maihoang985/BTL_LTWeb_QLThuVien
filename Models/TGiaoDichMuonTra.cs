@@ -11,11 +11,11 @@ public partial class TGiaoDichMuonTra
 
     public string MaTk { get; set; } = null!;
 
-    public DateTime NgayMuon { get; set; }
+    public DateOnly NgayMuon { get; set; }
 
-    public DateTime NgayHenTra { get; set; }
+    public DateOnly NgayHenTra { get; set; }
 
-    public DateTime? NgayTra { get; set; }
+    public DateOnly? NgayTra { get; set; }
 
     public string TrangThai { get; set; } = null!;
 
@@ -23,5 +23,5 @@ public partial class TGiaoDichMuonTra
 
     public virtual TTaiKhoan MaTkNavigation { get; set; } = null!;
 
-    public virtual ICollection<TGiaoDichBanSao> TGiaoDichBanSaos { get; set; } = new List<TGiaoDichBanSao>();
+    public virtual ICollection<TGiaoDichBanSao> TGiaoDichBanSao { get; set; } = new List<TGiaoDichBanSao>();
 }

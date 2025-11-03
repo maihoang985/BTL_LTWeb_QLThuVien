@@ -9,5 +9,5 @@ public partial class TTheLoai
 
     public string TenThL { get; set; } = null!;
 
-    public virtual ICollection<TTaiLieu> TTaiLieus { get; set; } = new List<TTaiLieu>();
+    public virtual ICollection<TTaiLieu> TTaiLieu { get; set; } = new List<TTaiLieu>();
 }

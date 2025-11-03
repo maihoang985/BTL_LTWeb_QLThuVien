@@ -9,9 +9,9 @@ public partial class TBanSao
 
     public string MaTl { get; set; } = null!;
 
-    public string? TinhTrang { get; set; }
+    public string TrangThai { get; set; } = null!;
 
     public virtual TTaiLieu MaTlNavigation { get; set; } = null!;
 
-    public virtual ICollection<TGiaoDichBanSao> TGiaoDichBanSaos { get; set; } = new List<TGiaoDichBanSao>();
+    public virtual ICollection<TGiaoDichBanSao> TGiaoDichBanSao { get; set; } = new List<TGiaoDichBanSao>();
 }

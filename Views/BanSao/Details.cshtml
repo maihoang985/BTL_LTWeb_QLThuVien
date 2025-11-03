@@ -7,7 +7,7 @@
 
 @{
     // Logic cho Badge Tình trạng
-    var tinhTrang = Model.TinhTrang;
+    var tinhTrang = Model.TrangThai;
     var badgeClass = tinhTrang switch
     {
         "Có sẵn" => "bg-label-success",
@@ -89,9 +89,9 @@
                 <i class='bx bx-transfer me-1'></i> Lịch sử Mượn/Trả (Giao dịch)
             </h6>
             <div class="mb-3">
-                @if (Model.TGiaoDichBanSaos.Any())
+                @if (Model.TGiaoDichBanSao.Any())
                 {
-                    <p class="text-muted">Bản sao này đã có **@Model.TGiaoDichBanSaos.Count** giao dịch. Hãy kiểm tra Controller của bạn để hiển thị chi tiết lịch sử giao dịch tại đây.</p>
+                    <p class="text-muted">Bản sao này đã có **@Model.TGiaoDichBanSao.Count** giao dịch. Hãy kiểm tra Controller của bạn để hiển thị chi tiết lịch sử giao dịch tại đây.</p>
                 }
                 else
                 {

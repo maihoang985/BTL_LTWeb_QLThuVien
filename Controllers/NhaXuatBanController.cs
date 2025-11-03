@@ -26,7 +26,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // 1. Giữ ở dạng IQueryable (không dùng ToList hay ToListAsync)
-            IQueryable<TNhaXuatBan> nhaXuatBans = _context.TNhaXuatBans;
+            IQueryable<TNhaXuatBan> nhaXuatBans = _context.TNhaXuatBan;
 
             // 2. Tìm kiếm theo Mã hoặc Tên Nhà Xuất Bản
             if (!string.IsNullOrEmpty(searchString))
@@ -59,7 +59,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNhaXuatBan = await _context.TNhaXuatBans
+            var tNhaXuatBan = await _context.TNhaXuatBan
                 .FirstOrDefaultAsync(m => m.MaNxb == id);
             if (tNhaXuatBan == null)
             {
@@ -99,7 +99,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNhaXuatBan = await _context.TNhaXuatBans.FindAsync(id);
+            var tNhaXuatBan = await _context.TNhaXuatBan.FindAsync(id);
             if (tNhaXuatBan == null)
             {
                 return NotFound();
@@ -169,7 +169,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNhaXuatBan = await _context.TNhaXuatBans
+            var tNhaXuatBan = await _context.TNhaXuatBan
                 .FirstOrDefaultAsync(m => m.MaNxb == id);
             if (tNhaXuatBan == null)
             {
@@ -184,10 +184,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tNhaXuatBan = await _context.TNhaXuatBans.FindAsync(id);
+            var tNhaXuatBan = await _context.TNhaXuatBan.FindAsync(id);
             if (tNhaXuatBan != null)
             {
-                _context.TNhaXuatBans.Remove(tNhaXuatBan);
+                _context.TNhaXuatBan.Remove(tNhaXuatBan);
             }
 
             await _context.SaveChangesAsync();
@@ -196,7 +196,7 @@ namespace Library_Manager.Controllers
 
         private bool TNhaXuatBanExists(string id)
         {
-            return _context.TNhaXuatBans.Any(e => e.MaNxb == id);
+            return _context.TNhaXuatBan.Any(e => e.MaNxb == id);
         }
     }
 }

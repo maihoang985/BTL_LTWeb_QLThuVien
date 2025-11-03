@@ -28,7 +28,7 @@ namespace Library_Manager.Controllers
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
-            IQueryable<TTaiKhoan> taiKhoans = _context.TTaiKhoans
+            IQueryable<TTaiKhoan> taiKhoans = _context.TTaiKhoan
                 .Include(t => t.MaNvNavigation)
                 .Include(t => t.MaVtNavigation);
 
@@ -52,7 +52,7 @@ namespace Library_Manager.Controllers
 
             ViewBag.CurrentFilter = searchString;
             ViewBag.CurrentRoleFilter = roleFilter; // Gửi vai trò đang được chọn về View
-            ViewBag.VaiTros = _context.TVaiTros.ToList(); // Gửi danh sách vai trò về View
+            ViewBag.VaiTros = _context.TVaiTro.ToList(); // Gửi danh sách vai trò về View
 
             return View(pagedTaiKhoans);
         }
@@ -65,7 +65,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tTaiKhoan = await _context.TTaiKhoans
+            var tTaiKhoan = await _context.TTaiKhoan
                 .Include(t => t.MaNvNavigation)
                 .Include(t => t.MaVtNavigation)
                 .FirstOrDefaultAsync(m => m.MaTk == id);
@@ -82,8 +82,8 @@ namespace Library_Manager.Controllers
         // GET: TTaiKhoans/Create
         public IActionResult Create()
         {
-            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv");
-            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt");
+            ViewData["MaNv"] = new SelectList(_context.TNhanVien, "MaNv", "MaNv");
+            ViewData["MaVt"] = new SelectList(_context.TVaiTro, "MaVt", "MaVt");
             return View();
         }
 
@@ -103,8 +103,8 @@ namespace Library_Manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
-            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
+            ViewData["MaNv"] = new SelectList(_context.TNhanVien, "MaNv", "MaNv", tTaiKhoan.MaNv);
+            ViewData["MaVt"] = new SelectList(_context.TVaiTro, "MaVt", "MaVt", tTaiKhoan.MaVt);
             return View(tTaiKhoan);
         }
 
@@ -116,13 +116,13 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tTaiKhoan = await _context.TTaiKhoans.FindAsync(id);
+            var tTaiKhoan = await _context.TTaiKhoan.FindAsync(id);
             if (tTaiKhoan == null)
             {
                 return NotFound();
             }
-            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
-            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
+            ViewData["MaNv"] = new SelectList(_context.TNhanVien, "MaNv", "MaNv", tTaiKhoan.MaNv);
+            ViewData["MaVt"] = new SelectList(_context.TVaiTro, "MaVt", "MaVt", tTaiKhoan.MaVt);
             return View(tTaiKhoan);
         }
 
@@ -144,7 +144,7 @@ namespace Library_Manager.Controllers
             {
                 try
                 {
-                    var existing = await _context.TTaiKhoans.AsNoTracking()
+                    var existing = await _context.TTaiKhoan.AsNoTracking()
                                         .FirstOrDefaultAsync(x => x.MaTk == id);
                     if (existing == null)
                     {
@@ -178,8 +178,8 @@ namespace Library_Manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["MaNv"] = new SelectList(_context.TNhanViens, "MaNv", "MaNv", tTaiKhoan.MaNv);
-            ViewData["MaVt"] = new SelectList(_context.TVaiTros, "MaVt", "MaVt", tTaiKhoan.MaVt);
+            ViewData["MaNv"] = new SelectList(_context.TNhanVien, "MaNv", "MaNv", tTaiKhoan.MaNv);
+            ViewData["MaVt"] = new SelectList(_context.TVaiTro, "MaVt", "MaVt", tTaiKhoan.MaVt);
             return View(tTaiKhoan);
         }
 
@@ -192,7 +192,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tTaiKhoan = await _context.TTaiKhoans
+            var tTaiKhoan = await _context.TTaiKhoan
                 .Include(t => t.MaNvNavigation)
                 .Include(t => t.MaVtNavigation)
                 .FirstOrDefaultAsync(m => m.MaTk == id);
@@ -209,10 +209,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tTaiKhoan = await _context.TTaiKhoans.FindAsync(id);
+            var tTaiKhoan = await _context.TTaiKhoan.FindAsync(id);
             if (tTaiKhoan != null)
             {
-                _context.TTaiKhoans.Remove(tTaiKhoan);
+                _context.TTaiKhoan.Remove(tTaiKhoan);
             }
 
             await _context.SaveChangesAsync();
@@ -221,7 +221,7 @@ namespace Library_Manager.Controllers
 
         private bool TTaiKhoanExists(string id)
         {
-            return _context.TTaiKhoans.Any(e => e.MaTk == id);
+            return _context.TTaiKhoan.Any(e => e.MaTk == id);
         }
     }
 }

@@ -7,7 +7,7 @@
 
 @{
     // Logic cho Badge Tình trạng
-    var tinhTrang = Model.TinhTrang;
+    var tinhTrang = Model.TrangThai;
     var badgeClass = tinhTrang switch
     {
         "Có sẵn" => "bg-label-success",
@@ -31,9 +31,9 @@
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">CẢNH BÁO QUAN TRỌNG!</h4>
         <p>Bạn đang chuẩn bị **xóa vĩnh viễn** Bản sao **@Model.MaBs** của Tài liệu **@Model.MaTlNavigation?.TenTl**.</p>
-        @if (Model.TGiaoDichBanSaos.Count > 0)
+        @if (Model.TGiaoDichBanSao.Count > 0)
         {
-            <p class="fw-bold">Lưu ý: Bản sao này có **@Model.TGiaoDichBanSaos.Count** giao dịch liên quan. Việc xóa có thể ảnh hưởng đến lịch sử mượn trả.</p>
+            <p class="fw-bold">Lưu ý: Bản sao này có **@Model.TGiaoDichBanSao.Count** giao dịch liên quan. Việc xóa có thể ảnh hưởng đến lịch sử mượn trả.</p>
         }
         <p class="mb-0">Hành động này **không thể hoàn tác**. Vui lòng kiểm tra kỹ thông tin trước khi xác nhận.</p>
     </div>
@@ -62,7 +62,7 @@
                         <dd class="col-sm-8"><span class="badge @badgeClass">@tinhTrang</span></dd>
 
                         <dt class="col-sm-4 text-muted">Số giao dịch:</dt>
-                        <dd class="col-sm-8">@Model.TGiaoDichBanSaos.Count</dd>
+                        <dd class="col-sm-8">@Model.TGiaoDichBanSao.Count</dd>
                     </dl>
                 </div>
 

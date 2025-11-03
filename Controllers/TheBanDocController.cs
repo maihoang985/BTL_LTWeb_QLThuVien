@@ -26,7 +26,7 @@ namespace Library_Manager.Controllers
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
-            IQueryable<TTheBanDoc> theBanDocs = _context.TTheBanDocs
+            IQueryable<TTheBanDoc> theBanDocs = _context.TTheBanDoc
                 .Include(t => t.MaBdNavigation);
 
             if (!string.IsNullOrEmpty(searchString))
@@ -52,7 +52,7 @@ namespace Library_Manager.Controllers
         {
             if (id == null) { return NotFound(); }
 
-            var tTheBanDoc = await _context.TTheBanDocs
+            var tTheBanDoc = await _context.TTheBanDoc
                 .Include(t => t.MaBdNavigation)
                 .Include(t => t.MaTkNavigation)
                 .ThenInclude(t => t.MaNvNavigation)
@@ -104,8 +104,8 @@ namespace Library_Manager.Controllers
         // Helper private
         private async Task PopulateBanDocChuaCoTheDropDownList(object selectedBanDoc = null)
         {
-            var maBdDaCoThe = _context.TTheBanDocs.Select(t => t.MaBd);
-            var banDocChuaCoThe = await _context.TBanDocs
+            var maBdDaCoThe = _context.TTheBanDoc.Select(t => t.MaBd);
+            var banDocChuaCoThe = await _context.TBanDoc
                 .Where(b => !maBdDaCoThe.Contains(b.MaBd))
                 .Select(b => new { MaBd = b.MaBd, HoTen = b.HoDem + " " + b.Ten })
                 .OrderBy(b => b.HoTen)
@@ -119,11 +119,11 @@ namespace Library_Manager.Controllers
         {
             if (id == null) { return NotFound(); }
 
-            var tTheBanDoc = await _context.TTheBanDocs.FindAsync(id);
+            var tTheBanDoc = await _context.TTheBanDoc.FindAsync(id);
             if (tTheBanDoc == null) { return NotFound(); }
 
             // Logic lấy Họ Tên Bạn đọc (Giữ nguyên)
-            var banDoc = await _context.TBanDocs.FindAsync(tTheBanDoc.MaBd);
+            var banDoc = await _context.TBanDoc.FindAsync(tTheBanDoc.MaBd);
             if (banDoc != null)
             {
                 ViewBag.HoTenBanDoc = banDoc.HoDem + " " + banDoc.Ten;
@@ -151,7 +151,7 @@ namespace Library_Manager.Controllers
             if (ModelState.IsValid)
             {
                 // Logic quan trọng: Phải lấy lại MaTk (người tạo thẻ) gốc vì nó không được post lên
-                var originalMaTk = await _context.TTheBanDocs
+                var originalMaTk = await _context.TTheBanDoc
                     .Where(t => t.MaTbd == id)
                     .Select(t => t.MaTk)
                     .AsNoTracking()
@@ -163,7 +163,7 @@ namespace Library_Manager.Controllers
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = "Lỗi: Không tìm thấy thẻ gốc để cập nhật.";
                     // Vẫn phải trả về View với thông tin
-                    var banDocDisplay = await _context.TBanDocs.FindAsync(tTheBanDoc.MaBd);
+                    var banDocDisplay = await _context.TBanDoc.FindAsync(tTheBanDoc.MaBd);
                     ViewBag.HoTenBanDoc = banDocDisplay != null ? (banDocDisplay.HoDem + " " + banDocDisplay.Ten) : "Lỗi";
                     return View(tTheBanDoc);
                 }
@@ -183,7 +183,7 @@ namespace Library_Manager.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.TTheBanDocs.Any(e => e.MaTbd == id)) { return NotFound(); }
+                    if (!_context.TTheBanDoc.Any(e => e.MaTbd == id)) { return NotFound(); }
 
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = "Lỗi xung đột dữ liệu. Thẻ này vừa được chỉnh sửa bởi người khác. Vui lòng tải lại trang.";
@@ -205,7 +205,7 @@ namespace Library_Manager.Controllers
 
             // Xử lý khi THẤT BẠI hoặc THÀNH CÔNG (luôn return View)
             // Tải lại HoTen cho ô input readonly
-            var banDoc = await _context.TBanDocs.FindAsync(tTheBanDoc.MaBd);
+            var banDoc = await _context.TBanDoc.FindAsync(tTheBanDoc.MaBd);
             ViewBag.HoTenBanDoc = banDoc != null ? (banDoc.HoDem + " " + banDoc.Ten) : "Lỗi";
 
             return View(tTheBanDoc);
@@ -217,7 +217,7 @@ namespace Library_Manager.Controllers
         {
             if (id == null) { return NotFound(); }
 
-            var tTheBanDoc = await _context.TTheBanDocs
+            var tTheBanDoc = await _context.TTheBanDoc
                 .Include(t => t.MaBdNavigation)
                 .FirstOrDefaultAsync(m => m.MaTbd == id);
 
@@ -231,10 +231,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tTheBanDoc = await _context.TTheBanDocs.FindAsync(id);
+            var tTheBanDoc = await _context.TTheBanDoc.FindAsync(id);
             if (tTheBanDoc != null)
             {
-                _context.TTheBanDocs.Remove(tTheBanDoc);
+                _context.TTheBanDoc.Remove(tTheBanDoc);
             }
 
             await _context.SaveChangesAsync();
@@ -243,7 +243,7 @@ namespace Library_Manager.Controllers
 
         private bool TTheBanDocExists(string id)
         {
-            return _context.TTheBanDocs.Any(e => e.MaTbd == id);
+            return _context.TTheBanDoc.Any(e => e.MaTbd == id);
         }
         #endregion
     }

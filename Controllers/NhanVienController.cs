@@ -28,7 +28,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // 1. Giữ dạng IQueryable để dễ xử lý phân trang
-            IQueryable<TNhanVien> nhanViens = _context.TNhanViens;
+            IQueryable<TNhanVien> nhanViens = _context.TNhanVien;
 
             // 2. Nếu có từ khóa tìm kiếm
             if (!string.IsNullOrEmpty(searchString))
@@ -63,7 +63,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNhanVien = await _context.TNhanViens
+            var tNhanVien = await _context.TNhanVien
                 .FirstOrDefaultAsync(m => m.MaNv == id);
             if (tNhanVien == null)
             {
@@ -106,7 +106,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNhanVien = await _context.TNhanViens.FindAsync(id);
+            var tNhanVien = await _context.TNhanVien.FindAsync(id);
             if (tNhanVien == null)
             {
                 return NotFound();
@@ -157,7 +157,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tNhanVien = await _context.TNhanViens
+            var tNhanVien = await _context.TNhanVien
                 .FirstOrDefaultAsync(m => m.MaNv == id);
             if (tNhanVien == null)
             {
@@ -172,10 +172,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tNhanVien = await _context.TNhanViens.FindAsync(id);
+            var tNhanVien = await _context.TNhanVien.FindAsync(id);
             if (tNhanVien != null)
             {
-                _context.TNhanViens.Remove(tNhanVien);
+                _context.TNhanVien.Remove(tNhanVien);
             }
 
             await _context.SaveChangesAsync();
@@ -184,7 +184,7 @@ namespace Library_Manager.Controllers
 
         private bool TNhanVienExists(string id)
         {
-            return _context.TNhanViens.Any(e => e.MaNv == id);
+            return _context.TNhanVien.Any(e => e.MaNv == id);
         }
     }
 }

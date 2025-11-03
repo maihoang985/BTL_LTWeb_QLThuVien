@@ -74,8 +74,8 @@
             @foreach (var link in Model)
                 {
                     <div class="row mb-4 border-bottom pb-3">
-                        @* --- Cột thông tin bản sao --- *@
-                        <div class="col-md-5">
+                        @* --- Cột thông tin bản sao (Giữ nguyên) --- *@
+                        <div class="col-md-7">
                             <div class="mb-2">
                                 <label class="form-label text-secondary d-block">Mã Bản sao</label>
                                 <p class="fw-semibold mb-0">
@@ -87,39 +87,34 @@
                                 <p class="fw-semibold mb-0">
                                     @(link.MaBsNavigation?.MaTlNavigation?.TenTl ?? "(Không rõ)")
                                     @* Link đến chi tiết Tài liệu *@
-                                        <a asp-controller="Tailieu" asp-action="Details" asp-route-id="@link.MaBsNavigation.MaTl" asp-route-returnUrl="@currentUrl"
-                                           class="btn btn-xs btn-outline-info ms-2" title="Xem chi tiết Bản sao">
-                                            <i class="bx bx-book"></i>
-                                        </a>
+                                    <a asp-controller="Tailieu" asp-action="Details" asp-route-id="@link.MaBsNavigation.MaTl" asp-route-returnUrl="@currentUrl"
+                                       class="btn btn-xs btn-outline-info ms-2" title="Xem chi tiết Bản sao">
+                                        <i class="bx bx-book"></i>
+                                    </a>
                                 </p>
                             </div>
                         </div>
 
-                        @* --- Cột tình trạng mượn --- *@
-                        <div class="col-md-3">
-                            <label class="form-label d-block text-secondary">Tình trạng lúc mượn</label>
+                        @* --- Cột Trạng thái Bản sao trong Giao dịch (MỚI) --- *@
+                        <div class="col-md-5">
+                            <label class="form-label d-block text-secondary">Trạng thái Bản sao</label>
                             @{
-                                var ttMuon = link.TinhTrangMuon ?? "Không rõ";
-                                var badgeMuon = "bg-label-secondary";
-                                if (ttMuon == "Tốt") { badgeMuon = "bg-label-success"; }
-                                else if (ttMuon.Contains("Hỏng") || ttMuon.Contains("Mất")) { badgeMuon = "bg-label-danger"; }
-                                else if (ttMuon.Contains("Trầy") || ttMuon.Contains("Cũ")) { badgeMuon = "bg-label-warning"; }
+                                // Dựa trên thuộc tính bool TinhTrang mới
+                                var isReturned = link.TinhTrang; // true: Đã hoàn tất/Trả, false: Đang mượn
+                                var ttText = isReturned ? "Đã trả/Hoàn tất" : "Đang mượn";
+                                var badgeClass = isReturned ? "bg-label-success" : "bg-label-warning";
                             }
-                            <p class="mb-0"><span class="badge @badgeMuon fs-6">@ttMuon</span></p>
+                            <p class="mb-0">
+                                <span class="badge @badgeClass fs-6">@ttText</span>
+                            </p>
+
+                            @* Thêm thông tin chi tiết trạng thái bản sao hiện tại (Trạng thái chung của tBanSao) *@
+                            <label class="form-label d-block text-secondary mt-2">Trạng thái hiện tại</label>
+                            <p class="mb-0 fw-semibold">
+                                @link.MaBsNavigation.TrangThai
+                            </p>
                         </div>
 
-                        @* --- Cột tình trạng trả --- *@
-                        <div class="col-md-3">
-                            <label class="form-label d-block text-secondary">Tình trạng lúc trả</label>
-                            @{
-                                var ttTra = link.TinhTrangTra ?? "Chưa trả";
-                                var badgeTra = "bg-label-secondary";
-                                if (ttTra == "Tốt") { badgeTra = "bg-label-success"; }
-                                else if (ttTra.Contains("Hỏng") || ttTra.Contains("Mất")) { badgeTra = "bg-label-danger"; }
-                                else if (ttTra.Contains("Trầy") || ttTra.Contains("Cũ")) { badgeTra = "bg-label-warning"; }
-                            }
-                            <p class="mb-0"><span class="badge @badgeTra fs-6">@ttTra</span></p>
-                        </div>
                     </div>
                 }
             </div>
@@ -127,13 +122,6 @@
             @* --- FOOTER (CÁC NÚT HÀNH ĐỘNG CHUNG) --- *@
             <div class="card-footer border-top pt-3">
                 <div class="d-flex gap-3">
-
-                    @* Nút Sửa chung (có thể là sửa thông tin chung của Giao dịch)
-                       <a asp-controller="TGiaoDichMuonTra" asp-action="Edit" asp-route-id="@firstLink.MaGd" class="btn btn-primary @(canEdit ? "" : " disabled")">
-                           <i class="bx bx-pencil me-1"></i> Sửa Giao dịch
-                       </a>
-                    *@
-
                     @* Nút Quay lại *@
                     <div>
                         @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Library_Manager.Models;
 
@@ -12,7 +11,7 @@ public partial class TNhanVien
 
     public string Ten { get; set; } = null!;
 
-    public DateTime NgaySinh { get; set; }
+    public DateOnly NgaySinh { get; set; }
 
     public string GioiTinh { get; set; } = null!;
 
@@ -22,8 +21,7 @@ public partial class TNhanVien
 
     public string Email { get; set; } = null!;
 
-    public string PhuTrach { get; set; } = null!;
+    public string? PhuTrach { get; set; }
 
-    public virtual ICollection<TTaiKhoan> TTaiKhoans { get; set; } = new List<TTaiKhoan>();
-
+    public virtual ICollection<TTaiKhoan> TTaiKhoan { get; set; } = new List<TTaiKhoan>();
 }

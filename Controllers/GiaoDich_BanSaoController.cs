@@ -21,7 +21,7 @@ namespace Library_Manager.Controllers
         // GET: GiaoDichBanSao
         public async Task<IActionResult> Index()
         {
-            var qlthuVienContext = _context.TGiaoDichBanSaos.Include(t => t.MaBsNavigation).Include(t => t.MaGdNavigation);
+            var qlthuVienContext = _context.TGiaoDichBanSao.Include(t => t.MaBsNavigation).Include(t => t.MaGdNavigation);
             return View(await qlthuVienContext.ToListAsync());
         }
 
@@ -33,7 +33,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tGiaoDichBanSao = await _context.TGiaoDichBanSaos
+            var tGiaoDichBanSao = await _context.TGiaoDichBanSao
                 .Where(t => t.MaGd == id)
                 .Include(t => t.MaBsNavigation)
                     .ThenInclude(t => t.MaTlNavigation)
@@ -55,8 +55,8 @@ namespace Library_Manager.Controllers
         // GET: GiaoDichBanSao/Create
         public IActionResult Create()
         {
-            ViewData["MaBs"] = new SelectList(_context.TBanSaos, "MaBs", "MaBs");
-            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTras, "MaGd", "MaGd");
+            ViewData["MaBs"] = new SelectList(_context.TBanSao, "MaBs", "MaBs");
+            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTra, "MaGd", "MaGd");
             return View();
         }
 
@@ -73,8 +73,8 @@ namespace Library_Manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaBs"] = new SelectList(_context.TBanSaos, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
-            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTras, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
+            ViewData["MaBs"] = new SelectList(_context.TBanSao, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
+            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTra, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
             return View(tGiaoDichBanSao);
         }
 
@@ -86,13 +86,13 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tGiaoDichBanSao = await _context.TGiaoDichBanSaos.FindAsync(id);
+            var tGiaoDichBanSao = await _context.TGiaoDichBanSao.FindAsync(id);
             if (tGiaoDichBanSao == null)
             {
                 return NotFound();
             }
-            ViewData["MaBs"] = new SelectList(_context.TBanSaos, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
-            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTras, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
+            ViewData["MaBs"] = new SelectList(_context.TBanSao, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
+            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTra, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
             return View(tGiaoDichBanSao);
         }
 
@@ -128,8 +128,8 @@ namespace Library_Manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaBs"] = new SelectList(_context.TBanSaos, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
-            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTras, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
+            ViewData["MaBs"] = new SelectList(_context.TBanSao, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
+            ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTra, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
             return View(tGiaoDichBanSao);
         }
 
@@ -141,7 +141,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tGiaoDichBanSao = await _context.TGiaoDichBanSaos
+            var tGiaoDichBanSao = await _context.TGiaoDichBanSao
                 .Include(t => t.MaBsNavigation)
                 .Include(t => t.MaGdNavigation)
                 .FirstOrDefaultAsync(m => m.MaGd == id);
@@ -158,10 +158,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tGiaoDichBanSao = await _context.TGiaoDichBanSaos.FindAsync(id);
+            var tGiaoDichBanSao = await _context.TGiaoDichBanSao.FindAsync(id);
             if (tGiaoDichBanSao != null)
             {
-                _context.TGiaoDichBanSaos.Remove(tGiaoDichBanSao);
+                _context.TGiaoDichBanSao.Remove(tGiaoDichBanSao);
             }
 
             await _context.SaveChangesAsync();
@@ -170,7 +170,7 @@ namespace Library_Manager.Controllers
 
         private bool TGiaoDichBanSaoExists(string id)
         {
-            return _context.TGiaoDichBanSaos.Any(e => e.MaGd == id);
+            return _context.TGiaoDichBanSao.Any(e => e.MaGd == id);
         }
     }
 }

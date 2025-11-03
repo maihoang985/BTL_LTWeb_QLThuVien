@@ -7,7 +7,11 @@ public partial class TNhaXuatBan
 {
     public string MaNxb { get; set; } = null!;
 
+    public string MaQg { get; set; } = null!;
+
     public string TenNxb { get; set; } = null!;
 
-    public virtual ICollection<TTaiLieu> TTaiLieus { get; set; } = new List<TTaiLieu>();
+    public virtual TQuocGia MaQgNavigation { get; set; } = null!;
+
+    public virtual ICollection<TTaiLieu> TTaiLieu { get; set; } = new List<TTaiLieu>();
 }

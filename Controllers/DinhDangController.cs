@@ -26,7 +26,7 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // 1. Giữ ở dạng IQueryable (Không dùng ToList hoặc ToListAsync)
-            IQueryable<TDinhDang> dinhDangs = _context.TDinhDangs;
+            IQueryable<TDinhDang> dinhDangs = _context.TDinhDang;
 
             // 2. Lọc theo chuỗi tìm kiếm (nếu có)
             if (!string.IsNullOrEmpty(searchString))
@@ -59,7 +59,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tDinhDang = await _context.TDinhDangs
+            var tDinhDang = await _context.TDinhDang
                 .FirstOrDefaultAsync(m => m.MaDd == id);
             if (tDinhDang == null)
             {
@@ -99,7 +99,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tDinhDang = await _context.TDinhDangs.FindAsync(id);
+            var tDinhDang = await _context.TDinhDang.FindAsync(id);
             if (tDinhDang == null)
             {
                 return NotFound();
@@ -169,7 +169,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tDinhDang = await _context.TDinhDangs
+            var tDinhDang = await _context.TDinhDang
                 .FirstOrDefaultAsync(m => m.MaDd == id);
             if (tDinhDang == null)
             {
@@ -184,10 +184,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tDinhDang = await _context.TDinhDangs.FindAsync(id);
+            var tDinhDang = await _context.TDinhDang.FindAsync(id);
             if (tDinhDang != null)
             {
-                _context.TDinhDangs.Remove(tDinhDang);
+                _context.TDinhDang.Remove(tDinhDang);
             }
 
             await _context.SaveChangesAsync();
@@ -196,7 +196,7 @@ namespace Library_Manager.Controllers
 
         private bool TDinhDangExists(string id)
         {
-            return _context.TDinhDangs.Any(e => e.MaDd == id);
+            return _context.TDinhDang.Any(e => e.MaDd == id);
         }
     }
 }
