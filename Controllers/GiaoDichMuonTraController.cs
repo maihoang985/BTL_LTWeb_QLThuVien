@@ -69,7 +69,7 @@ namespace Library_Manager.Controllers
             return View(pagedGiaoDiches);
         }
 
-        [Authorization("QLM")]
+        
         // GET: GiaoDichMuonTra/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -94,7 +94,7 @@ namespace Library_Manager.Controllers
             return View(tGiaoDichMuonTra);
         }
 
-        [Authorization("QLM")]
+        
         // GET: GiaoDichMuonTra/Create
         public IActionResult Create(string returnUrl)
         {
@@ -109,7 +109,6 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorization("QLM")]
         public async Task<IActionResult> Create([Bind("MaGd,MaTbd,MaTk,NgayMuon,NgayHenTra,NgayTra,TrangThai")] TGiaoDichMuonTra tGiaoDichMuonTra)
         {
             if (ModelState.IsValid)
@@ -125,7 +124,6 @@ namespace Library_Manager.Controllers
 
 
         // GET: GiaoDichMuonTra/Edit/5
-        [Authorization("QLM")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -148,7 +146,6 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorization("QLM")]
         public async Task<IActionResult> Edit(string id, [Bind("MaGd,MaTbd,MaTk,NgayMuon,NgayHenTra,NgayTra,TrangThai")] TGiaoDichMuonTra tGiaoDichMuonTra)
         {
             if (id != tGiaoDichMuonTra.MaGd)
@@ -182,7 +179,6 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichMuonTra/Delete/5
-        [Authorization("QLM")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -205,7 +201,6 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorization("QLM")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTras.FindAsync(id);

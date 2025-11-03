@@ -69,7 +69,6 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Details/5
-        [Authorization("QLT")]
         public async Task<IActionResult> Details(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
@@ -103,7 +102,6 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Edit/5
-        [Authorization("QLT")]
         public async Task<IActionResult> Edit(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
@@ -121,7 +119,6 @@ namespace Library_Manager.Controllers
         // POST: TaiLieu/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorization("QLT")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTaiLieu = await _context.TTaiLieus.FindAsync(id);
@@ -139,7 +136,6 @@ namespace Library_Manager.Controllers
         // ------------------------------------------------------------------------------------------------
         // GET: TaiLieu/Create
         // ------------------------------------------------------------------------------------------------
-        [Authorization("QLT")]
         public IActionResult Create(string returnUrl)
         {
             PopulateSelectList();
@@ -153,7 +149,6 @@ namespace Library_Manager.Controllers
         // ------------------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorization("QLT")]
         public async Task<IActionResult> Create(
             [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
             ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
@@ -235,7 +230,6 @@ namespace Library_Manager.Controllers
         // ------------------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorization("QLT")]
         public async Task<IActionResult> Edit(string id, 
             [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
             ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
@@ -306,7 +300,6 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Delete/5
-        [Authorization("QLT")]
         public async Task<IActionResult> Delete(string id)
         {
             // 1. Kiểm tra ID

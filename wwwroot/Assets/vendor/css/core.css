@@ -15010,11 +15010,12 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
   margin: 0;
 }
 .menu-item.disabled .menu-link {
-  cursor: not-allowed !important;
+    cursor: not-allowed !important;
 }
+
 .menu:not(.menu-no-animation) .menu-link {
-  transition-duration: 0.3s;
-  transition-property: color, background-color;
+    transition-duration: 0.3s;
+    transition-property: color, background-color;
 }
 .menu-link > :not(.menu-icon) {
   flex: 0 1 auto;

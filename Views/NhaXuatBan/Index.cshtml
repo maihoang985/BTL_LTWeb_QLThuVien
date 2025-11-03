@@ -11,7 +11,7 @@
     // Giả định: Thêm logic phân quyền đơn giản (nếu cần)
     var userRole = Context.Session.GetString("UserRole");
     // Giả sử QTV (Quản trị viên) và QLS (Quản lý Sách) có quyền chỉnh sửa/thêm/xóa NXB
-    bool canEdit = (userRole == "QTV" || userRole == "QLS");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
 @* ========================================================================

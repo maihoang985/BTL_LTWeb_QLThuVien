@@ -20,41 +20,7 @@
         <i class='bx bxs-user-account fa-border fs-1 me-2'></i> @ViewData["Title"]
     </h1>
 
-    @* Dropdown Lọc theo Vai trò *@
-   @*  <div class="flex-shrink-0 me-2" style="min-width: 200px;">
-        <select name="maVt" class="form-select" onchange="this.form.submit()">
-          
-            @if (ViewBag.VaiTros != null)
-            {
-                foreach (var item in (SelectList)ViewBag.VaiTros)
-                {
-                    <option value="@item.Value" selected="@item.Selected">@item.Text</option>
-                }
-            }
-        </select>
-    </div> *@
-
     <div class="card">
-        @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
-       @*  <div class="card-header border-bottom">
-            <div class="d-flex justify-content-between align-items-center">
-
-                
-                <div class="flex-grow-1 me-3">
-                    <partial name="SearchBar" />
-                </div>
-
-                
-                <div class="flex-shrink-0 ">
-                    <p class="m-0">
-                        <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
-                            <i class="bx bx-plus me-1"></i> Thêm Tài khoản
-                        </a>
-                    </p>
-                </div>
-            </div>
-        </div> *@
-
         @* --- PHẦN 2.2: THANH TÁC VỤ (SEARCH & CREATE) --- *@
         <div class="card-header border-bottom">
 
@@ -101,7 +67,7 @@
                 @* 4. Nút Thêm mới (giữ nguyên) *@
                 <div class="flex-shrink-0">
                     <p class="m-0">
-                        <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
+                        <a asp-action="Create" class="btn btn-primary text-nowrap  ">
                             <i class="bx bx-plus me-1"></i> Thêm Tài khoản
                         </a>
                     </p>
@@ -176,14 +142,14 @@
 
                                         @* 2. Sửa (Edit) - Chỉ QTV *@
                                         <a asp-action="Edit" asp-route-id="@item.MaTk"
-                                           class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
+                                           class="btn btn-icon btn-label-primary waves-effect  "
                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
                                             <i class='bx bx-pencil'></i>
                                         </a>
 
                                         @* 3. Xóa (Delete) - Chỉ QTV *@
                                         <a asp-action="Delete" asp-route-id="@item.MaTk"
-                                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
+                                           class="btn btn-icon btn-label-danger waves-effect  "
                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
                                             <i class='bx bx-trash'></i>
                                         </a>

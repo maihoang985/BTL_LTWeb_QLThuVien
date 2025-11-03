@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
-    [Authorization("QTV")]
+    //[Authorization("QTV")]
     public class TaiKhoanController : Controller
     {
         private readonly QlthuVienContext _context;
