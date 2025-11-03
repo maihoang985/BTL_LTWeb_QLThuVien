@@ -3,6 +3,10 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @model PagedList.Core.IPagedList<Library_Manager.Models.TTaiLieu>
+@{
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
+}
 
 <tbody>
     @if (Model.Any())
@@ -25,13 +29,13 @@
                         </a>
 
                         <a asp-action="Edit" asp-route-id="@item.MaTl"
-                           class="btn btn-icon btn-label-primary waves-effect "
+                           class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")" "
                            data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
                             <i class='bx bx-pencil'></i>
                         </a>
 
                         <a asp-action="Delete" asp-route-id="@item.MaTl"
-                           class="btn btn-icon btn-label-danger waves-effect "
+                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")" "
                            data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
                             <i class='bx bx-trash'></i>
                         </a>

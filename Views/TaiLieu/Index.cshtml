@@ -7,7 +7,7 @@
 @{
     ViewData["Title"] = "Quản lý Tài liệu"; // Tiêu đề trang
     var userRole = Context.Session.GetString("UserRole"); // Lấy vai trò người dùng từ Session
-    bool canEdit = (userRole == "QTV" || userRole == "QLT"); // Ví dụ: QLT là Quản lý Tài liệu
+    bool canEdit = (userRole == "QTV" || userRole == "QLT"); 
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 

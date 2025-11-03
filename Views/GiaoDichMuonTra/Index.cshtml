@@ -8,7 +8,7 @@
     ViewData["Title"] = "Quản lý Giao dịch Mượn/Trả";
     var userRole = Context.Session.GetString("UserRole");
     // Giả định rằng QTV và QLB đều có thể chỉnh sửa giao dịch
-    bool canEdit = (userRole == "QTV" || userRole == "QLB");
+    bool canEdit = (userRole == "QTV" || userRole == "QLM");
 }
 
 @* ========================================================================
