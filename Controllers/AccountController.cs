@@ -37,7 +37,7 @@ namespace Library_Manager.Controllers
         public IActionResult Login(TTaiKhoan user)
         {
             // --- BƯỚC 1: TRUY VẤN TÀI KHOẢN ---
-            var taiKhoan = _context.TTaiKhoans
+            var taiKhoan = _context.TTaiKhoan
                 .Include(tk => tk.MaNvNavigation)  // JOIN tới TNhanVien
                 .Include(tk => tk.MaVtNavigation)  // JOIN tới TVaiTro
                 .FirstOrDefault(x => x.TenDangNhap == user.TenDangNhap);

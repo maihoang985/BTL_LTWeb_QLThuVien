@@ -9,7 +9,5 @@ public partial class TVaiTro
 
     public string TenVt { get; set; } = null!;
 
-    public string? MoTa { get; set; }
-
-    public virtual ICollection<TTaiKhoan> TTaiKhoans { get; set; } = new List<TTaiKhoan>();
+    public virtual ICollection<TTaiKhoan> TTaiKhoan { get; set; } = new List<TTaiKhoan>();
 }

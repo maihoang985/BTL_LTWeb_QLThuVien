@@ -26,13 +26,13 @@ namespace Library_Manager.Controllers
             var pageSize = 6;
 
             // Ban đầu lấy tất cả bản sao
-            IQueryable<TBanSao> banSaos = _context.TBanSaos.Include(t => t.MaTlNavigation);
+            IQueryable<TBanSao> banSaos = _context.TBanSao.Include(t => t.MaTlNavigation);
 
             // Nếu có mã tài liệu truyền vào thì lọc theo mã đó
             if (!string.IsNullOrEmpty(id))
             {
                 banSaos = banSaos.Where(bs => bs.MaTl == id);
-                ViewBag.TenTaiLieu = _context.TTaiLieus
+                ViewBag.TenTaiLieu = _context.TTaiLieu
                     .Where(t => t.MaTl == id)
                     .Select(t => t.TenTl)
                     .FirstOrDefault();
@@ -72,7 +72,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tBanSao = await _context.TBanSaos
+            var tBanSao = await _context.TBanSao
                 .Include(t => t.MaTlNavigation)
                 .FirstOrDefaultAsync(m => m.MaBs == id);
             if (tBanSao == null)
@@ -86,7 +86,7 @@ namespace Library_Manager.Controllers
         // GET: BanSao/Create
         public IActionResult Create()
         {
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl");
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl");
             return View();
         }
 
@@ -103,7 +103,7 @@ namespace Library_Manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tBanSao.MaTl);
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tBanSao.MaTl);
             return View(tBanSao);
         }
 
@@ -115,12 +115,12 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tBanSao = await _context.TBanSaos.FindAsync(id);
+            var tBanSao = await _context.TBanSao.FindAsync(id);
             if (tBanSao == null)
             {
                 return NotFound();
             }
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tBanSao.MaTl);
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tBanSao.MaTl);
             ViewBag.ReturnUrl = returnUrl;
             return View(tBanSao);
         }
@@ -157,7 +157,7 @@ namespace Library_Manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tBanSao.MaTl);
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tBanSao.MaTl);
             return View(tBanSao);
         }
 
@@ -169,7 +169,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
 
-            var tBanSao = await _context.TBanSaos
+            var tBanSao = await _context.TBanSao
                 .Include(t => t.MaTlNavigation)
                 .FirstOrDefaultAsync(m => m.MaBs == id);
             if (tBanSao == null)
@@ -185,10 +185,10 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tBanSao = await _context.TBanSaos.FindAsync(id);
+            var tBanSao = await _context.TBanSao.FindAsync(id);
             if (tBanSao != null)
             {
-                _context.TBanSaos.Remove(tBanSao);
+                _context.TBanSao.Remove(tBanSao);
             }
 
             await _context.SaveChangesAsync();
@@ -197,7 +197,7 @@ namespace Library_Manager.Controllers
 
         private bool TBanSaoExists(string id)
         {
-            return _context.TBanSaos.Any(e => e.MaBs == id);
+            return _context.TBanSao.Any(e => e.MaBs == id);
         }
     }
 }

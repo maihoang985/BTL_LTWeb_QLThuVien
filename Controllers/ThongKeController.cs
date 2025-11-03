@@ -28,7 +28,7 @@ namespace Library_Manager.Controllers
         [HttpGet]
         public IActionResult GetLuotMuonTheoThang(int year)
         {
-            var thongKe = _context.TGiaoDichMuonTras
+            var thongKe = _context.TGiaoDichMuonTra
                 .Where(g => g.NgayMuon.Year == year)
                 .GroupBy(g => g.NgayMuon.Month)
                 .Select(g => new
@@ -49,9 +49,9 @@ namespace Library_Manager.Controllers
             try
             {
                 // Lấy danh sách MaBS đang được mượn (chưa trả)
-                var banSaoDangMuon = _context.TGiaoDichMuonTras
+                var banSaoDangMuon = _context.TGiaoDichMuonTra
                     .Where(g => g.NgayTra == null) // Giao dịch chưa trả
-                    .Join(_context.TGiaoDichBanSaos,
+                    .Join(_context.TGiaoDichBanSao,
                         gd => gd.MaGd,
                         gdbs => gdbs.MaGd,
                         (gd, gdbs) => gdbs.MaBs)
@@ -59,44 +59,44 @@ namespace Library_Manager.Controllers
                     .ToList();
 
                 // Đếm tổng số giáo trình (MaThL = "GT")
-                var tongGiaoTrinh = _context.TBanSaos
-                    .Join(_context.TTaiLieus,
+                var tongGiaoTrinh = _context.TBanSao
+                    .Join(_context.TTaiLieu,
                         bs => bs.MaTl,
                         tl => tl.MaTl,
                         (bs, tl) => tl)
                     .Count(tl => tl.MaThL == "GT");
 
                 // Đếm tổng số tài liệu khác (không phải GT)
-                var tongTaiLieu = _context.TBanSaos
-                    .Join(_context.TTaiLieus,
+                var tongTaiLieu = _context.TBanSao
+                    .Join(_context.TTaiLieu,
                         bs => bs.MaTl,
                         tl => tl.MaTl,
                         (bs, tl) => tl)
                     .Count(tl => tl.MaThL != "GT" && tl.MaThL != null);
 
                 // Đếm giáo trình có sẵn (GT và không đang mượn)
-                var giaoTrinhCoSan = _context.TBanSaos
-                    .Join(_context.TTaiLieus,
+                var giaoTrinhCoSan = _context.TBanSao
+                    .Join(_context.TTaiLieu,
                         bs => bs.MaTl,
                         tl => tl.MaTl,
                         (bs, tl) => new { bs.MaBs, tl.MaThL })
                     .Count(x => x.MaThL == "GT" && !banSaoDangMuon.Contains(x.MaBs));
 
                 // Đếm tài liệu có sẵn (không phải GT và không đang mượn)
-                var taiLieuCoSan = _context.TBanSaos
-                    .Join(_context.TTaiLieus,
+                var taiLieuCoSan = _context.TBanSao
+                    .Join(_context.TTaiLieu,
                         bs => bs.MaTl,
                         tl => tl.MaTl,
                         (bs, tl) => new { bs.MaBs, tl.MaThL })
                     .Count(x => x.MaThL != "GT" && x.MaThL != null && !banSaoDangMuon.Contains(x.MaBs));
 
                 // Thống kê chi tiết theo thể loại - GỘP theo MaThL
-                var chiTietTheoDanhMuc = _context.TBanSaos
-                    .Join(_context.TTaiLieus,
+                var chiTietTheoDanhMuc = _context.TBanSao
+                    .Join(_context.TTaiLieu,
                         bs => bs.MaTl,
                         tl => tl.MaTl,
                         (bs, tl) => new { bs.MaBs, tl.MaThL })
-                    .Join(_context.TTheLoais,
+                    .Join(_context.TTheLoai,
                         x => x.MaThL,
                         thl => thl.MaThL,
                         (x, thl) => new { x.MaBs, x.MaThL, thl.TenThL })
@@ -150,9 +150,9 @@ namespace Library_Manager.Controllers
             try
             {
                 // 1. Lấy danh sách MaBS đang được mượn (chưa trả)
-                var banSaoDangMuon = _context.TGiaoDichMuonTras
+                var banSaoDangMuon = _context.TGiaoDichMuonTra
                     .Where(g => g.NgayTra == null) // Giao dịch chưa trả
-                    .Join(_context.TGiaoDichBanSaos,
+                    .Join(_context.TGiaoDichBanSao,
                         gd => gd.MaGd,
                         gdbs => gdbs.MaGd,
                         (gd, gdbs) => gdbs.MaBs)
@@ -160,8 +160,8 @@ namespace Library_Manager.Controllers
                     .ToList();
 
                 // 2. Lấy chi tiết các bản sao thuộc thể loại
-                var chiTiet = _context.TBanSaos
-                    .Join(_context.TTaiLieus,
+                var chiTiet = _context.TBanSao
+                    .Join(_context.TTaiLieu,
                         bs => bs.MaTl,
                         tl => tl.MaTl,
                         (bs, tl) => new { bs, tl })

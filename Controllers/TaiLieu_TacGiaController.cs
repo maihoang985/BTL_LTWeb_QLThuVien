@@ -81,7 +81,7 @@ namespace Library_Manager.Controllers
         public IActionResult Create()
         {
             ViewData["MaTg"] = new SelectList(_context.TTacGia, "MaTg", "MaTg");
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl");
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl");
             return View();
         }
 
@@ -99,7 +99,7 @@ namespace Library_Manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MaTg"] = new SelectList(_context.TTacGia, "MaTg", "MaTg", tTaiLieuTacGia.MaTg);
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tTaiLieuTacGia.MaTl);
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tTaiLieuTacGia.MaTl);
             return View(tTaiLieuTacGia);
         }
 
@@ -117,7 +117,7 @@ namespace Library_Manager.Controllers
                 return NotFound();
             }
             ViewData["MaTg"] = new SelectList(_context.TTacGia, "MaTg", "MaTg", tTaiLieuTacGia.MaTg);
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tTaiLieuTacGia.MaTl);
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tTaiLieuTacGia.MaTl);
             return View(tTaiLieuTacGia);
         }
 
@@ -154,7 +154,7 @@ namespace Library_Manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MaTg"] = new SelectList(_context.TTacGia, "MaTg", "MaTg", tTaiLieuTacGia.MaTg);
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieus, "MaTl", "MaTl", tTaiLieuTacGia.MaTl);
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tTaiLieuTacGia.MaTl);
             return View(tTaiLieuTacGia);
         }
 

@@ -15,6 +15,8 @@ public partial class TTaiLieu
 
     public string MaDd { get; set; } = null!;
 
+    public string? MaTk { get; set; }
+
     public string TenTl { get; set; } = null!;
 
     public int? LanXuatBan { get; set; }
@@ -25,7 +27,7 @@ public partial class TTaiLieu
 
     public string? KhoCo { get; set; }
 
-    public string MaTk { get; set; } = null!;
+    public string? Anh { get; set; }
 
     public virtual TDinhDang MaDdNavigation { get; set; } = null!;
 
@@ -35,9 +37,9 @@ public partial class TTaiLieu
 
     public virtual TTheLoai MaThLNavigation { get; set; } = null!;
 
-    public virtual TTaiKhoan MaTkNavigation { get; set; } = null!;
+    public virtual TTaiKhoan? MaTkNavigation { get; set; }
 
-    public virtual ICollection<TBanSao> TBanSaos { get; set; } = new List<TBanSao>();
+    public virtual ICollection<TBanSao> TBanSao { get; set; } = new List<TBanSao>();
 
     public virtual ICollection<TTaiLieuTacGia> TTaiLieuTacGia { get; set; } = new List<TTaiLieuTacGia>();
 }

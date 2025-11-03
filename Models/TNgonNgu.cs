@@ -9,5 +9,5 @@ public partial class TNgonNgu
 
     public string TenNn { get; set; } = null!;
 
-    public virtual ICollection<TTaiLieu> TTaiLieus { get; set; } = new List<TTaiLieu>();
+    public virtual ICollection<TTaiLieu> TTaiLieu { get; set; } = new List<TTaiLieu>();
 }

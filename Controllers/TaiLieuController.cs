@@ -27,7 +27,7 @@ namespace Library_Manager.Controllers
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
-            IQueryable<TTaiLieu> taiLieus = _context.TTaiLieus
+            IQueryable<TTaiLieu> taiLieus = _context.TTaiLieu
                 .Include(t => t.MaDdNavigation).Include(t => t.MaNnNavigation).Include(t => t.MaNxbNavigation)
                 .Include(t => t.MaThLNavigation).Include(t => t.MaTkNavigation);
 
@@ -55,9 +55,9 @@ namespace Library_Manager.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            ViewBag.Categories = _context.TTheLoais.Select(c => c.TenThL).Distinct().ToList();
-            ViewBag.Publishers = _context.TNhaXuatBans.Select(p => p.TenNxb).Distinct().ToList();
-            ViewBag.Languages = _context.TNgonNgus.Select(l => l.TenNn).Distinct().ToList();
+            ViewBag.Categories = _context.TTheLoai.Select(c => c.TenThL).Distinct().ToList();
+            ViewBag.Publishers = _context.TNhaXuatBan.Select(p => p.TenNxb).Distinct().ToList();
+            ViewBag.Languages = _context.TNgonNgu.Select(l => l.TenNn).Distinct().ToList();
 
             ViewBag.SelectedCategory = category;
             ViewBag.SelectedPublisher = publisher;
@@ -72,14 +72,14 @@ namespace Library_Manager.Controllers
         public async Task<IActionResult> Details(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
-            var tTaiLieu = await _context.TTaiLieus
+            var tTaiLieu = await _context.TTaiLieu
                 .Include(t => t.MaDdNavigation)
                 .Include(t => t.MaNnNavigation)
                 .Include(t => t.MaNxbNavigation)
                 .Include(t => t.MaThLNavigation)
                 .Include(t => t.MaTkNavigation)
                 .Include(t => t.TTaiLieuTacGia)
-                .Include(t => t.TBanSaos)
+                .Include(t => t.TBanSao)
                 .FirstOrDefaultAsync(m => m.MaTl == id);
             if (tTaiLieu == null) { return NotFound(); }
             ViewBag.ReturnUrl = returnUrl;
@@ -89,11 +89,11 @@ namespace Library_Manager.Controllers
         // HÀM CHUNG: Tải các danh sách SelectList
         private void PopulateSelectList(TTaiLieu tTaiLieu = null)
         {
-            ViewData["MaDd"] = new SelectList(_context.TDinhDangs, "MaDd", "TenDd", tTaiLieu?.MaDd);
-            ViewData["MaNn"] = new SelectList(_context.TNgonNgus, "MaNn", "TenNn", tTaiLieu?.MaNn);
-            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBans, "MaNxb", "TenNxb", tTaiLieu?.MaNxb);
-            ViewData["MaThL"] = new SelectList(_context.TTheLoais, "MaThL", "TenThL", tTaiLieu?.MaThL);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoans, "MaTk", "MaTk", tTaiLieu?.MaTk);
+            ViewData["MaDd"] = new SelectList(_context.TDinhDang, "MaDd", "TenDd", tTaiLieu?.MaDd);
+            ViewData["MaNn"] = new SelectList(_context.TNgonNgu, "MaNn", "TenNn", tTaiLieu?.MaNn);
+            ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBan, "MaNxb", "TenNxb", tTaiLieu?.MaNxb);
+            ViewData["MaThL"] = new SelectList(_context.TTheLoai, "MaThL", "TenThL", tTaiLieu?.MaThL);
+            ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk", tTaiLieu?.MaTk);
 
             ViewData["TacGiaList"] = new SelectList(
                 _context.TTacGia.Select(tg => new { tg.MaTg, FullName = tg.HoDem + " " + tg.Ten }).OrderBy(x => x.FullName),
@@ -105,7 +105,7 @@ namespace Library_Manager.Controllers
         public async Task<IActionResult> Edit(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
-            var tTaiLieu = await _context.TTaiLieus
+            var tTaiLieu = await _context.TTaiLieu
                 .Include(t => t.TTaiLieuTacGia)
                 .ThenInclude(ttg => ttg.MaTgNavigation)
                 .FirstOrDefaultAsync(m => m.MaTl == id);
@@ -121,15 +121,15 @@ namespace Library_Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var tTaiLieu = await _context.TTaiLieus.FindAsync(id);
-            if (tTaiLieu != null) { _context.TTaiLieus.Remove(tTaiLieu); }
+            var tTaiLieu = await _context.TTaiLieu.FindAsync(id);
+            if (tTaiLieu != null) { _context.TTaiLieu.Remove(tTaiLieu); }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TTaiLieuExists(string id)
         {
-            return _context.TTaiLieus.Any(e => e.MaTl == id);
+            return _context.TTaiLieu.Any(e => e.MaTl == id);
         }
         #endregion
 
@@ -243,7 +243,7 @@ namespace Library_Manager.Controllers
 
             if (ModelState.IsValid)
             {
-                var originalTaiLieu = await _context.TTaiLieus
+                var originalTaiLieu = await _context.TTaiLieu
                     .Include(t => t.TTaiLieuTacGia).FirstOrDefaultAsync(m => m.MaTl == id);
                 if (originalTaiLieu == null) { return NotFound(); }
 
@@ -265,7 +265,7 @@ namespace Library_Manager.Controllers
                     TempData["Message"] = "Thông tin Tài liệu đã được lưu thành công.";
 
                     // Reload đối tượng để View hiển thị đúng trạng thái mới
-                    originalTaiLieu = await _context.TTaiLieus
+                    originalTaiLieu = await _context.TTaiLieu
                         .Include(t => t.TTaiLieuTacGia).ThenInclude(ttg => ttg.MaTgNavigation).FirstOrDefaultAsync(m => m.MaTl == id);
 
                     PopulateSelectList(originalTaiLieu);
@@ -309,13 +309,13 @@ namespace Library_Manager.Controllers
             }
 
             // 2. Truy vấn tài liệu và các thông tin liên quan cần thiết cho View xác nhận
-            var tTaiLieu = await _context.TTaiLieus
+            var tTaiLieu = await _context.TTaiLieu
                 .Include(t => t.MaNxbNavigation)
                 .Include(t => t.MaThLNavigation)
                 .Include(t => t.MaNnNavigation)
                 .Include(t => t.MaDdNavigation)
                 .Include(t => t.MaTkNavigation)
-                .Include(t => t.TBanSaos) // Cần include TBanSaos để đếm số lượng bản sao hiển thị trên trang Delete
+                .Include(t => t.TBanSao) // Cần include TBanSaos để đếm số lượng bản sao hiển thị trên trang Delete
                 .FirstOrDefaultAsync(m => m.MaTl == id);
 
             // 3. Kiểm tra tài liệu tồn tại
@@ -333,16 +333,16 @@ namespace Library_Manager.Controllers
         [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewTacGiaAjax([FromBody] TacGiaModel model) { if (string.IsNullOrEmpty(model.HoDem) || string.IsNullOrEmpty(model.Ten)) { return Json(new { success = false, message = "Họ đệm và Tên không được để trống." }); } var newMaTg = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newTacGia = new TTacGia { MaTg = newMaTg, HoDem = model.HoDem, Ten = model.Ten }; try { _context.TTacGia.Add(newTacGia); await _context.SaveChangesAsync(); return Json(new { success = true, maTg = newTacGia.MaTg, hoDem = newTacGia.HoDem, ten = newTacGia.Ten, fullName = newTacGia.HoDem + " " + newTacGia.Ten }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
 
         // 2. Nhà Xuất Bản
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewNxbAjax([FromBody] NxbModel model) { if (string.IsNullOrEmpty(model.TenNxb)) { return Json(new { success = false, message = "Tên Nhà xuất bản không được để trống." }); } var newMaNxb = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newNxb = new TNhaXuatBan { MaNxb = newMaNxb, TenNxb = model.TenNxb }; try { _context.TNhaXuatBans.Add(newNxb); await _context.SaveChangesAsync(); return Json(new { success = true, maNxb = newNxb.MaNxb, tenNxb = newNxb.TenNxb }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewNxbAjax([FromBody] NxbModel model) { if (string.IsNullOrEmpty(model.TenNxb)) { return Json(new { success = false, message = "Tên Nhà xuất bản không được để trống." }); } var newMaNxb = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newNxb = new TNhaXuatBan { MaNxb = newMaNxb, TenNxb = model.TenNxb }; try { _context.TNhaXuatBan.Add(newNxb); await _context.SaveChangesAsync(); return Json(new { success = true, maNxb = newNxb.MaNxb, tenNxb = newNxb.TenNxb }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
 
         // 3. Ngôn ngữ
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewNgonNguAjax([FromBody] NnModel model) { if (string.IsNullOrEmpty(model.TenNn)) { return Json(new { success = false, message = "Tên Ngôn ngữ không được để trống." }); } var newMaNn = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newNn = new TNgonNgu { MaNn = newMaNn, TenNn = model.TenNn }; try { _context.TNgonNgus.Add(newNn); await _context.SaveChangesAsync(); return Json(new { success = true, maNn = newNn.MaNn, tenNn = newNn.TenNn }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewNgonNguAjax([FromBody] NnModel model) { if (string.IsNullOrEmpty(model.TenNn)) { return Json(new { success = false, message = "Tên Ngôn ngữ không được để trống." }); } var newMaNn = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newNn = new TNgonNgu { MaNn = newMaNn, TenNn = model.TenNn }; try { _context.TNgonNgu.Add(newNn); await _context.SaveChangesAsync(); return Json(new { success = true, maNn = newNn.MaNn, tenNn = newNn.TenNn }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
 
         // 4. Thể loại
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewTheLoaiAjax([FromBody] ThLModel model) { if (string.IsNullOrEmpty(model.TenThL)) { return Json(new { success = false, message = "Tên Thể loại không được để trống." }); } var newMaThL = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newThL = new TTheLoai { MaThL = newMaThL, TenThL = model.TenThL }; try { _context.TTheLoais.Add(newThL); await _context.SaveChangesAsync(); return Json(new { success = true, maThL = newThL.MaThL, tenThL = newThL.TenThL }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewTheLoaiAjax([FromBody] ThLModel model) { if (string.IsNullOrEmpty(model.TenThL)) { return Json(new { success = false, message = "Tên Thể loại không được để trống." }); } var newMaThL = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newThL = new TTheLoai { MaThL = newMaThL, TenThL = model.TenThL }; try { _context.TTheLoai.Add(newThL); await _context.SaveChangesAsync(); return Json(new { success = true, maThL = newThL.MaThL, tenThL = newThL.TenThL }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
 
         // 5. Định dạng
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewDinhDangAjax([FromBody] DdModel model) { if (string.IsNullOrEmpty(model.TenDd)) { return Json(new { success = false, message = "Tên Định dạng không được để trống." }); } var newMaDd = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newDd = new TDinhDang { MaDd = newMaDd, TenDd = model.TenDd }; try { _context.TDinhDangs.Add(newDd); await _context.SaveChangesAsync(); return Json(new { success = true, maDd = newDd.MaDd, tenDd = newDd.TenDd }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewDinhDangAjax([FromBody] DdModel model) { if (string.IsNullOrEmpty(model.TenDd)) { return Json(new { success = false, message = "Tên Định dạng không được để trống." }); } var newMaDd = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newDd = new TDinhDang { MaDd = newMaDd, TenDd = model.TenDd }; try { _context.TDinhDang.Add(newDd); await _context.SaveChangesAsync(); return Json(new { success = true, maDd = newDd.MaDd, tenDd = newDd.TenDd }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
 
         public class TacGiaModel { public string HoDem { get; set; } public string Ten { get; set; } }
         public class NxbModel { public string TenNxb { get; set; } }
