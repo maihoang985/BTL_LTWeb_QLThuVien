@@ -119,3 +119,17 @@
         width: max-content;
         /* Hoặc dùng: min-width: 100%; */
     }
+
+/*
+  SỬA LỖI CURSOR 'NOT-ALLOWED' CHO CÁC NÚT (BUTTON) BỊ VÔ HIỆU HÓA
+*/
+.btn.disabled,
+.btn:disabled,
+a.btn.disabled {
+    cursor: not-allowed !important;
+    /* QUAN TRỌNG: Ghi đè 'pointer-events: none;' của template.
+      Chúng ta đặt là 'auto' để nút có thể nhận tương tác chuột
+      và hiển thị con trỏ 'not-allowed'.
+    */
+    pointer-events: auto !important;
+}
