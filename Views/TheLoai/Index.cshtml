@@ -1,25 +1,26 @@
-﻿@* ========================================================================
-   KHỐI 1: KHAI BÁO MODEL VÀ VIEWDATA
-   ======================================================================== *@
-@using PagedList.Core.Mvc
+﻿@using PagedList.Core.Mvc
 @model PagedList.Core.IPagedList<Library_Manager.Models.TTheLoai>
 
 @{
-    ViewData["Title"] = "Quản lý Thể loại"; // Tiêu đề trang
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý Thể loại";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 
-    // Giả định: Thêm logic phân quyền đơn giản (nếu cần)
-    var userRole = Context.Session.GetString("UserRole");
-    // Giả sử QTV (Quản trị viên) và QLS (Quản lý Sách) có quyền chỉnh sửa/thêm/xóa Thể loại
-    bool canEdit = (userRole == "QTV" || userRole == "QLT");
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
-@* ========================================================================
-   KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     <partial name="_DanhMuc" />
+
+    @* --- PHẦN HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (Đã thêm) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="indexAlertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -48,8 +49,8 @@
         </div>
 
         @* ========================================================================
-           KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
-           ======================================================================== *@
+           KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
+           ======================================================================== *@
         <div class="table-responsive">
             <table class="table table-bordered text-nowrap table-hover" id="myTable">
 
@@ -78,22 +79,22 @@
 
                                     @* 1. Chi tiết (Details) *@
                                     <a asp-action="Details" asp-route-id="@item.MaThL"
-                                                           class="btn btn-icon btn-label-info waves-effect"
-                                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
+                                       class="btn btn-icon btn-label-info waves-effect"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
                                         <i class='bx bx-detail'></i>
                                     </a>
 
                                     @* 2. Sửa (Edit) *@
                                     <a asp-action="Edit" asp-route-id="@item.MaThL"
-                                                           class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
-                                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
+                                       class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
                                         <i class='bx bx-pencil'></i>
                                     </a>
 
                                     @* 3. Xóa (Delete) *@
                                     <a asp-action="Delete" asp-route-id="@item.MaThL"
-                                                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
-                                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+                                       class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
                                         <i class='bx bx-trash'></i>
                                     </a>
                                 </div>
