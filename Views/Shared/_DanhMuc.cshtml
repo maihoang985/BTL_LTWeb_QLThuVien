@@ -1,34 +1,33 @@
 ﻿@*
-    PARTIAL VIEW: _DanhMuc.cshtml
-    Chức năng: Cung cấp menu Tabs chuyển đổi giữa các Controller quản lý danh mục.
+    PARTIAL VIEW: _DanhMuc.cshtml
+    Chức năng: Cung cấp menu Tabs chuyển đổi giữa các Controller quản lý danh mục.
 *@
 @using Microsoft.AspNetCore.Http
 @using System.Linq
 
 @{
-    // Lấy controller hiện tại (để đánh dấu mục đang được chọn)
-    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    // Đảm bảo Controller hiện tại được in hoa chữ cái đầu tiên (ví dụ: dinhdang -> DinhDang)
-    if (!string.IsNullOrEmpty(currentController))
+    // Lấy controller hiện tại (để đánh dấu mục đang được chọn)
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    // Đảm bảo Controller hiện tại được in hoa chữ cái đầu tiên (ví dụ: dinhdang -> DinhDang)
+    if (!string.IsNullOrEmpty(currentController))
     {
         currentController = char.ToUpper(currentController[0]) + currentController.Substring(1);
     }
 
-    // Danh sách các Controller, tên hiển thị và Icon tương ứng
-    var categories = new List<(string Value, string DisplayName, string IconClass)>
- {
-  ("TacGia", "Tác giả", "bx-pen"),
-  ("NhaXuatBan", "Nhà xuất bản", "bx-buildings"),
-  ("NgonNgu", "Ngôn ngữ", "bx-globe"),
-  ("TheLoai", "Thể loại", "bx-book-bookmark"),
-  ("DinhDang", "Định dạng", "bx-tag-alt")
- };
+    // Danh sách các Controller, tên hiển thị và Icon tương ứng
+    var categories = new List<(string Value, string DisplayName, string IconClass)>
+    {
+     ("TacGia", "Tác giả", "bx-pen"),
+     ("NhaXuatBan", "Nhà xuất bản", "bx-buildings"),
+     // ("NgonNgu", "Ngôn ngữ", "bx-globe"), <--- Đã loại bỏ
+     ("TheLoai", "Thể loại", "bx-book-bookmark"),
+     ("DinhDang", "Định dạng", "bx-tag-alt")
+    };
 }
 
 @* Sử dụng cấu trúc Card bao ngoài Nav-Pills để tạo khối điều hướng nổi bật *@
 <div class="card mb-4">
     @* HEADER: Tiêu đề khối *@
-    @* ĐÃ SỬA: Thay text-dark bằng text-primary để tự động đổi màu theo theme *@
     <div class="card-header border-bottom pb-3">
         <h5 class="m-0 text-primary">Danh mục quản lý nhanh</h5>
     </div>
@@ -44,9 +43,9 @@
                 @* ĐIỀU CHỈNH: Sử dụng mx-1 để tạo khoảng cách nhỏ giữa các pill *@
                 <li class="nav-item mx-1 mb-1">
                     <a href="@linkUrl"
-                                   class="nav-link @isActive"
-                                   role="tab"
-                                   aria-selected="@(currentController == category.Value ? "true" : "false")">
+                       class="nav-link @isActive"
+                       role="tab"
+                       aria-selected="@(currentController == category.Value ? "true" : "false")">
 
                         <span class="d-none d-sm-inline-flex align-items-center">
                             <i class='icon-base bx @category.IconClass icon-sm me-2'></i>

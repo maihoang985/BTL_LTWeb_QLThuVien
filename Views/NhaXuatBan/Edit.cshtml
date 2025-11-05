@@ -2,49 +2,64 @@
 
 @{
     ViewData["Title"] = "Chỉnh sửa Nhà Xuất Bản: " + Model.TenNxb;
+    Layout = "~/Views/Shared/_Layout.cshtml";
     var userRole = Context.Session.GetString("UserRole");
-    bool canEdit = (userRole == "QTV" || userRole == "QLS");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
+    // Lấy tên quốc gia để hiển thị tham khảo
+    var tenQuocGia = Model.MaQgNavigation != null ?
+    Model.MaQgNavigation.TenQg : Model.MaQg;
 }
 
 <div class="container-xxl flex-grow-1 container-p-y">
 
+    @* Tiêu đề trang *@
     <h1 class="fw-bold text-primary mb-4">
-        <i class='bx bx-pencil fs-2 me-2'></i> Chỉnh sửa Nhà Xuất Bản
+        <i class='bx bx-pencil fs-2 me-2 border p-1 rounded-2'></i> Chỉnh sửa thông tin Nhà Xuất Bản
     </h1>
 
-    @* 1. THÊM: Vị trí hiển thị thông báo *@
-    <div id="alertPlaceholder"></div>
+    @* PHẦN HIỂN THỊ THÔNG BÁO TEMP DATA *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <div class="card">
-
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">
-                Chỉnh sửa thông tin Nhà Xuất Bản: <span class="text-primary fw-bold">@Model.TenNxb</span>
-            </h5>
-            <small class="text-muted">Mã NXB: <span class="fw-bold">@Model.MaNxb</span></small>
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Chỉnh sửa thông tin cho: <span class="text-primary fw-bold">@Model.TenNxb</span></h5>
         </div>
 
-        @* 2. THÊM: ID cho Form *@
         <form asp-action="Edit" id="editNxbForm">
             <div class="card-body">
 
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
+                @* Mã NXB và Mã Quốc gia là Hidden fields *@
                 <input type="hidden" asp-for="MaNxb" />
+                <input type="hidden" asp-for="MaQg" />
 
                 <div class="row">
                     <div class="col-md-6">
+                        @* Mã Nhà Xuất Bản (Chỉ hiển thị) *@
                         <div class="mb-3">
-                            <label class="form-label">Mã Nhà Xuất Bản</label>
+                            <label class="form-label text-muted">Mã Nhà Xuất Bản</label>
                             <input value="@Model.MaNxb" class="form-control" disabled />
                         </div>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
+                        @* Quốc gia (Chỉ hiển thị - Không thể sửa) *@
                         <div class="mb-3">
-                            <label asp-for="TenNxb" class="form-label">Tên Nhà Xuất Bản</label>
+                            <label class="form-label text-muted">Quốc gia (Không thể sửa)</label>
+                            <input value="@tenQuocGia" class="form-control" disabled />
+                            <small class="form-text text-warning">Mã NXB được sinh theo Quốc gia, không thể thay đổi.</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        @* Tên Nhà Xuất Bản *@
+                        <div class="mb-3">
+                            <label asp-for="TenNxb" class="form-label text-primary">Tên Nhà Xuất Bản</label>
                             <input asp-for="TenNxb" class="form-control" />
                             <span asp-validation-for="TenNxb" class="text-danger"></span>
                         </div>
@@ -54,55 +69,60 @@
             </div>
 
             <div class="card-footer border-top pt-3">
-                <div class="d-flex gap-3">
-                    @* 3. THÊM: ID cho Nút Submit *@
-                    <button type="submit" value="Save" class="btn btn-primary @(canEdit ? "" : "disabled")" id="submitButton">
-                        <i class="bx bx-save me-1"></i> Lưu thay đổi
-                    </button>
+                <div class="d-flex justify-content-between">
 
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                    </a>
+                    @* KHỐI BÊN TRÁI: Nút Quay lại - Dùng btn-outline-primary *@
+                    <div>
+                        <a asp-action="Index" class="btn btn-outline-primary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                        </a>
+                    </div>
+
+                    @* KHỐI BÊN PHẢI: Lưu & Xem chi tiết *@
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary @(canEdit ? "" : "disabled")" id="submitButton">
+                            <i class="bx bx-save me-1"></i> Lưu thay đổi
+                        </button>
+
+                        <a asp-action="Details" asp-route-id="@Model?.MaNxb" class="btn btn-info">
+                            <i class="bx bx-detail me-1"></i> Xem chi tiết
+                        </a>
+                    </div>
+
                 </div>
             </div>
+
         </form>
     </div>
 </div>
 
-@* 4. THÊM: Toàn bộ khối Script cho thông báo *@
+
 @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
     <script>
-        // Hàm hiển thị thông báo (Toast)
-        function showToast(message, type = 'success') {
-            const alertPlaceholder = document.getElementById('alertPlaceholder');
-            alertPlaceholder.innerHTML = '';
-
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = [
-                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-                `  <div>${message}</div>`,
-                '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-                '</div>'
-            ].join('');
-
-            alertPlaceholder.appendChild(wrapper);
-            // Tự động ẩn sau 5 giây
-            setTimeout(() => {
-                $(wrapper).alert('close');
-            }, 5000);
-        }
-
+        // --- Logic chặn double submit và hiển thị lại nút khi lỗi ---
         document.addEventListener('DOMContentLoaded', function () {
-
-            // ==========================================================
-            // LOGIC FORM SUBMIT (Kiểm tra và báo cáo kết quả)
-            // ==========================================================
-
-            // SỬA: Trỏ đúng ID của Form
             const editForm = document.getElementById('editNxbForm');
             const submitButton = document.getElementById('submitButton');
+            const alertElement = document.getElementById('alertMessage');
 
-            // 1. Logic chặn submit và đổi text nút
+            // Logic tự động đóng thông báo thành công (5 giây)
+            if (alertElement && alertElement.classList.contains('alert-success')) {
+                setTimeout(() => {
+                    const alert = new bootstrap.Alert(alertElement);
+                    alert.close();
+                }, 5000);
+            }
+            // Logic kích hoạt lại nút submit nếu có lỗi trả về
+            else if (alertElement && alertElement.classList.contains('alert-danger') && submitButton) {
+                 submitButton.disabled = false;
+                 submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
+            }
+
+
             if (editForm && submitButton) {
                 editForm.addEventListener('submit', function (e) {
                     // Kiểm tra validation client-side
@@ -113,26 +133,6 @@
                     }
                 });
             }
-
-            // 2. Logic hiển thị thông báo từ TempData
-            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
-            {
-                    <text>
-                        setTimeout(function() {
-                            // Hiển thị toast
-                            showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
-
-                            // Kích hoạt lại nút submit nếu có lỗi
-                            if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
-                                submitButton.disabled = false;
-                                submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
-                            }
-                        }, 10);
-                    </text>
-            }
         });
     </script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
 }

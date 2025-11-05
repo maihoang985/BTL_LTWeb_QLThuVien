@@ -5,12 +5,16 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    @* KHÔNG CÓ KHỐI HIỂN THỊ TEMP DATA Ở ĐÂY (Thông báo được hiển thị ở Index) *@
+    @* --- PHẦN HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (Nếu có lỗi từ Controller trả về) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -66,17 +70,17 @@
 
             @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
             <div class="card-footer border-top pt-3">
-                <div class="d-flex justify-content-start gap-3">
+                <div class="d-flex justify-content-between">
 
-                    @* NÚT TẠO MỚI *@
+                    @* NÚT QUAY LẠI DANH SÁCH (TRÁI) - Dùng btn-outline-primary *@
+                    <a asp-action="Index" class="btn btn-outline-primary">
+                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                    </a>
+
+                    @* NÚT TẠO MỚI (PHẢI) *@
                     <button type="submit" value="Create" class="btn btn-primary">
                         <i class="bx bx-plus me-1"></i> Tạo mới
                     </button>
-
-                    @* NÚT QUAY LẠI DANH SÁCH *@
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                    </a>
                 </div>
             </div>
         </form>
@@ -87,6 +91,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-    @* ĐÃ BỎ: Khối JavaScript tự động đóng thông báo. Lỗi/Thành công hiển thị ở Index. *@
 }

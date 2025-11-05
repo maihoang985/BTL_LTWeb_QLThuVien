@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Chỉnh sửa Thể loại: " + Model.TenThL;
     var userRole = Context.Session.GetString("UserRole");
-    bool canEdit = (userRole == "QTV" || userRole == "QLS");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -12,8 +12,14 @@
         <i class='bx bx-pencil fs-2 me-2'></i> Chỉnh sửa Thể loại
     </h1>
 
-    @* 1. THÊM: Vị trí hiển thị thông báo *@
-    <div id="alertPlaceholder"></div>
+    @* PHẦN HIỂN THỊ THÔNG BÁO TEMP DATA *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <div class="card">
 
@@ -54,27 +60,37 @@
             </div>
 
             <div class="card-footer border-top pt-3">
-                <div class="d-flex gap-3">
-                    @* 3. THÊM: ID cho Nút Submit *@
-                    <button type="submit" value="Save" class="btn btn-primary @(canEdit ? "" : "disabled")" id="submitButton">
-                        <i class="bx bx-save me-1"></i> Lưu thay đổi
-                    </button>
+                <div class="d-flex justify-content-between">
 
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                    </a>
+                    @* KHỐI BÊN TRÁI: Nút Quay lại - Dùng btn-outline-primary *@
+                    <div>
+                        <a asp-action="Index" class="btn btn-outline-primary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                        </a>
+                    </div>
+
+                    @* KHỐI BÊN PHẢI: Lưu & Xem chi tiết *@
+                    <div class="d-flex gap-2">
+                        <button type="submit" value="Save" class="btn btn-primary @(canEdit ? "" : "disabled")" id="submitButton">
+                            <i class="bx bx-save me-1"></i> Lưu thay đổi
+                        </button>
+
+                        <a asp-action="Details" asp-route-id="@Model?.MaThL" class="btn btn-info">
+                            <i class='bx bx-detail'></i> Chi tiết
+                        </a>
+                    </div>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-@* 4. THAY THẾ: Toàn bộ khối Script cho thông báo *@
 @section Scripts {
     <script>
         // Hàm hiển thị thông báo (Toast)
         function showToast(message, type = 'success') {
-            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            // Logic hiển thị toast... (Giữ nguyên)
+            const alertPlaceholder = document.getElementById('alertMessage');
             alertPlaceholder.innerHTML = '';
 
             const wrapper = document.createElement('div');
@@ -84,19 +100,16 @@
                 '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
                 '</div>'
             ].join('');
-
             alertPlaceholder.appendChild(wrapper);
-            // Tự động ẩn sau 5 giây
-            setTimeout(() => {
-                $(wrapper).alert('close');
-            }, 5000);
+            // Tự động ẩn sau 5 giây (chỉ ẩn nếu là thành công)
+            if (type === 'success') {
+                setTimeout(() => {
+                    $(wrapper).alert('close');
+                }, 5000);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-
-            // ==========================================================
-            // LOGIC FORM SUBMIT (Kiểm tra và báo cáo kết quả)
-            // ==========================================================
 
             // SỬA: Trỏ đúng ID của Form
             const editForm = document.getElementById('editTheLoaiForm');
@@ -117,18 +130,18 @@
             // 2. Logic hiển thị thông báo từ TempData
             @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
             {
-                    <text>
-                        setTimeout(function() {
-                            // Hiển thị toast
-                            showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+                        <text>
+                            setTimeout(function() {
+                                // Hiển thị toast
+                                showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
 
-                            // Kích hoạt lại nút submit nếu có lỗi
-                            if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
-                                submitButton.disabled = false;
-                                submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
-                            }
-                        }, 10);
-                    </text>
+                                // Kích hoạt lại nút submit nếu có lỗi
+                                if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
+                                    submitButton.disabled = false;
+                                    submit submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
+                                }
+                            }, 10);
+                        </text>
             }
         });
     </script>

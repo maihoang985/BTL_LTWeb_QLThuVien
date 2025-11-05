@@ -4,14 +4,14 @@
     // Tiêu đề trang, sử dụng tên Nhà Xuất Bản để hiển thị
     ViewData["Title"] = "Chi tiết Nhà Xuất Bản: " + Model.TenNxb;
 
-    // Logic kiểm tra quyền chỉnh sửa/xóa (Giả định QTV/QLS có quyền)
+    // Logic kiểm tra quyền chỉnh sửa/xóa
     var userRole = Context.Session.GetString("UserRole");
-    bool canEdit = (userRole == "QTV" || userRole == "QLS");
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
 @* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+    KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
@@ -35,11 +35,11 @@
 
             @* === THÔNG TIN CƠ BẢN === *@
             <h6 class="text-muted text-uppercase mb-3">
-                <i class='bx bx-info-circle me-1'></i> Chi tiết Nhà Xuất Bản
+                <i class='bx bx-info-circle me-1'></i> Thông tin Nhà Xuất Bản
             </h6>
 
-            <div class="row">
-                <div class="col-12">
+            <div class="row mb-4">
+                <div class="col-md-6">
 
                     @* Mã Nhà Xuất Bản *@
                     <div class="mb-3">
@@ -54,22 +54,34 @@
                     </div>
 
                 </div>
+                <div class="col-md-6">
+                    @* Quốc gia (Mới) *@
+                    <div class="mb-3">
+                        <label class="form-label d-block text-secondary">Quốc gia</label>
+                        <p class="fw-semibold mb-0">
+                            @(Model.MaQgNavigation != null ?
+                                                        Model.MaQgNavigation.TenQg : "Chưa xác định")
+                        </p>
+                    </div>
+                </div>
             </div>
 
         </div>
 
         @* FOOTER CỦA CARD: Chứa các nút Hành động *@
         <div class="card-footer border-top pt-3">
-            <div class="d-flex gap-3">
-                @* Nút Sửa *@
+            <div class="d-flex justify-content-between">
+
+                @* 1. Nút Quay lại (ĐƯA LÊN TRƯỚC, BÊN TRÁI) *@
+                <a asp-action="Index" class="btn btn-outline-primary">
+                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                </a>
+
+                @* 2. Nút Sửa (ĐƯA RA SAU, BÊN PHẢI) *@
                 <a asp-action="Edit" asp-route-id="@Model?.MaNxb" class="btn btn-primary @(canEdit ? "" : "disabled")">
                     <i class="bx bx-pencil me-1"></i> Sửa thông tin
                 </a>
 
-                @* Nút Quay lại *@
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
-                </a>
             </div>
         </div>
 

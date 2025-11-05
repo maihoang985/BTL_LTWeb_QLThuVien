@@ -2,11 +2,15 @@
 
 @{
     ViewData["Title"] = "Xóa Nhà Xuất Bản";
+    // Giả định: Lấy Tên Nhà Xuất Bản
+    var tenNxb = Model.TenNxb;
+    // Lấy tên quốc gia để hiển thị
+    var tenQuocGia = Model.MaQgNavigation != null ? Model.MaQgNavigation.TenQg : Model.MaQg;
 }
 
 @* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+    KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
@@ -17,7 +21,10 @@
     @* --- KHỐI CẢNH BÁO XÓA --- *@
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">CẢNH BÁO QUAN TRỌNG!</h4>
-        <p>Bạn đang chuẩn bị **xóa vĩnh viễn** Nhà Xuất Bản **@Model.TenNxb** (Mã: **@Model.MaNxb**). Hành động này không thể hoàn tác.</p>
+        @* Sử dụng Html.Raw để in đậm tên NXB *@
+        <p>
+            @Html.Raw($"Bạn đang chuẩn bị <strong>xóa vĩnh viễn</strong> Nhà Xuất Bản <strong>{tenNxb}</strong> (Mã: <strong>{Model.MaNxb}</strong>). Hành động này không thể hoàn tác.")
+        </p>
         <p class="mb-0">Vui lòng kiểm tra kỹ thông tin bên dưới trước khi xác nhận.</p>
     </div>
 
@@ -26,14 +33,14 @@
 
         @* HEADER CỦA CARD: Tên Nhà Xuất Bản *@
         <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Chi tiết Nhà Xuất Bản: <span class="text-danger fw-bold">@Model.TenNxb</span></h5>
+            <h5 class="card-title mb-0">Chi tiết Nhà Xuất Bản: <span class="text-danger fw-bold">@tenNxb</span></h5>
         </div>
 
         @* BODY CỦA CARD: Hiển thị chi tiết *@
         <div class="card-body">
 
             @* === THÔNG TIN CƠ BẢN === *@
-            <h6 class="text-muted text-uppercase mb-3 mt-0">
+            <h6 class="text-muted text-uppercase mb-4 mt-4">
                 <i class='bx bx-info-circle me-1'></i> Chi tiết Nhà Xuất Bản
             </h6>
             <dl class="row mb-0">
@@ -42,6 +49,10 @@
 
                 <dt class="col-sm-4 text-muted">Tên NXB:</dt>
                 <dd class="col-sm-8">@Model.TenNxb</dd>
+
+                @* Quốc gia (Mới) *@
+                <dt class="col-sm-4 text-muted">Quốc gia:</dt>
+                <dd class="col-sm-8">@tenQuocGia</dd>
             </dl>
 
         </div> @* End card-body *@
@@ -52,8 +63,8 @@
                 <input type="hidden" asp-for="MaNxb" />
                 <div class="d-flex justify-content-between">
 
-                    @* NÚT QUAY LẠI (TRÁI) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    @* NÚT QUAY LẠI (TRÁI) - Dùng btn-outline-primary *@
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 

@@ -112,7 +112,8 @@ namespace Library_Manager.Controllers
                     await _context.SaveChangesAsync();
 
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = $"Đã tạo mới Tác giả: {tTacGium.HoDem} {tTacGium.Ten} với Mã TG: {tTacGium.MaTg}";
+                    // SỬA: Dùng <strong> thay vì **
+                    TempData["Message"] = $"Đã tạo mới Tác giả: <strong>{tTacGium.HoDem} {tTacGium.Ten}</strong> với Mã TG: <strong>{tTacGium.MaTg}</strong>";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -127,7 +128,8 @@ namespace Library_Manager.Controllers
                     {
                         errorMessage = errorMessage.Substring(errorMessage.IndexOf("RAISERROR") + 10).Trim();
                     }
-                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: " + errorMessage;
+                    // SỬA: Dùng <strong>
+                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: <strong>" + errorMessage + "</strong>";
                 }
             }
             else
@@ -140,8 +142,10 @@ namespace Library_Manager.Controllers
                 {
                     errors.Add("Quốc gia: Vui lòng chọn một Quốc gia.");
                 }
-                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+                // SỬA: Dùng <ul><li> và <strong>
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
+            // QUAN TRỌNG: Trả về View để hiển thị lỗi ngay trên trang
             return View(tTacGium);
         }
 
@@ -160,7 +164,7 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // POST: TacGia/Delete/5 (ĐÃ THÊM LOGIC XỬ LÝ LỖI DB KHI XÓA)
+        // POST: TacGia/Delete/5
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -176,22 +180,21 @@ namespace Library_Manager.Controllers
                     await _context.SaveChangesAsync();
 
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = $"Đã xóa Tác giả có Mã: {id} thành công.";
+                    // SỬA: Dùng <strong>
+                    TempData["Message"] = $"Đã xóa Tác giả có Mã: <strong>{id}</strong> thành công.";
                 }
                 catch (DbUpdateException ex)
                 {
-                    // Lỗi: Ràng buộc Khóa Ngoại (Foreign Key Constraint)
                     TempData["StatusMessage"] = "danger";
-                    TempData["Message"] = $"Không thể xóa tác giả {id} vì đang có tài liệu tham chiếu đến tác giả này. Vui lòng xóa các tài liệu liên quan trước.";
-
-                    // Trả về View Index mà không thực hiện Redirect (hoặc redirect sau đó)
+                    // SỬA: Dùng <strong>
+                    TempData["Message"] = $"Không thể xóa tác giả <strong>{id}</strong> vì đang có tài liệu tham chiếu đến tác giả này. Vui lòng xóa các tài liệu liên quan trước.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    // Lỗi hệ thống khác
                     TempData["StatusMessage"] = "danger";
-                    TempData["Message"] = $"Lỗi hệ thống khi xóa: {ex.Message}";
+                    // SỬA: Dùng <strong>
+                    TempData["Message"] = $"Lỗi hệ thống khi xóa: <strong>{ex.Message}</strong>";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -244,7 +247,8 @@ namespace Library_Manager.Controllers
                     await _context.SaveChangesAsync();
 
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = $"Thông tin Tác giả {tTacGium.HoDem} {tTacGium.Ten} đã được cập nhật thành công.";
+                    // SỬA: Dùng <strong>
+                    TempData["Message"] = $"Thông tin Tác giả <strong>{tTacGium.HoDem} {tTacGium.Ten}</strong> đã được cập nhật thành công.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -262,7 +266,8 @@ namespace Library_Manager.Controllers
                 catch (Exception ex)
                 {
                     TempData["StatusMessage"] = "danger";
-                    TempData["Message"] = "Lỗi hệ thống khi lưu: " + ex.Message;
+                    // SỬA: Dùng <strong>
+                    TempData["Message"] = "Lỗi hệ thống khi lưu: <strong>" + ex.Message + "</strong>";
                 }
             }
             else
@@ -270,7 +275,8 @@ namespace Library_Manager.Controllers
                 TempData["StatusMessage"] = "danger";
                 var errors = ModelState.Where(x => x.Value.Errors.Any())
                    .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
-                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+                // SỬA: Dùng <ul><li> và <strong>
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
 
             return View(tTacGium);

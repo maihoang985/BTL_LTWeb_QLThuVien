@@ -6,7 +6,8 @@
 
     // Logic kiểm tra quyền chỉnh sửa/xóa (Giả định QTV/QLS có quyền)
     var userRole = Context.Session.GetString("UserRole");
-    bool canEdit = (userRole == "QTV" || userRole == "QLS");
+    // Sửa QLS thành QLT để đồng bộ (nếu cần, hoặc giữ QLS tùy theo phân quyền của bạn)
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
 @* ========================================================================
@@ -58,17 +59,18 @@
 
         </div>
 
-        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
+        @* FOOTER CỦA CARD: Chứa các nút Hành động (ĐÃ SỬA BỐ CỤC) *@
         <div class="card-footer border-top pt-3">
-            <div class="d-flex gap-3">
-                @* Nút Sửa *@
-                <a asp-action="Edit" asp-route-id="@Model?.MaThL" class="btn btn-primary @(canEdit ? "" : "disabled")">
-                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
+            <div class="d-flex justify-content-between">
+
+                @* Nút Quay lại (TRÁI) - Dùng btn-outline-primary *@
+                <a asp-action="Index" class="btn btn-outline-primary">
+                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                 </a>
 
-                @* Nút Quay lại *@
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
+                @* Nút Sửa (PHẢI) *@
+                <a asp-action="Edit" asp-route-id="@Model?.MaThL" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
                 </a>
             </div>
         </div>

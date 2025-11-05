@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Xóa Định dạng";
+    var tenDd = Model.TenDd;
 }
 
 @* ========================================================================
@@ -14,10 +15,12 @@
         <i class='bx bx-trash fs-2 me-2 border p-1 rounded-2'></i> Xác nhận xóa Định dạng
     </h1>
 
-    @* --- KHỐI CẢNH BÁO XÓA --- *@
+    @* --- KHỐI CẢNH BÁO XÓA (Đã sửa định dạng) --- *@
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">CẢNH BÁO QUAN TRỌNG!</h4>
-        <p>Bạn đang chuẩn bị **xóa vĩnh viễn** định dạng **@Model.TenDd** (Mã: **@Model.MaDd**). Hành động này không thể hoàn tác.</p>
+        <p>
+            @Html.Raw($"Bạn đang chuẩn bị <strong>xóa vĩnh viễn</strong> định dạng <strong>{tenDd}</strong> (Mã: <strong>{Model.MaDd}</strong>). Hành động này không thể hoàn tác.")
+        </p>
         <p class="mb-0">Vui lòng kiểm tra kỹ thông tin bên dưới trước khi xác nhận.</p>
     </div>
 
@@ -33,7 +36,7 @@
         <div class="card-body">
 
             @* === THÔNG TIN CƠ BẢN === *@
-            <h6 class="text-muted text-uppercase mb-3 mt-0">
+            <h6 class="text-muted text-uppercase mb-4 mt-4">
                 <i class='bx bx-info-circle me-1'></i> Chi tiết Định dạng
             </h6>
             <dl class="row mb-0">
@@ -46,14 +49,14 @@
 
         </div> @* End card-body *@
 
-        @* FOOTER CỦA CARD: Nút Xác nhận và Quay lại *@
+        @* FOOTER CỦA CARD: Nút Xác nhận và Quay lại (Đã chuẩn hóa bố cục) *@
         <div class="card-footer border-top pt-3">
             <form asp-action="Delete">
                 <input type="hidden" asp-for="MaDd" />
                 <div class="d-flex justify-content-between">
 
-                    @* NÚT QUAY LẠI (TRÁI) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    @* NÚT QUAY LẠI (TRÁI) - Dùng btn-outline-primary *@
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 
