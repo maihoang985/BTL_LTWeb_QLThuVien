@@ -6,9 +6,11 @@
 }
 
 @* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* KHÔNG CÓ KHỐI HIỂN THỊ TEMP DATA Ở ĐÂY (Thông báo được hiển thị ở Index) *@
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -27,17 +29,19 @@
             @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
             <div class="card-body">
 
-                @* Phần hiển thị lỗi tổng thể *@
+                @* Phần hiển thị lỗi tổng thể (Nếu cần) *@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
                 <div class="row">
                     <div class="col-md-6 pt-3">
 
-                        @* Mã Tác Giả *@
+                        @* Trường chọn Quốc gia (Mã Quốc gia sẽ dùng để sinh Mã Tác giả) *@
                         <div class="mb-3">
-                            <label asp-for="MaTg" class="form-label">Mã Tác Giả</label>
-                            <input asp-for="MaTg" class="form-control" />
-                            <span asp-validation-for="MaTg" class="text-danger"></span>
+                            <label asp-for="MaQg" class="form-label">Quốc gia</label>
+                            <select asp-for="MaQg" class="form-select" asp-items="ViewBag.MaQg">
+                                <option value="" disabled selected>-- Chọn Quốc gia --</option>
+                            </select>
+                            <span asp-validation-for="MaQg" class="text-danger"></span>
                         </div>
 
                         <div class="row">
@@ -83,4 +87,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    @* ĐÃ BỎ: Khối JavaScript tự động đóng thông báo. Lỗi/Thành công hiển thị ở Index. *@
 }

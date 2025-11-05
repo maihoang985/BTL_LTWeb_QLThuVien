@@ -2,13 +2,13 @@
 
 @{
     ViewData["Title"] = "Xóa Tác giả";
-    // Giả định: Lấy Tên đầy đủ
-    var tenDayDu = Model.HoDem + " " + Model.Ten;
+    // Giả định: Lấy Tên đầy đủ
+    var tenDayDu = Model.HoDem + " " + Model.Ten;
 }
 
 @* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
@@ -47,6 +47,12 @@
 
                 <dt class="col-sm-4 text-muted">Tên:</dt>
                 <dd class="col-sm-8">@Model.Ten</dd>
+
+                @* Quốc gia (Mới) *@
+                <dt class="col-sm-4 text-muted">Quốc gia:</dt>
+                <dd class="col-sm-8">
+                    @(Model.MaQgNavigation != null ? Model.MaQgNavigation.TenQg : "Chưa xác định")
+                </dd>
             </dl>
 
         </div> @* End card-body *@
