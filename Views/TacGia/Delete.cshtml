@@ -11,6 +11,8 @@
    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
+
+
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-danger mb-4">
         <i class='bx bx-trash fs-2 me-2 border p-1 rounded-2'></i> Xác nhận xóa Tác giả
@@ -19,7 +21,10 @@
     @* --- KHỐI CẢNH BÁO XÓA --- *@
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">CẢNH BÁO QUAN TRỌNG!</h4>
-        <p>Bạn đang chuẩn bị **xóa vĩnh viễn** tác giả **@tenDayDu** (Mã: **@Model.MaTg**). Hành động này không thể hoàn tác.</p>
+        @* <<< ĐÃ SỬ DỤNG @Html.Raw VÀ THẺ <strong> ĐỂ IN ĐẬM >>> *@
+        <p>
+            @Html.Raw($"Bạn đang chuẩn bị <strong>xóa vĩnh viễn</strong> tác giả <strong>{tenDayDu}</strong> (Mã: <strong>{Model.MaTg}</strong>). Hành động này không thể hoàn tác.")
+        </p>
         <p class="mb-0">Vui lòng kiểm tra kỹ thông tin bên dưới trước khi xác nhận.</p>
     </div>
 
@@ -35,7 +40,8 @@
         <div class="card-body">
 
             @* === THÔNG TIN CƠ BẢN === *@
-            <h6 class="text-muted text-uppercase mb-3 mt-0">
+            @* ĐÃ SỬA: Thay đổi mt-0 thành mt-3 để tăng khoảng cách với đường viền phía trên *@
+            <h6 class="text-muted text-uppercase mb-4 mt-4">
                 <i class='bx bx-info-circle me-1'></i> Chi tiết Tác giả
             </h6>
             <dl class="row mb-0">
@@ -63,8 +69,8 @@
                 <input type="hidden" asp-for="MaTg" />
                 <div class="d-flex justify-content-between">
 
-                    @* NÚT QUAY LẠI (TRÁI) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    @* NÚT QUAY LẠI (TRÁI) - ĐÃ DÙNG BTN OUTLINE PRIMARY *@
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 
