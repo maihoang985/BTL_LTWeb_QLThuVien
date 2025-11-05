@@ -89,6 +89,16 @@ namespace Library_Manager.Controllers
             ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl");
             return View();
         }
+        // GET: BanSao/Create
+        public IActionResult Create(string MaTl = null)
+        {
+            // Nếu có MaTl được truyền vào từ Dashboard, pre-select mã đó
+            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", MaTl);
+            ViewBag.SelectedMaTl = MaTl; // Lưu lại để sử dụng trong View Create
+
+            // Nếu bạn muốn tạo nhiều bản sao cho 1 MaTl, bạn có thể chuyển hướng sang view Create chung
+            return View();
+        }
 
         // POST: BanSao/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.

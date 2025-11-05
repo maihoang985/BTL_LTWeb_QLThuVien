@@ -47,6 +47,14 @@ html[data-theme="theme-dark-custom"] {
 html[data-theme="theme-dark-custom"] {
     color: var(--custom-text-main);
 }
+    html[data-theme="theme-dark-custom"] .text-body {
+        color: var(--custom-text-heading) !important; /* Ép về màu Trắng tinh (#fff) */
+    }
+
+    html[data-theme="theme-dark-custom"] .text-muted {
+        color: var(--custom-text-heading) !important; /* Ép về màu Trắng tinh (#fff) */
+        opacity: 0.8; /* Giảm opacity để phân biệt với text-body, nếu cần */
+    }
 
     /* 1.2. Links: Màu Vàng */
     html[data-theme="theme-dark-custom"] a {
