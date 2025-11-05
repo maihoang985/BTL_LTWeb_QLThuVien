@@ -1,5 +1,5 @@
 ﻿/*==================================================================================
-// LIGHT THEME CUSTOM CSS
+// LIGHT THEME CUSTOM CSS (ĐÃ ĐỒNG BỘ)
 // Tên theme: theme-light-custom
 // Áp dụng khi <html> có data-theme="theme-light-custom"
 // Bảng màu cốt lõi: Xanh Đậm (#303481), Xanh Nhạt (#D6E6F2), Trắng (#F5F5F5), Vàng (#FFF200)
@@ -14,9 +14,11 @@ html[data-theme="theme-light-custom"] {
     --color-body-bg: #D6E6F2; /* Xanh Dương Nhạt (Nền Content/Body) */
     --color-light-bg: #F5F5F5; /* Trắng/Rất Nhạt (Navbar, Sidebar, Card) */
     --color-high-contrast-text: #FFF200; /* Vàng (Text trên nền Xanh Đậm) */
+    --color-text-on-contrast: var(--color-primary-dark); /* Xanh Đậm (Chữ trên nền Vàng) */
     /* -------------------- MÀU DẪN XUẤT (SHADES & TINTS) -------------------- */
     --custom-text-main: var(--color-primary-dark);
     --custom-text-heading: var(--color-primary-dark);
+    --custom-text-muted: #8897aa; /* Màu chữ phụ/nhẹ */
     --custom-primary: var(--color-primary-dark);
     --custom-primary-dark: var(--color-primary-dark);
     --custom-primary-dark-hover: #1f2260; /* Sắc thái đậm hơn khi hover */
@@ -25,6 +27,7 @@ html[data-theme="theme-light-custom"] {
     --custom-body-bg: var(--color-body-bg);
     --custom-card-bg: var(--color-light-bg);
     --custom-primary-bg-light: var(--color-light-bg);
+    --custom-primary-bg-dark: var(--color-light-bg); /* Giữ lại cho đồng bộ, nhưng không dùng */
     --custom-footer-bg: #ebecec;
     --custom-hover-bg-light: #d6d7d9;
     --custom-border-color: #d9dee3;
@@ -47,6 +50,15 @@ html[data-theme="theme-light-custom"] {
 html[data-theme="theme-light-custom"] {
     color: var(--custom-text-main);
 }
+    /* Đảm bảo text-body, text-muted, text-secondary đổi màu đúng theo theme */
+    html[data-theme="theme-light-custom"] .text-body {
+        color: var(--custom-text-main) !important;
+    }
+
+    html[data-theme="theme-light-custom"] .text-muted,
+    html[data-theme="theme-light-custom"] .text-secondary {
+        color: var(--custom-text-muted) !important;
+    }
 
     /* 1.2. Links */
     html[data-theme="theme-light-custom"] a {
@@ -70,7 +82,9 @@ html[data-theme="theme-light-custom"] {
     /* 1.4. Card, Dropdown, Border */
     html[data-theme="theme-light-custom"] .card,
     html[data-theme="theme-light-custom"] .list-group-item,
-    html[data-theme="theme-light-custom"] .dropdown-menu {
+    html[data-theme="theme-light-custom"] .dropdown-menu,
+    html[data-theme="theme-light-custom"] .modal-content,
+    html[data-theme="theme-light-custom"] .offcanvas {
         background-color: var(--custom-card-bg) !important;
         border-color: var(--custom-border-color) !important;
     }
@@ -141,10 +155,10 @@ html[data-theme="theme-light-custom"] {
             color: var(--custom-menu-header-text);
         }
 
-        /* 3.6. APP BRANDING (Logo Text) */
-        html[data-theme="theme-light-custom"] .app-brand-text.menu-text {
-            color: var(--custom-primary-dark) !important; /* Xanh Đậm cho chữ "Quản lý" */
-        }
+    /* 3.6. APP BRANDING (Logo Text) */
+    html[data-theme="theme-light-custom"] .app-brand-text.menu-text {
+        color: var(--custom-primary-dark) !important; /* Xanh Đậm cho chữ "Quản lý" */
+    }
 
         html[data-theme="theme-light-custom"] .app-brand-text.menu-text .fs-tiny {
             color: var(--custom-primary-dark-hover) !important; /* Xanh Đậm hơn cho chữ "THƯ VIỆN" */
@@ -162,6 +176,15 @@ html[data-theme="theme-light-custom"] {
     /* -----------------------------------------------------------------------------
  * 5. FORM CONTROLS & BUTTONS
  * -----------------------------------------------------------------------------*/
+
+    /* 5.1. Input / Select */
+    html[data-theme="theme-light-custom"] .form-control,
+    html[data-theme="theme-light-custom"] .form-select,
+    html[data-theme="theme-light-custom"] .input-group-text {
+        background-color: var(--custom-card-bg);
+        border-color: var(--custom-border-color);
+        color: var(--custom-text-main);
+    }
 
     /* 5.2. Button Primary (Nền Xanh Đậm, Chữ Vàng) */
     html[data-theme="theme-light-custom"] .btn-primary {
@@ -286,44 +309,52 @@ html[data-theme="theme-light-custom"] {
             background-color: rgba(255, 62, 29, 0.15) !important; /* Slightly darker tint on hover */
         }
 
-/* -----------------------------------------------------------------------------
-* 8. PHẦN BỔ SUNG
-* -----------------------------------------------------------------------------*/
+    /* -----------------------------------------------------------------------------
+ * 8. PHẦN BỔ SUNG
+ * -----------------------------------------------------------------------------*/
 
-/* 8.1. SCROLLBAR */
-html[data-theme="theme-light-custom"] ::-webkit-scrollbar-thumb {
-    background-color: rgba(48, 52, 129, 0.2);
-}
+    /* 8.1. SCROLLBAR */
+    html[data-theme="theme-light-custom"] ::-webkit-scrollbar-thumb {
+        background-color: rgba(48, 52, 129, 0.2);
+    }
 
-/* 8.2. CUSTOM NAV-PILLS (_DanhMuc) */
+    /* 8.2. CUSTOM NAV-PILLS (_DanhMuc) */
 
-/* Default state (Chữ Xanh Đậm) */
-html[data-theme="theme-light-custom"] .nav-pills .nav-link {
-    color: var(--custom-primary-dark);
-    border: 1px solid var(--custom-border-color);
-    background-color: transparent; /* Nền trong suốt trên nền Card */
-    margin: 0.25rem; /* Khoảng cách giữa các pill */
-    border-radius: 0.5rem;
-}
+    /* Default state (Chữ Xanh Đậm) */
+    html[data-theme="theme-light-custom"] .nav-pills .nav-link {
+        color: var(--custom-primary-dark);
+        border: 1px solid var(--custom-border-color);
+        background-color: transparent; /* Nền trong suốt trên nền Card */
+        margin: 0.25rem; /* Khoảng cách giữa các pill */
+        border-radius: 0.5rem;
+    }
 
-    /* Hover state (Nền Xanh Nhạt/Hover, Chữ Xanh Đậm) */
-    html[data-theme="theme-light-custom"] .nav-pills .nav-link:not(.active):hover {
-        color: var(--custom-primary-dark-hover);
-        background-color: var(--custom-hover-bg-light); /* Màu xám nhạt khi hover */
+        /* Hover state (Nền Xanh Nhạt/Hover, Chữ Xanh Đậm) */
+        html[data-theme="theme-light-custom"] .nav-pills .nav-link:not(.active):hover {
+            color: var(--custom-primary-dark-hover);
+            background-color: var(--custom-hover-bg-light); /* Màu xám nhạt khi hover */
+            border-color: var(--custom-border-color);
+        }
+
+        /* Active state (Nền Xanh Đậm, Chữ Vàng) */
+        html[data-theme="theme-light-custom"] .nav-pills .nav-link.active {
+            color: var(--color-high-contrast-text) !important; /* <--- MÀU VÀNG */
+            background-color: var(--custom-primary-dark) !important; /* <--- NỀN XANH ĐẬM */
+            border-color: var(--custom-primary-dark) !important;
+            box-shadow: 0 0.125rem 0.25rem rgba(48, 52, 129, 0.2); /* Thêm bóng nhẹ cho Pill active */
+        }
+
+    /* 8.3. ALERTS */
+    html[data-theme="theme-light-custom"] .alert-primary {
+        color: var(--custom-primary-dark);
+        background-color: var(--custom-primary-tint);
+        border-color: rgba(48, 52, 129, 0.2);
+    }
+
+    /* 8.4. MODAL & OFFCANVAS */
+    html[data-theme="theme-light-custom"] .modal-content,
+    html[data-theme="theme-light-custom"] .offcanvas {
+        background-color: var(--custom-card-bg);
+        color: var(--custom-text-main);
         border-color: var(--custom-border-color);
     }
-
-    /* Active state (Nền Xanh Đậm, Chữ Vàng) */
-    html[data-theme="theme-light-custom"] .nav-pills .nav-link.active {
-        color: var(--color-high-contrast-text) !important; /* <--- MÀU VÀNG */
-        background-color: var(--custom-primary-dark) !important; /* <--- NỀN XANH ĐẬM */
-        border-color: var(--custom-primary-dark) !important;
-        box-shadow: 0 0.125rem 0.25rem rgba(48, 52, 129, 0.2); /* Thêm bóng nhẹ cho Pill active */
-    }
-
-/* 8.3. ALERTS */
-html[data-theme="theme-light-custom"] .alert-primary {
-    color: var(--custom-primary-dark);
-    background-color: var(--custom-primary-tint);
-    border-color: rgba(48, 52, 129, 0.2);
-}
