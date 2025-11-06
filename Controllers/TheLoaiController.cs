@@ -12,6 +12,7 @@ using System.Data; // Thêm
 
 namespace Library_Manager.Controllers
 {
+    [Route("The-loai")]
     public class TheLoaiController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -24,6 +25,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheLoai (Giữ nguyên)
         // =======================================================
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
         {
             var pageNumber = page ?? 1;
@@ -49,6 +51,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheLoai/Details/5 (Giữ nguyên)
         // =======================================================
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null) { return NotFound(); }
@@ -63,6 +66,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheLoai/Create (Giữ nguyên)
         // =======================================================
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             return View();
@@ -73,6 +77,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         // BỎ MaThL khỏi Bind để nó được sinh tự động
         public async Task<IActionResult> Create([Bind("TenThL")] TTheLoai tTheLoai)
         {
@@ -141,6 +146,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheLoai/Edit/5 (Giữ nguyên)
         // =======================================================
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -155,6 +161,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaThL,TenThL")] TTheLoai tTheLoai)
         {
             if (id != tTheLoai.MaThL) { return NotFound(); }
@@ -235,6 +242,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheLoai/Delete/5 (Giữ nguyên)
         // =======================================================
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -251,6 +259,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTheLoai = await _context.TTheLoai.FindAsync(id);

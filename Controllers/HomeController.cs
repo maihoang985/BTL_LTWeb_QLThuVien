@@ -7,6 +7,7 @@ using System.Diagnostics;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Tong-quan")]
     public class HomeController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -19,6 +20,8 @@ namespace Library_Manager.Controllers
         }
 
         [Authorization("QTV,QLB,QLT,QLM")]
+        [Route("Trang-chu")]
+        [Route("")]
         public IActionResult Index()
         {
             string? currentMaTk = HttpContext.Session.GetString("MaTk");
@@ -124,13 +127,14 @@ namespace Library_Manager.Controllers
             return View();
         }
 
-
+        [Route("Dieu-khoan")]
         public IActionResult Privacy()
         {
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [Route("Loi")]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

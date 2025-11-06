@@ -14,6 +14,7 @@ using System.Data;
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
+    [Route("Nhan-vien")]
     public class NhanVienController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -26,6 +27,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Index
         // =======================================================
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
         {
             var pageNumber = page ?? 1;
@@ -51,6 +53,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Details/5
         // =======================================================
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null) { return NotFound(); }
@@ -64,6 +67,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Create
         // =======================================================
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create()
         {
             await PopulatePhuTrachDropDownList();
@@ -76,6 +80,7 @@ namespace Library_Manager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorization("QTV")]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
             ModelState.Remove("MaNv");
@@ -143,6 +148,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Edit/5
         // =======================================================
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -157,6 +163,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaNv,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
             if (id != tNhanVien.MaNv) { return NotFound(); }
@@ -220,6 +227,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Delete/5
         // =======================================================
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -233,6 +241,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tNhanVien = await _context.TNhanVien.FindAsync(id);

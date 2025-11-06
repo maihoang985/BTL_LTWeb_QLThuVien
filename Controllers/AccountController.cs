@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Auth")]
     public class AccountController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -20,6 +21,9 @@ namespace Library_Manager.Controllers
         // KHỐI 1: ACTION LOGIN (HIỂN THỊ FORM)
         // ==========================================================
         [HttpGet]
+        [Route("Dang-nhap")]
+        [Route("")]
+        [Route("~/")]
         public IActionResult Login()
         {
             // SỬA ĐỔI: Kiểm tra Session "MaTk" (hoặc "UserName")
@@ -34,6 +38,7 @@ namespace Library_Manager.Controllers
         // KHỐI 2: ACTION LOGIN (XỬ LÝ ĐĂNG NHẬP)
         // ==========================================================
         [HttpPost]
+        [Route("Dang-nhap")]
         public IActionResult Login(TTaiKhoan user)
         {
             // --- BƯỚC 1: TRUY VẤN TÀI KHOẢN ---
@@ -97,6 +102,7 @@ namespace Library_Manager.Controllers
         // ==========================================================
         // KHỐI 3: ACTION LOGOUT
         // ==========================================================
+        [Route("Dang-xuat")]
         public IActionResult Logout()
         {
             // Xóa tất cả Session

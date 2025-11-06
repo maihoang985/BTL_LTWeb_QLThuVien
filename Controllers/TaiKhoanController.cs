@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace Library_Manager.Controllers
 {
     //[Authorization("QTV")]
+    [Route("Tai-khoan")]
     public class TaiKhoanController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -23,6 +24,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TTaiKhoans
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string roleFilter)
         {
             var pageNumber = page ?? 1;
@@ -58,6 +60,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TTaiKhoans/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null)
@@ -80,6 +83,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TTaiKhoans/Create
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             ViewData["MaNv"] = new SelectList(_context.TNhanVien, "MaNv", "MaNv");
@@ -92,6 +96,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaTk,MaNv,MaVt,TenDangNhap,MatKhau,TrangThai,NgayTao")] TTaiKhoan tTaiKhoan)
         {
             if (ModelState.IsValid)
@@ -109,6 +114,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TTaiKhoans/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -133,6 +139,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaTk,MaNv,MaVt,TenDangNhap,MatKhau,TrangThai,NgayTao")] TTaiKhoan tTaiKhoan)
         {
             if (id != tTaiKhoan.MaTk)
@@ -185,6 +192,7 @@ namespace Library_Manager.Controllers
 
 
         // GET: TTaiKhoans/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -207,6 +215,7 @@ namespace Library_Manager.Controllers
         // POST: TTaiKhoans/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTaiKhoan = await _context.TTaiKhoan.FindAsync(id);

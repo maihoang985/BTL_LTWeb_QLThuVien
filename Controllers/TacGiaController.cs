@@ -12,6 +12,7 @@ using System.Data;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Tac-gia")]
     public class TacGiaController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -24,6 +25,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TacGia
         // =======================================================
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string maQg)
         {
             var pageNumber = page ?? 1;
@@ -64,6 +66,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TacGia/Details/5
         // =======================================================
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null) { return NotFound(); }
@@ -77,6 +80,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TacGia/Create
         // =======================================================
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create()
         {
             ViewData["MaQg"] = new SelectList(_context.TQuocGia.OrderBy(q => q.TenQg), "MaQg", "TenQg");
@@ -88,6 +92,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaQg,HoDem,Ten")] TTacGia tTacGium)
         {
             ViewData["MaQg"] = new SelectList(_context.TQuocGia.OrderBy(q => q.TenQg), "MaQg", "TenQg", tTacGium.MaQg);
@@ -152,6 +157,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TacGia/Delete/5
         // =======================================================
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -168,6 +174,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTacGium = await _context.TTacGia.FindAsync(id);
@@ -210,6 +217,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TacGia/Edit/5
         // =======================================================
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -230,6 +238,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaTg,MaQg,HoDem,Ten")] TTacGia tTacGium)
         {
             if (id != tTacGium.MaTg)
