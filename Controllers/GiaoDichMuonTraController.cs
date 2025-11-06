@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http; // Cần thiết cho HttpContext.Session.GetStr
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
+    [Route("Giao-dich-muon-tra")]
     public class GiaoDichMuonTraController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -27,6 +28,7 @@ namespace Library_Manager.Controllers
         // --- Index và Details (Giữ nguyên) ---
 
         // GET: GiaoDichMuonTra
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string returnUrl)
         {
             var pageNumber = page ?? 1;
@@ -66,6 +68,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichMuonTra/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null) return NotFound();
@@ -89,6 +92,7 @@ namespace Library_Manager.Controllers
         // --- HÀNH ĐỘNG CREATE ĐÃ ĐIỀU CHỈNH ---
 
         // GET: GiaoDichMuonTra/Create
+        [Route("Tao-moi")]
         public IActionResult Create(string returnUrl)
         {
             var defaultGd = new TGiaoDichMuonTra
@@ -104,6 +108,7 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create(
             [Bind("MaTbd,NgayHenTra")] TGiaoDichMuonTra tGiaoDichMuonTra,
             [FromForm] List<string> selectedBanSaoList)
@@ -290,6 +295,7 @@ namespace Library_Manager.Controllers
         // --- Edit, Delete (Giữ nguyên) ---
 
         // GET: GiaoDichMuonTra/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) return NotFound();
@@ -305,6 +311,7 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaGd,MaTbd,MaTk,NgayMuon,NgayHenTra,NgayTra,TrangThai")] TGiaoDichMuonTra tGiaoDichMuonTra)
         {
             if (id != tGiaoDichMuonTra.MaGd) return NotFound();
@@ -350,6 +357,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichMuonTra/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) return NotFound();
@@ -366,6 +374,7 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra.FindAsync(id);
