@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Http; // Cần thiết cho HttpContext.Session.GetStr
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
-    [Route("Giao-dich-muon-tra")]
     public class GiaoDichMuonTraController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -28,7 +27,6 @@ namespace Library_Manager.Controllers
         // --- Index và Details (Giữ nguyên) ---
 
         // GET: GiaoDichMuonTra
-        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string returnUrl)
         {
             var pageNumber = page ?? 1;
@@ -67,14 +65,7 @@ namespace Library_Manager.Controllers
             return View(pagedGiaoDiches);
         }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         // GET: GiaoDichMuonTra/Details/5
-        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null) return NotFound();
@@ -95,18 +86,9 @@ namespace Library_Manager.Controllers
         }
 
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
         // --- HÀNH ĐỘNG CREATE ĐÃ ĐIỀU CHỈNH ---
 
->>>>>>> Stashed changes
-=======
-        // --- HÀNH ĐỘNG CREATE ĐÃ ĐIỀU CHỈNH ---
-
->>>>>>> Stashed changes
         // GET: GiaoDichMuonTra/Create
-        [Route("Tao-moi")]
         public IActionResult Create(string returnUrl)
         {
             var defaultGd = new TGiaoDichMuonTra
@@ -122,20 +104,9 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        [Route("Tao-moi")]
-        public async Task<IActionResult> Create([Bind("MaGd,MaTbd,MaTk,NgayMuon,NgayHenTra,NgayTra,TrangThai")] TGiaoDichMuonTra tGiaoDichMuonTra)
-=======
         public async Task<IActionResult> Create(
             [Bind("MaTbd,NgayHenTra")] TGiaoDichMuonTra tGiaoDichMuonTra,
             [FromForm] List<string> selectedBanSaoList)
->>>>>>> Stashed changes
-=======
-        public async Task<IActionResult> Create(
-            [Bind("MaTbd,NgayHenTra")] TGiaoDichMuonTra tGiaoDichMuonTra,
-            [FromForm] List<string> selectedBanSaoList)
->>>>>>> Stashed changes
         {
             // Tự động sinh MaGD
             string newMaGd;
@@ -235,97 +206,6 @@ namespace Library_Manager.Controllers
         // Action: Tìm Thẻ Bạn đọc đang hoạt động (ĐÃ SỬA LỖI ĐỊNH DẠNG NGÀY)
         [HttpGet]
         public async Task<IActionResult> SearchActiveTheBanDoc(string searchTerm)
-<<<<<<< Updated upstream
-        {
-            if (string.IsNullOrEmpty(searchTerm))
-            {
-                return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
-            }
-
-            var searchLower = searchTerm.Trim().ToLower();
-
-            // 1. Thực hiện truy vấn LINQ: Lấy dữ liệu thô
-            var activeCardsQuery = await _context.TTheBanDoc
-                .Include(t => t.MaBdNavigation)
-                .Where(t => t.TrangThai.ToLower() == "hoạt động" && (
-                    t.MaTbd.ToLower().Contains(searchLower) ||
-                    (t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten).ToLower().Contains(searchLower)
-                ))
-                .Select(t => new
-                {
-                    t.MaTbd,
-                    HoTen = t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten,
-                    t.NgayHetHan // Lấy DateOnly? thô
-                })
-                .Take(10)
-                .ToListAsync(); // Thực thi truy vấn
-
-            // 2. Định dạng dữ liệu (in-memory) và trả về Json
-            var formattedCards = activeCardsQuery.Select(t => new
-            {
-                t.MaTbd,
-                t.HoTen,
-                // Ép kiểu an toàn (kiểm tra HasValue)
-                NgayHetHan = t.NgayHetHan.HasValue
-                             ? t.NgayHetHan.Value.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")
-                             : ""
-            }).ToList();
-
-            return Json(new { success = true, data = formattedCards });
-        }
-
-        // Action: Tìm Bản sao tài liệu đang SẴN CÓ
-        [HttpGet]
-        public async Task<IActionResult> SearchAvailableBanSao(string searchTerm)
-        {
-            if (string.IsNullOrEmpty(searchTerm))
-            {
-                return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
-            }
-
-            var searchLower = searchTerm.Trim().ToLower();
-
-            var availableCopies = await _context.TBanSao
-                .Include(bs => bs.MaTlNavigation)
-                .Where(bs => bs.MaBs.ToLower().Contains(searchLower)
-                            || (bs.MaTlNavigation != null && bs.MaTlNavigation.TenTl.ToLower().Contains(searchLower)))
-                .Where(bs => !_context.TGiaoDichBanSao.Any(gdbs => gdbs.MaBs == bs.MaBs && gdbs.TinhTrang == false))
-                .Select(bs => new
-                {
-                    MaBs = bs.MaBs,
-                    TenTaiLieu = (bs.MaTlNavigation != null ? bs.MaTlNavigation.TenTl : "Không rõ tên tài liệu"),
-                    TrangThai = "Sẵn có"
-                })
-                .Take(10)
-                .ToListAsync();
-
-            return Json(new { success = true, data = availableCopies });
-        }
-
-        // --- HÀM PRIVATE HỖ TRỢ SINH MÃ ---
-
-        private async Task<string> GenerateNewMaGd()
-        {
-            var pMaGd = new SqlParameter("@NewMaGD", System.Data.SqlDbType.Char, 12)
-            {
-                Direction = System.Data.ParameterDirection.Output
-            };
-
-            await _context.Database.ExecuteSqlRawAsync("EXEC SP_GenerateNewMaGD @NewMaGD OUTPUT", pMaGd);
-
-            return pMaGd.Value != DBNull.Value ? pMaGd.Value.ToString().Trim() : throw new Exception("Không thể sinh Mã Giao dịch mới.");
-        }
-
-
-        // --- Edit, Delete (Giữ nguyên) ---
-
-        // GET: GiaoDichMuonTra/Edit/5
-        [Route("Chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null) return NotFound();
-
-=======
         {
             if (string.IsNullOrEmpty(searchTerm))
             {
@@ -414,7 +294,6 @@ namespace Library_Manager.Controllers
         {
             if (id == null) return NotFound();
 
->>>>>>> Stashed changes
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra.FindAsync(id);
             if (tGiaoDichMuonTra == null) return NotFound();
 
@@ -426,7 +305,6 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaGd,MaTbd,MaTk,NgayMuon,NgayHenTra,NgayTra,TrangThai")] TGiaoDichMuonTra tGiaoDichMuonTra)
         {
             if (id != tGiaoDichMuonTra.MaGd) return NotFound();
@@ -472,7 +350,6 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichMuonTra/Delete/5
-        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) return NotFound();
@@ -489,7 +366,6 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichMuonTra/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra.FindAsync(id);
