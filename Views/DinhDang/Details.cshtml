@@ -4,9 +4,8 @@
     // Tiêu đề trang, sử dụng tên Định dạng để hiển thị
     ViewData["Title"] = "Chi tiết Định dạng: " + Model.TenDd;
 
-    // Logic kiểm tra quyền chỉnh sửa/xóa (Giả định QTV/QLS có quyền)
+    // Logic kiểm tra quyền chỉnh sửa/xóa
     var userRole = Context.Session.GetString("UserRole");
-    // Sửa QLS thành QLT để đồng bộ (nếu cần, hoặc giữ QLS tùy theo phân quyền của bạn)
     bool canEdit = (userRole == "QTV" || userRole == "QLT");
 }
 
@@ -34,7 +33,7 @@
         @* BODY CỦA CARD: HIỂN THỊ DỮ LIỆU CHÍNH *@
         <div class="card-body">
 
-            @* === THÔNG TIN CƠ BẢN (DÙNG ROW ĐƠN GIẢN) === *@
+            @* === THÔNG TIN CƠ BẢN === *@
             <h6 class="text-muted text-uppercase mb-3">
                 <i class='bx bx-info-circle me-1'></i> Chi tiết Định dạng
             </h6>
@@ -59,7 +58,7 @@
 
         </div>
 
-        @* FOOTER CỦA CARD: Chứa các nút Hành động (ĐÃ SỬA BỐ CỤC) *@
+        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
         <div class="card-footer border-top pt-3">
             <div class="d-flex justify-content-between">
 

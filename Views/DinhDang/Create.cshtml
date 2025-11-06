@@ -7,7 +7,7 @@
 
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    @* --- PHẦN HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (Để hiển thị lỗi khi Controller return View) --- *@
+    @* --- PHẦN HIỂN THỊ THÔNG BÁO LỖI TỪ TEMP DATA (Khi Controller return View) --- *@
     @if (TempData["Message"] != null)
     {
         <div id="alertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
@@ -38,26 +38,17 @@
 
                 <div class="row">
                     <div class="col-md-6 pt-3">
-
-                        @* Mã Định dạng *@
-                        <div class="mb-3">
-                            <label asp-for="MaDd" class="form-label">Mã Định dạng</label>
-                            <input asp-for="MaDd" class="form-control" />
-                            <span asp-validation-for="MaDd" class="text-danger"></span>
-                        </div>
-
                         @* Tên Định dạng *@
                         <div class="mb-3">
                             <label asp-for="TenDd" class="form-label">Tên Định dạng</label>
                             <input asp-for="TenDd" class="form-control" />
                             <span asp-validation-for="TenDd" class="text-danger"></span>
                         </div>
-
                     </div>
                 </div>
             </div> @* End card-body *@
 
-            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại (Đã chuẩn hóa bố cục) *@
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
             <div class="card-footer border-top pt-3">
                 <div class="d-flex justify-content-between">
 

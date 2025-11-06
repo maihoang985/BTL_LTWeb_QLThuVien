@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient; // Thêm
+using Microsoft.Data.SqlClient;
 using PagedList.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Data; // Thêm
+using System.Data;
 
 namespace Library_Manager.Controllers
 {
@@ -22,7 +22,7 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // GET: DinhDang
+        // GET: DinhDang/Index
         // =======================================================
         public IActionResult Index(int? page, string searchString)
         {
@@ -69,62 +69,68 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // POST: DinhDang/Create (THÊM LOGIC BẮT LỖI TRÙNG LẶP VÀ CHUẨN HÓA THÔNG BÁO)
+        // POST: DinhDang/Create (Sinh mã và xử lý luồng lỗi/thành công)
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaDd,TenDd")] TDinhDang tDinhDang)
+        public async Task<IActionResult> Create([Bind("TenDd")] TDinhDang tDinhDang)
         {
-            // Bỏ kiểm tra Navigation Property nếu có (mặc dù Định dạng không có, nên giữ an toàn)
-            // ModelState.Remove("MaDdNavigation"); 
+            ModelState.Remove("MaDd");
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // === LOGIC SINH MÃ TỰ ĐỘNG (DÙNG SP_GenerateNewMaDD) ===
+                    var newMaDdParam = new SqlParameter("@NewMaDD", SqlDbType.Char, 5) { Direction = ParameterDirection.Output };
+                    await _context.Database.ExecuteSqlRawAsync(
+                        "EXEC SP_GenerateNewMaDD @NewMaDD OUTPUT",
+                        newMaDdParam
+                    );
+                    var newMaDdValue = newMaDdParam.Value;
+                    if (newMaDdValue == DBNull.Value || string.IsNullOrEmpty(newMaDdValue.ToString()))
+                    {
+                        throw new InvalidOperationException("Không thể sinh mã Định dạng mới. Vui lòng kiểm tra SP_GenerateNewMaDD.");
+                    }
+                    tDinhDang.MaDd = newMaDdValue.ToString();
+                    // ==============================
+
                     _context.Add(tDinhDang);
                     await _context.SaveChangesAsync();
 
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = $"Đã tạo mới Định dạng: <strong>{tDinhDang.TenDd}</strong> với Mã DĐ: <strong>{tDinhDang.MaDd}</strong>";
+                    TempData["Message"] = $"Đã tạo mới Định dạng: <strong>{tDinhDang.TenDd}</strong> với Mã DD: <strong>{tDinhDang.MaDd}</strong>";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateException dbEx) // Bắt lỗi DB Update (bao gồm trùng lặp)
+                catch (DbUpdateException dbEx)
                 {
-                    // Kiểm tra lỗi trùng lặp UNIQUE KEY (Mã lỗi SQL 2627 hoặc 2601)
-                    if (dbEx.InnerException is SqlException sqlEx &&
-                        (sqlEx.Number == 2627 || sqlEx.Number == 2601))
+                    TempData["StatusMessage"] = "danger";
+                    if (dbEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601))
                     {
-                        TempData["StatusMessage"] = "danger";
-                        // Lỗi trùng lặp có thể xảy ra với MaDd (PK) hoặc TenDd (UNIQUE)
-                        TempData["Message"] = "Không thể lưu. Mã hoặc Tên Định dạng đã tồn tại.";
+                        TempData["Message"] = $"Không thể lưu. Tên Định dạng <strong>{tDinhDang.TenDd}</strong> đã tồn tại.";
                     }
                     else
                     {
-                        // Lỗi DB khác
-                        TempData["StatusMessage"] = "danger";
                         string innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
                         TempData["Message"] = $"Lỗi hệ thống khi tạo mới: <strong>{innerMessage}</strong>";
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Lỗi hệ thống chung
                     TempData["StatusMessage"] = "danger";
-                    string innerMessage = ex.InnerException?.Message ?? ex.Message;
-                    TempData["Message"] = $"Lỗi hệ thống khi tạo mới: <strong>{innerMessage}</strong>";
+                    string errorMessage = ex.InnerException?.Message ?? ex.Message;
+                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: <strong>" + errorMessage + "</strong>";
                 }
             }
-
-            // LỖI VALIDATION hoặc LỖI DB: Trả về View để hiển thị thông báo
-            if (!ModelState.IsValid)
+            // LUỒNG THẤT BẠI: Hiển thị lỗi ngay trên View Create
+            else
             {
                 TempData["StatusMessage"] = "danger";
                 var errors = ModelState.Where(x => x.Value.Errors.Any())
-                  .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                   .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}").ToList();
                 TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
-
             return View(tDinhDang);
         }
 
@@ -141,7 +147,7 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // POST: DinhDang/Edit/5 (THÊM LOGIC BẮT LỖI TRÙNG LẶP VÀ CHUẨN HÓA THÔNG BÁO)
+        // POST: DinhDang/Edit/5 (Xử lý luồng lỗi/thành công)
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -153,72 +159,56 @@ namespace Library_Manager.Controllers
             {
                 try
                 {
-                    // Logic cập nhật tương tự NXB/Tác giả để tránh lỗi tracking
                     var originalDinhDang = await _context.TDinhDang
                         .AsNoTracking()
                         .FirstOrDefaultAsync(m => m.MaDd == id);
 
                     if (originalDinhDang == null) { return NotFound(); }
 
-                    // Ánh xạ trường được phép sửa
                     originalDinhDang.TenDd = tDinhDang.TenDd;
 
                     _context.Update(originalDinhDang);
                     await _context.SaveChangesAsync();
 
-                    // THÀNH CÔNG: Set TempData
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
                     TempData["StatusMessage"] = "success";
                     TempData["Message"] = $"Thông tin Định dạng <strong>{originalDinhDang.TenDd}</strong> đã được cập nhật thành công.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TDinhDangExists(tDinhDang.MaDd))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        // LỖI XUNG ĐỘT: Set TempData
-                        TempData["StatusMessage"] = "danger";
-                        TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng thử lại.";
-                    }
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng thử lại.";
                 }
-                catch (DbUpdateException dbEx) // Bắt lỗi DB Update (bao gồm trùng lặp tên DĐ)
+                catch (DbUpdateException dbEx)
                 {
-                    // Kiểm tra lỗi trùng lặp UNIQUE KEY (Mã lỗi SQL 2627 hoặc 2601)
-                    if (dbEx.InnerException is SqlException sqlEx &&
-                        (sqlEx.Number == 2627 || sqlEx.Number == 2601))
+                    TempData["StatusMessage"] = "danger";
+                    if (dbEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601))
                     {
-                        TempData["StatusMessage"] = "danger";
                         TempData["Message"] = $"Không thể lưu. Tên Định dạng <strong>{tDinhDang.TenDd}</strong> đã tồn tại.";
                     }
                     else
                     {
-                        // LỖI DB khác
-                        TempData["StatusMessage"] = "danger";
                         string innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
                         TempData["Message"] = $"Lỗi hệ thống khi lưu: <strong>{innerMessage}</strong>";
                     }
                 }
                 catch (Exception ex)
                 {
-                    // LỖI HỆ THỐNG: Set TempData
                     TempData["StatusMessage"] = "danger";
                     string innerMessage = ex.InnerException?.Message ?? ex.Message;
                     TempData["Message"] = $"Lỗi hệ thống khi lưu: <strong>{innerMessage}</strong>";
                 }
             }
+            // LUỒNG THẤT BẠI: Hiển thị lỗi ngay trên View Edit
             else
             {
-                // LỖI VALIDATION: Set TempData
                 TempData["StatusMessage"] = "danger";
                 var errors = ModelState.Where(x => x.Value.Errors.Any())
                    .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
                 TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
 
-            // LUÔN LUÔN: Return View để hiển thị thông báo
             return View(tDinhDang);
         }
 
@@ -237,7 +227,7 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // POST: DinhDang/Delete/5 (THÊM XỬ LÝ LỖI KHÓA NGOẠI VÀ CHUẨN HÓA THÔNG BÁO)
+        // POST: DinhDang/Delete/5 (Xử lý luồng lỗi/thành công)
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -252,25 +242,23 @@ namespace Library_Manager.Controllers
                     _context.TDinhDang.Remove(tDinhDang);
                     await _context.SaveChangesAsync();
 
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
                     TempData["StatusMessage"] = "success";
                     TempData["Message"] = $"Đã xóa Định dạng có Mã: <strong>{id}</strong> thành công.";
                 }
-                catch (DbUpdateException dbEx) // Bắt lỗi khóa ngoại
+                catch (DbUpdateException dbEx)
                 {
-                    // Lỗi: Ràng buộc Khóa Ngoại (Foreign Key Constraint)
+                    // LUỒNG THẤT BẠI: Redirect về Index (Hiển thị lỗi trên Index)
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = $"Không thể xóa Định dạng <strong>{id}</strong> vì đang có tài liệu tham chiếu đến. Vui lòng xóa các tài liệu liên quan trước.";
-                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    // Lỗi hệ thống khác
+                    // LUỒNG THẤT BẠI: Redirect về Index (Hiển thị lỗi trên Index)
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = $"Lỗi hệ thống khi xóa: <strong>{ex.Message}</strong>";
-                    return RedirectToAction(nameof(Index));
                 }
             }
-
             return RedirectToAction(nameof(Index));
         }
 
