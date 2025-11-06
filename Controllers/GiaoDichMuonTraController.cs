@@ -105,7 +105,7 @@ namespace Library_Manager.Controllers
             return View(defaultGd);
         }
 
-        // POST: GiaoDichMuonTra/Create
+        // POST: GiaoDichMuonTra/Create (ĐÃ CHỈNH SỬA)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Tao-moi")]
@@ -113,7 +113,24 @@ namespace Library_Manager.Controllers
             [Bind("MaTbd,NgayHenTra")] TGiaoDichMuonTra tGiaoDichMuonTra,
             [FromForm] List<string> selectedBanSaoList)
         {
-            // Tự động sinh MaGD
+            // === BƯỚC 1: XÓA LỖI VALIDATION CHO CÁC TRƯỜNG ĐƯỢC GÁN TỰ ĐỘNG VÀ KHÓA NGOẠI NAVIGATION ===
+
+            // Loại bỏ các lỗi Model State cho các trường sẽ được gán giá trị tự động/ẩn.
+            // Việc này phải làm trước khi gọi ModelState.IsValid
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaGd));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaTk));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.NgayMuon));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.NgayTra));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.TrangThai));
+
+            // **KHẮC PHỤC LỖI CỦA BẠN:** Xóa lỗi cho Navigation Properties
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaTkNavigation));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaTbdNavigation));
+
+
+            // === BƯỚC 2: GÁN CÁC GIÁ TRỊ TỰ ĐỘNG VÀ KIỂM TRA ĐIỀU KIỆN TIÊN QUYẾT ===
+
+            // 2.1. Tự động sinh MaGD
             string newMaGd;
             try
             {
@@ -122,13 +139,12 @@ namespace Library_Manager.Controllers
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi sinh mã
                 TempData["StatusMessage"] = "danger";
                 TempData["Message"] = $"Lỗi hệ thống khi sinh mã: <strong>{ex.Message}</strong>";
                 return View(tGiaoDichMuonTra);
             }
 
-            // 2. Lấy MaTK từ người dùng đang đăng nhập
+            // 2.2. Lấy MaTK từ người dùng đang đăng nhập (MaTk)
             var loggedInMaTk = HttpContext.Session.GetString("MaTk");
             if (string.IsNullOrEmpty(loggedInMaTk))
             {
@@ -138,43 +154,52 @@ namespace Library_Manager.Controllers
             }
             tGiaoDichMuonTra.MaTk = loggedInMaTk;
 
-            // 3. Mặc định Ngày Mượn là ngày hôm nay
+            // 2.3. Mặc định Ngày Mượn, Trang Thái, NgayTra
             tGiaoDichMuonTra.NgayMuon = DateOnly.FromDateTime(DateTime.Now);
-
-            // 4. Mặc định TrangThai
             tGiaoDichMuonTra.TrangThai = "Đang mượn";
             tGiaoDichMuonTra.NgayTra = null;
 
+            // 2.4. Kiểm tra danh sách Bản sao
             if (selectedBanSaoList == null || !selectedBanSaoList.Any())
             {
                 TempData["StatusMessage"] = "danger";
                 TempData["Message"] = "Dữ liệu không hợp lệ: <strong>Giao dịch phải có ít nhất một bản sao tài liệu được chọn.</strong>";
-                // Không return RedirectToAction, trả về View để hiển thị lỗi ngay trên trang
                 return View(tGiaoDichMuonTra);
             }
 
-
+            // === BƯỚC 3: THỰC HIỆN LƯU DATABASE (CHỈ CÒN KIỂM TRA MA TBD VÀ NGÀY HẸN TRẢ) ===
             if (ModelState.IsValid)
             {
                 using var transaction = await _context.Database.BeginTransactionAsync();
                 try
                 {
+                    // 1. Lưu Giao dịch chính
                     _context.Add(tGiaoDichMuonTra);
                     await _context.SaveChangesAsync();
 
+                    // 2. Lưu Chi tiết Bản sao VÀ CẬP NHẬT TRẠNG THÁI BẢN SAO
                     foreach (var maBs in selectedBanSaoList)
                     {
+                        // 2.1. Tạo chi tiết giao dịch
                         var gdbs = new TGiaoDichBanSao
                         {
                             MaGd = tGiaoDichMuonTra.MaGd,
                             MaBs = maBs,
-                            TinhTrang = false // 0 = Đang mượn
+                            TinhTrang = false // false = Đang mượn
                         };
                         _context.TGiaoDichBanSao.Add(gdbs);
 
-                        // TODO: Cập nhật trạng thái Bản sao trong bảng tBanSao
+                        // 2.2. CẬP NHẬT TRẠNG THÁI BẢN SAO TRONG BẢNG TBanSao
+                        var banSao = await _context.TBanSao.FindAsync(maBs);
+                        if (banSao != null)
+                        {
+                            // Cập nhật trạng thái
+                            banSao.TrangThai = "Đã mượn"; // Hoặc "Đang mượn" tùy theo quy ước của bạn
+                            _context.TBanSao.Update(banSao);
+                        }
                     }
 
+                    // Lưu tất cả thay đổi (Giao dịch chi tiết VÀ Cập nhật trạng thái bản sao)
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
@@ -196,85 +221,110 @@ namespace Library_Manager.Controllers
                     return View(tGiaoDichMuonTra);
                 }
             }
-            // Xử lý ModelState không hợp lệ
+
+            // === BƯỚC 4: XỬ LÝ LỖI MODELSTATE KHÔNG HỢP LỆ ===
             TempData["StatusMessage"] = "danger";
             var errors = ModelState.Where(x => x.Value.Errors.Any())
-                   .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                           .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
             TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
 
             return View(tGiaoDichMuonTra);
         }
 
-
         // --- CÁC ACTIONS HỖ TRỢ CHO AJAX ---
-
-        // Action: Tìm Thẻ Bạn đọc đang hoạt động (ĐÃ SỬA LỖI ĐỊNH DẠNG NGÀY)
+        // Action: Tìm Thẻ Bạn đọc đang hoạt động (ĐÃ SỬA LỖI ROUTING)
         [HttpGet]
+        [Route("Tim-kiem-the-ban-doc")] // THÊM ROUTE
         public async Task<IActionResult> SearchActiveTheBanDoc(string searchTerm)
         {
-            if (string.IsNullOrEmpty(searchTerm))
+            try
             {
-                return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
-            }
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
+                }
 
-            var searchLower = searchTerm.Trim().ToLower();
+                var searchLower = searchTerm.Trim().ToLower();
 
-            // 1. Thực hiện truy vấn LINQ: Lấy dữ liệu thô
-            var activeCardsQuery = await _context.TTheBanDoc
-                .Include(t => t.MaBdNavigation)
-                .Where(t => t.TrangThai.ToLower() == "hoạt động" && (
-                    t.MaTbd.ToLower().Contains(searchLower) ||
-                    (t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten).ToLower().Contains(searchLower)
-                ))
-                .Select(t => new
+                // 1. Lọc an toàn trên DB
+                var activeCardsQuery = await _context.TTheBanDoc
+                    .Include(t => t.MaBdNavigation)
+                    .Where(t => t.TrangThai.ToLower() == "hoạt động" && (
+                        t.MaTbd.ToLower().Contains(searchLower) ||
+                        // Kỹ thuật kiểm tra NULL an toàn cho EF Core
+                        (t.MaBdNavigation != null && (
+                             t.MaBdNavigation.Ten.ToLower().Contains(searchLower) ||
+                             t.MaBdNavigation.HoDem.ToLower().Contains(searchLower)
+                        ))
+                    ))
+                    .Select(t => new
+                    {
+                        t.MaTbd,
+                        // Kỹ thuật kiểm tra NULL an toàn khi tạo đối tượng ẩn danh
+                        HoTen = t.MaBdNavigation != null
+                                ? t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten
+                                : "(Bạn đọc không rõ)",
+                        t.NgayHetHan
+                    })
+                    .Take(10)
+                    .ToListAsync();
+
+                // 2. Định dạng dữ liệu (in-memory) và trả về Json
+                var formattedCards = activeCardsQuery.Select(t => new
                 {
                     t.MaTbd,
-                    HoTen = t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten,
-                    t.NgayHetHan // Lấy DateOnly? thô
-                })
-                .Take(10)
-                .ToListAsync(); // Thực thi truy vấn
+                    t.HoTen,
+                    NgayHetHan = t.NgayHetHan.HasValue
+                                 ? t.NgayHetHan.Value.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")
+                                 : ""
+                }).ToList();
 
-            // 2. Định dạng dữ liệu (in-memory) và trả về Json
-            var formattedCards = activeCardsQuery.Select(t => new
+                return Json(new { success = true, data = formattedCards });
+            }
+            catch (Exception ex)
             {
-                t.MaTbd,
-                t.HoTen,
-                // Ép kiểu an toàn (kiểm tra HasValue)
-                NgayHetHan = t.NgayHetHan.HasValue
-                             ? t.NgayHetHan.Value.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")
-                             : ""
-            }).ToList();
-
-            return Json(new { success = true, data = formattedCards });
+                // BẮT LỖI: Chuyển lỗi 500 thành phản hồi JSON success: false
+                return Json(new { success = false, message = "Lỗi server khi tìm kiếm Thẻ Bạn đọc: " + ex.Message });
+            }
         }
 
-        // Action: Tìm Bản sao tài liệu đang SẴN CÓ
+        // Action: Tìm Bản sao tài liệu đang SẴN CÓ (ĐÃ SỬA LỖI ROUTING)
         [HttpGet]
+        [Route("Tim-kiem-ban-sao")] // THÊM ROUTE
         public async Task<IActionResult> SearchAvailableBanSao(string searchTerm)
         {
-            if (string.IsNullOrEmpty(searchTerm))
+            try
             {
-                return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
-            }
-
-            var searchLower = searchTerm.Trim().ToLower();
-
-            var availableCopies = await _context.TBanSao
-                .Include(bs => bs.MaTlNavigation)
-                .Where(bs => bs.MaBs.ToLower().Contains(searchLower)
-                            || (bs.MaTlNavigation != null && bs.MaTlNavigation.TenTl.ToLower().Contains(searchLower)))
-                .Where(bs => !_context.TGiaoDichBanSao.Any(gdbs => gdbs.MaBs == bs.MaBs && gdbs.TinhTrang == false))
-                .Select(bs => new
+                if (string.IsNullOrEmpty(searchTerm))
                 {
-                    MaBs = bs.MaBs,
-                    TenTaiLieu = (bs.MaTlNavigation != null ? bs.MaTlNavigation.TenTl : "Không rõ tên tài liệu"),
-                    TrangThai = "Sẵn có"
-                })
-                .Take(10)
-                .ToListAsync();
+                    return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
+                }
 
-            return Json(new { success = true, data = availableCopies });
+                var searchLower = searchTerm.Trim().ToLower();
+
+                var availableCopies = await _context.TBanSao
+                    .Include(bs => bs.MaTlNavigation)
+                    .Where(bs => !_context.TGiaoDichBanSao.Any(gdbs => gdbs.MaBs == bs.MaBs && gdbs.TinhTrang == false))
+                    .Where(bs => bs.MaBs.ToLower().Contains(searchLower)
+                                 // Kỹ thuật kiểm tra NULL an toàn cho EF Core
+                                 || (bs.MaTlNavigation != null && bs.MaTlNavigation.TenTl.ToLower().Contains(searchLower)))
+                    .Select(bs => new
+                    {
+                        MaBs = bs.MaBs,
+                        // Kỹ thuật kiểm tra NULL an toàn khi tạo đối tượng ẩn danh
+                        TenTaiLieu = (bs.MaTlNavigation != null ? bs.MaTlNavigation.TenTl : "Không rõ tên tài liệu"),
+                        TrangThai = "Sẵn có"
+                    })
+                    .Take(10)
+                    .ToListAsync();
+
+                return Json(new { success = true, data = availableCopies });
+            }
+            catch (Exception ex)
+            {
+                // BẮT LỖI: Chuyển lỗi 500 thành phản hồi JSON success: false
+                return Json(new { success = false, message = "Lỗi server khi tìm kiếm Bản sao: " + ex.Message });
+            }
         }
 
         // --- HÀM PRIVATE HỖ TRỢ SINH MÃ ---
@@ -300,11 +350,19 @@ namespace Library_Manager.Controllers
         {
             if (id == null) return NotFound();
 
-            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra.FindAsync(id);
+            // Eager load các thuộc tính cần thiết cho view (Bạn đọc và Danh sách bản sao)
+            var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra
+                .Include(t => t.MaTbdNavigation)
+                    .ThenInclude(tbd => tbd.MaBdNavigation)
+                .Include(t => t.TGiaoDichBanSao) // Load chi tiết các bản sao
+                    .ThenInclude(gdbs => gdbs.MaBsNavigation)
+                        .ThenInclude(bs => bs.MaTlNavigation) // Load tên tài liệu
+                .FirstOrDefaultAsync(m => m.MaGd == id);
+
             if (tGiaoDichMuonTra == null) return NotFound();
 
-            ViewData["MaTbd"] = new SelectList(_context.TTheBanDoc, "MaTbd", "MaTbd", tGiaoDichMuonTra.MaTbd);
-            ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk", tGiaoDichMuonTra.MaTk);
+            // Không cần ViewData cho MaTbd và MaTk vì chúng được ẩn/tự động gán
+
             return View(tGiaoDichMuonTra);
         }
 
@@ -312,14 +370,68 @@ namespace Library_Manager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Chinh-sua/{id}")]
+        // Cần Bind tất cả các trường khóa ngoại và các trường dữ liệu cần thiết
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "MaTbd and NgayMuon are required for entity binding.")]
         public async Task<IActionResult> Edit(string id, [Bind("MaGd,MaTbd,MaTk,NgayMuon,NgayHenTra,NgayTra,TrangThai")] TGiaoDichMuonTra tGiaoDichMuonTra)
         {
             if (id != tGiaoDichMuonTra.MaGd) return NotFound();
+
+            // 1. Lấy MaTK từ người dùng đang đăng nhập VÀ CẬP NHẬT
+            var loggedInMaTk = HttpContext.Session.GetString("MaTk");
+            if (string.IsNullOrEmpty(loggedInMaTk))
+            {
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = "Lỗi hệ thống: <strong>Không tìm thấy Mã Tài khoản nhân viên đang đăng nhập.</strong> Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Cập nhật MaTk (Nhân viên xử lý) bằng người dùng đang đăng nhập
+            tGiaoDichMuonTra.MaTk = loggedInMaTk;
+
+            // Loại bỏ lỗi ModelState cho các trường được gán/quản lý tự động/ẩn
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaTk));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaTkNavigation));
+            ModelState.Remove(nameof(tGiaoDichMuonTra.MaTbdNavigation));
+
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // === LOGIC TỰ ĐỘNG CẬP NHẬT NGÀY TRẢ VÀ TRẠNG THÁI GIAO DỊCH ===
+
+                    // 1. Kiểm tra xem tất cả bản sao đã được trả hết chưa
+                    // TinhTrang == true (Đã trả)
+                    bool allCopiesReturned = await _context.TGiaoDichBanSao
+                        .Where(gdbs => gdbs.MaGd == tGiaoDichMuonTra.MaGd)
+                        .AllAsync(gdbs => gdbs.TinhTrang == true);
+
+                    // 2. Cập nhật ngày trả và trạng thái giao dịch chính
+                    if (allCopiesReturned)
+                    {
+                        // Nếu tất cả đã được trả, gán Ngày Trả thực tế là ngày hôm nay
+                        tGiaoDichMuonTra.NgayTra = DateOnly.FromDateTime(DateTime.Now);
+
+                        // Cập nhật trạng thái giao dịch chính thành "Đã trả"
+                        if (tGiaoDichMuonTra.TrangThai != "Đã trả")
+                        {
+                            tGiaoDichMuonTra.TrangThai = "Đã trả";
+                        }
+                    }
+                    else
+                    {
+                        // Nếu vẫn còn sách chưa trả, đảm bảo Ngày Trả là NULL
+                        tGiaoDichMuonTra.NgayTra = null;
+
+                        // Nếu người dùng lỡ chọn trạng thái là "Đã trả" nhưng chưa trả hết, đặt lại
+                        if (tGiaoDichMuonTra.TrangThai == "Đã trả")
+                        {
+                            tGiaoDichMuonTra.TrangThai = "Đang mượn";
+                        }
+                    }
+                    // ====================================================================
+
+                    // 3. Tiến hành Update
                     _context.Update(tGiaoDichMuonTra);
                     await _context.SaveChangesAsync();
 
@@ -336,24 +448,27 @@ namespace Library_Manager.Controllers
                     {
                         TempData["StatusMessage"] = "danger";
                         TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng thử lại.";
-                        return View(tGiaoDichMuonTra);
+                        return RedirectToAction(nameof(Edit), new { id = id });
                     }
                 }
                 catch (Exception ex)
                 {
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = "Lỗi hệ thống khi lưu: <strong>" + ex.Message + "</strong>";
-                    return View(tGiaoDichMuonTra);
+                    return RedirectToAction(nameof(Edit), new { id = id });
                 }
                 return RedirectToAction(nameof(Index));
             }
 
+            // Xử lý ModelState không hợp lệ. Gọi lại GET Edit để hiển thị View với dữ liệu đầy đủ và Validation Error
             TempData["StatusMessage"] = "danger";
             var errors = ModelState.Where(x => x.Value.Errors.Any())
-                   .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                                    .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
             TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
 
-            return View(tGiaoDichMuonTra);
+            // Phải gọi lại action Edit (GET) để load lại các Navigation Properties (MaTbdNavigation, TGiaoDichBanSao)
+            // trước khi trả về View
+            return await Edit(id);
         }
 
         // GET: GiaoDichMuonTra/Delete/5
@@ -363,9 +478,16 @@ namespace Library_Manager.Controllers
             if (id == null) return NotFound();
 
             var tGiaoDichMuonTra = await _context.TGiaoDichMuonTra
+                // 1. Load thông tin Thẻ Bạn đọc (MaTbdNavigation)
                 .Include(t => t.MaTbdNavigation)
+                    // 2. TỪ Thẻ Bạn đọc, load thông tin Bạn đọc (MaBdNavigation)
+                    // (Đã thêm ThenInclude để lấy Tên bạn đọc)
+                    .ThenInclude(tbd => tbd.MaBdNavigation)
+
+                // 3. Load thông tin Tài khoản (MaTkNavigation)
                 .Include(t => t.MaTkNavigation)
                 .FirstOrDefaultAsync(m => m.MaGd == id);
+
             if (tGiaoDichMuonTra == null) return NotFound();
 
             return View(tGiaoDichMuonTra);
@@ -405,6 +527,75 @@ namespace Library_Manager.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [Route("Cap-nhat-tinh-trang-ban-sao")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBanSaoStatus(string maGd, string maBs, bool tinhTrang)
+        {
+            try
+            {
+                // 1. Tìm chi tiết giao dịch bản sao
+                var giaoDichBanSao = await _context.TGiaoDichBanSao
+                    .FirstOrDefaultAsync(gdbs => gdbs.MaGd == maGd && gdbs.MaBs == maBs);
+
+                if (giaoDichBanSao == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bản sao trong giao dịch này." });
+                }
+
+                // 2. Cập nhật tình trạng
+                giaoDichBanSao.TinhTrang = tinhTrang;
+                _context.TGiaoDichBanSao.Update(giaoDichBanSao);
+
+                // 3. Nếu đánh dấu là "Đã trả", cập nhật trạng thái bản sao trong bảng TBanSao
+                if (tinhTrang) // true = Đã trả
+                {
+                    var banSao = await _context.TBanSao.FindAsync(maBs);
+                    if (banSao != null)
+                    {
+                        banSao.TrangThai = "Sẵn có"; // Hoặc "Có sẵn" tùy quy ước của bạn
+                        _context.TBanSao.Update(banSao);
+                    }
+                }
+
+                // 4. Lưu thay đổi
+                await _context.SaveChangesAsync();
+
+                // 5. Kiểm tra xem tất cả bản sao đã được trả hết chưa để tự động cập nhật trạng thái giao dịch
+                bool allCopiesReturned = await _context.TGiaoDichBanSao
+                    .Where(gdbs => gdbs.MaGd == maGd)
+                    .AllAsync(gdbs => gdbs.TinhTrang == true);
+
+                if (allCopiesReturned)
+                {
+                    // Tự động cập nhật trạng thái giao dịch chính
+                    var giaoDich = await _context.TGiaoDichMuonTra.FindAsync(maGd);
+                    if (giaoDich != null)
+                    {
+                        giaoDich.NgayTra = DateOnly.FromDateTime(DateTime.Now);
+                        giaoDich.TrangThai = "Đã trả";
+                        _context.TGiaoDichMuonTra.Update(giaoDich);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Đã cập nhật tình trạng bản sao {maBs} thành công.",
+                    allReturned = allCopiesReturned
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Lỗi khi cập nhật: {ex.Message}"
+                });
+            }
         }
 
         private bool TGiaoDichMuonTraExists(string id)

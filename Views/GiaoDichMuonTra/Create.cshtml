@@ -6,6 +6,12 @@
 }
 
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* KHỐI HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (ĐẢM BẢO LUÔN TỒN TẠI) *@
+    <div id="alertPlaceholder" class="mb-4">
+        @* NỘI DUNG SẼ ĐƯỢC JS ĐIỀN VÀO KHI CÓ LỖI HOẶC HIỂN THỊ LỖI RAZOR *@
+    </div>
+
     <h1 class="fw-bold text-primary mb-4">
         <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> @ViewData["Title"]
     </h1>
@@ -22,8 +28,7 @@
                 @* Các trường ẩn tự động điền trong Controller *@
                 <input type="hidden" asp-for="MaGd" />
                 <input type="hidden" asp-for="MaTk" />
-                <input type="hidden" asp-for="NgayTra" /> @* NgayTra là NULL khi tạo *@
-                @* Ẩn luôn trạng thái, vì mặc định là 'Đang mượn' *@
+                <input type="hidden" asp-for="NgayTra" />
                 <input type="hidden" asp-for="TrangThai" value="Đang mượn" />
 
                 <div class="row">
@@ -49,13 +54,13 @@
                         @* Ngày Mượn (Không chỉnh sửa, mặc định là hôm nay) *@
                         <div class="mb-3">
                             <label asp-for="NgayMuon" class="form-label">Ngày Mượn</label>
-                            <input asp-for="NgayMuon" class="form-control" type="date" readonly />
+                            <input asp-for="NgayMuon" class="form-control" type="date" value="@Model.NgayMuon.ToString("yyyy-MM-dd")" readonly />
                         </div>
 
                         @* Ngày Hẹn Trả *@
                         <div class="mb-3">
                             <label asp-for="NgayHenTra" class="form-label">Ngày Hẹn Trả</label>
-                            <input asp-for="NgayHenTra" class="form-control" type="date" />
+                            <input asp-for="NgayHenTra" class="form-control" type="date" value="@Model.NgayHenTra.ToString("yyyy-MM-dd")" />
                             <span asp-validation-for="NgayHenTra" class="text-danger"></span>
                         </div>
 
@@ -102,14 +107,12 @@
                         @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                         {
                             <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
-                                @* Sử dụng btn-secondary cho Quay lại *@
                                 <i class="bx bx-arrow-back me-1"></i> Quay lại
                             </a>
                         }
                         else
                         {
                             <a asp-action="Index" class="btn btn-outline-primary">
-                                @* Sử dụng btn-secondary cho Quay lại *@
                                 <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                             </a>
                         }
@@ -125,8 +128,6 @@
     </div> @* End card *@
 </div> @* End container-xxl *@
 
----
-## 🔍 Modal và Scripts (Giữ nguyên)
 
 @* ========================================================================
     MODAL CHỌN THẺ BẠN ĐỌC (Giữ nguyên)
@@ -166,18 +167,34 @@
     </div>
 </div>
 
----
-## ⚙️ Scripts (Giữ nguyên)
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-        $(document).ready(function () {
+        // Hàm hiển thị thông báo (Toast/Alert)
+        function showToast(message, type = 'success') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            if (!alertPlaceholder) return;
+            alertPlaceholder.innerHTML = '';
 
-            // --- Xử lý chọn Thẻ Bạn đọc ---
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('');
+            alertPlaceholder.appendChild(wrapper);
+        }
+
+        $(document).ready(function () {
+            const createForm = document.getElementById('createGdForm');
+            const submitButton = document.getElementById('submitButton');
+
+
+            // --- 1. Xử lý chọn Thẻ Bạn đọc (AJAX) ---
             $('#searchTbdBtn').click(function () {
                 var searchTerm = $('#tbdSearchTerm').val();
                 $.ajax({
@@ -186,7 +203,7 @@
                     data: { searchTerm: searchTerm },
                     success: function (response) {
                         var tbody = $('#tbdTableBody');
-                        tbody.empty(); // Xóa kết quả cũ
+                        tbody.empty();
 
                         if (response.success && response.data.length > 0) {
                             $.each(response.data, function (index, item) {
@@ -204,6 +221,7 @@
                         }
                     },
                     error: function () {
+                        // Lỗi AJAX server side
                         alert("Đã xảy ra lỗi khi tìm kiếm Thẻ Bạn đọc.");
                     }
                 });
@@ -219,8 +237,7 @@
                 $('#tbdSearchModal').modal('hide'); // Đóng modal
             });
 
-
-            // --- Xử lý tìm và chọn Bản sao ---
+            // --- 2. Xử lý tìm và chọn Bản sao (AJAX) ---
             $('#searchBanSaoBtn').click(function () {
                 var searchTerm = $('#banSaoSearchTerm').val();
                 if (searchTerm.length < 2) {
@@ -239,7 +256,6 @@
                         if (response.success && response.data.length > 0) {
                             resultsHtml += '<ul class="list-group">';
                             $.each(response.data, function (index, item) {
-                                // Kiểm tra xem bản sao đã được chọn chưa
                                 var isSelected = $('#selectedBanSaoList input[value="' + item.maBs + '"]').length > 0;
                                 var buttonHtml = isSelected ?
                                     '<span class="badge bg-primary">Đã thêm</span>' :
@@ -257,6 +273,7 @@
                         $('#banSaoSearchResults').html(resultsHtml);
                     },
                     error: function () {
+                        // Lỗi AJAX server side
                         $('#banSaoSearchResults').html('<div class="alert alert-danger">Lỗi khi tìm kiếm Bản sao.</div>');
                     }
                 });
@@ -295,6 +312,46 @@
                     currentResultItem.replaceWith('<button type="button" class="btn btn-sm btn-outline-primary select-bs-btn" data-mabs="' + maBsToRemove + '" data-tentl="' + tenTl + '">Thêm</button>');
                 }
             });
+
+            // --- 3. Logic Vô hiệu hóa nút và Hiển thị thông báo lỗi (BỔ SUNG) ---
+
+            // Logic 3a: Vô hiệu hóa nút khi submit
+            if (createForm && submitButton) {
+                createForm.addEventListener('submit', function (e) {
+                    if ($(createForm).valid()) {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+                    }
+                });
+            }
+
+            // Logic 3b: Hiển thị thông báo từ TempData (chạy khi Controller return View)
+            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
+            {
+                    if (TempData["StatusMessage"].ToString() == "danger")
+                    {
+                            <text>
+                                setTimeout(function() {
+                                    // Hiển thị toast
+                                    showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+                                    // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                                    if (submitButton) {
+                                        submitButton.disabled = false;
+                                        submitButton.innerHTML = '<i class="bx bx-plus me-1"></i> Tạo mới Giao dịch';
+                                    }
+                                }, 10);
+                            </text>
+                    }
+                    // Trường hợp nếu Controller vô tình redirect success về đây (tránh lỗi JS)
+                    else if (TempData["StatusMessage"].ToString() == "success")
+                    {
+                             <text>
+                                setTimeout(function() {
+                                    showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+                                }, 10);
+                            </text>
+                    }
+            }
         });
     </script>
-}
+}y

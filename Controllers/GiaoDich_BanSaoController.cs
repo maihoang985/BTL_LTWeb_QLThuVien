@@ -84,19 +84,24 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichBanSao/Edit/5
-        [Route("Chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(string id)
+        [Route("Chinh-sua/{id}/{maBs}")] // Đảm bảo route nhận cả MaBs
+        public async Task<IActionResult> Edit(string id, string maBs) // Đảm bảo hàm nhận cả maBs
         {
-            if (id == null)
+            if (id == null || maBs == null) // Kiểm tra cả hai khóa
             {
                 return NotFound();
             }
 
-            var tGiaoDichBanSao = await _context.TGiaoDichBanSao.FindAsync(id);
+            // *** SỬA LỖI KHÓA KÉP: Sử dụng cả hai khóa để Find ***
+            var tGiaoDichBanSao = await _context.TGiaoDichBanSao.FindAsync(id, maBs);
+
             if (tGiaoDichBanSao == null)
             {
                 return NotFound();
             }
+
+            // Load navigation properties cần thiết (nếu có)
+            // Giữ nguyên ViewData cho MaBs và MaGd nếu cần SelectList (nhưng thường không cần trong Edit chi tiết)
             ViewData["MaBs"] = new SelectList(_context.TBanSao, "MaBs", "MaBs", tGiaoDichBanSao.MaBs);
             ViewData["MaGd"] = new SelectList(_context.TGiaoDichMuonTra, "MaGd", "MaGd", tGiaoDichBanSao.MaGd);
             return View(tGiaoDichBanSao);
