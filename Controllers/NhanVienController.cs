@@ -25,7 +25,7 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // GET: NhanVien/Index
+        // GET: NhanVien/Index & Details & Edit (Giữ nguyên)
         // =======================================================
         [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
@@ -64,8 +64,17 @@ namespace Library_Manager.Controllers
             return View(tNhanVien);
         }
 
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null) { return NotFound(); }
+            var tNhanVien = await _context.TNhanVien.FindAsync(id);
+            if (tNhanVien == null) { return NotFound(); }
+            await PopulatePhuTrachDropDownList(tNhanVien.PhuTrach);
+            return View(tNhanVien);
+        }
+
         // =======================================================
-        // GET: NhanVien/Create
+        // GET: NhanVien/Create (Giữ nguyên)
         // =======================================================
         [Route("Tao-moi")]
         public async Task<IActionResult> Create()
@@ -75,7 +84,7 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // POST: NhanVien/Create (Thêm logic sinh mã và xử lý lỗi)
+        // POST: NhanVien/Create (ĐÃ HOÀN THIỆN)
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -83,25 +92,35 @@ namespace Library_Manager.Controllers
         [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
+            // Loại bỏ MaNv khỏi ModelState vì nó được sinh tự động
             ModelState.Remove("MaNv");
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // === LOGIC SINH MÃ TỰ ĐỘNG ===
+                    // === LOGIC SINH MÃ TỰ ĐỘNG BẰNG STORED PROCEDURE ===
+                    // Khai báo tham số Output: MaNv là CHAR(7)
                     var newMaNvParam = new SqlParameter("@NewMaNV", SqlDbType.Char, 7) { Direction = ParameterDirection.Output };
+
+                    // Thực thi Stored Procedure
                     await _context.Database.ExecuteSqlRawAsync(
                         "EXEC SP_GenerateNewMaNV @NewMaNV OUTPUT",
                         newMaNvParam
                     );
+
                     var newMaNvValue = newMaNvParam.Value;
 
                     if (newMaNvValue == DBNull.Value || string.IsNullOrEmpty(newMaNvValue.ToString()))
                     {
+                        // Stored procedure RAISERROR hoặc đạt giới hạn 99
                         throw new InvalidOperationException("Không thể sinh Mã Nhân viên mới (Đã đạt giới hạn/Lỗi hệ thống).");
                     }
-                    tNhanVien.MaNv = newMaNvValue.ToString();
+
+                    // 🌟 KHẮC PHỤC: Loại bỏ khoảng trắng đệm (padding) của kiểu CHAR(7)
+                    // Đảm bảo Mã NV không bị thừa khoảng trắng, giữ nguyên dấu '-'
+                    string maNvString = newMaNvValue.ToString();
+                    tNhanVien.MaNv = maNvString.Trim();
                     // ==============================
 
                     _context.Add(tNhanVien);
@@ -160,6 +179,7 @@ namespace Library_Manager.Controllers
 
         // =======================================================
         // POST: NhanVien/Edit/5
+        // POST: NhanVien/Edit/5 (Giữ nguyên)
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -172,7 +192,6 @@ namespace Library_Manager.Controllers
             {
                 try
                 {
-                    // Lấy bản ghi gốc để tránh lỗi tracking/concurrency
                     var originalNhanVien = await _context.TNhanVien
                         .AsNoTracking()
                         .FirstOrDefaultAsync(m => m.MaNv == id);
@@ -182,7 +201,6 @@ namespace Library_Manager.Controllers
                     _context.Update(tNhanVien);
                     await _context.SaveChangesAsync();
 
-                    // THÀNH CÔNG -> Redirect về Index
                     TempData["StatusMessage"] = "success";
                     TempData["Message"] = $"Thông tin Nhân viên <strong>{tNhanVien.HoDem} {tNhanVien.Ten}</strong> (Mã: <strong>{tNhanVien.MaNv}</strong>) đã được cập nhật thành công.";
                     return RedirectToAction(nameof(Index));
@@ -220,12 +238,12 @@ namespace Library_Manager.Controllers
                    .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}").ToList();
                 TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
-            await PopulatePhuTrachDropDownList(tNhanVien.PhuTrach); // Tải lại Dropdown
-            return View(tNhanVien); // Trả về View để hiển thị lỗi
+            await PopulatePhuTrachDropDownList(tNhanVien.PhuTrach);
+            return View(tNhanVien);
         }
 
         // =======================================================
-        // GET: NhanVien/Delete/5
+        // GET & POST: NhanVien/Delete/5 (Giữ nguyên)
         // =======================================================
         [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
@@ -236,9 +254,6 @@ namespace Library_Manager.Controllers
             return View(tNhanVien);
         }
 
-        // =======================================================
-        // POST: NhanVien/Delete/5
-        // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Route("Xoa/{id}")]
@@ -252,19 +267,16 @@ namespace Library_Manager.Controllers
                     _context.TNhanVien.Remove(tNhanVien);
                     await _context.SaveChangesAsync();
 
-                    // THÀNH CÔNG -> Redirect về Index
                     TempData["StatusMessage"] = "success";
                     TempData["Message"] = $"Đã xóa Nhân viên có Mã: <strong>{id}</strong> thành công.";
                 }
-                catch (DbUpdateException) // Lỗi khóa ngoại
+                catch (DbUpdateException)
                 {
-                    // LỖI -> Redirect về Index (Hiển thị lỗi trên Index)
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = $"Không thể xóa Nhân viên <strong>{id}</strong> vì đang có dữ liệu (tài khoản, tài liệu) tham chiếu đến.";
                 }
                 catch (Exception ex)
                 {
-                    // LỖI -> Redirect về Index
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = $"Lỗi hệ thống khi xóa: <strong>{ex.Message}</strong>";
                 }
@@ -277,7 +289,7 @@ namespace Library_Manager.Controllers
             return _context.TNhanVien.Any(e => e.MaNv == id);
         }
 
-        // HELPER: Lấy danh sách Phụ trách duy nhất cho Dropdown
+        // HELPER: Lấy danh sách Phụ trách duy nhất cho Dropdown 
         private async Task PopulatePhuTrachDropDownList(object selectedPhuTrach = null)
         {
             var phuTrachList = await _context.TNhanVien

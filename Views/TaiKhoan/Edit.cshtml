@@ -3,12 +3,32 @@
 @{
     ViewData["Title"] = "Chỉnh sửa Tài khoản: " + Model.TenDangNhap;
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Lấy thông tin NV liên kết để hiển thị (READONLY)
+    var nhanVienLienKet = ViewBag.NhanVienLienKet as string;
+    var canEdit = true; // Giả định quyền chỉnh sửa đã được kiểm tra ở Controller
 }
+
+<style>
+    /* CSS để ẩn phần Đổi mật khẩu mặc định */
+    #passwordFields {
+        display: none;
+    }
+</style>
 
 @* ========================================================================
     KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
     ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* --- PHẦN HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (Khi Controller return View) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertPlaceholder" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -20,56 +40,42 @@
 
         @* HEADER CỦA CARD: Tên biểu mẫu đang chỉnh sửa *@
         <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Chỉnh sửa cho tài khoản: <span class="text-info fw-bold">@Model.TenDangNhap</span></h5>
+            <h5 class="card-title mb-0">Chỉnh sửa cho tài khoản: <span class="text-primary fw-bold">@Model.TenDangNhap</span></h5>
         </div>
 
-        <form asp-action="Edit">
+        <form asp-action="Edit" id="editTaiKhoanForm">
             @* BODY CỦA CARD: Chứa Biểu mẫu nhập liệu *@
             <div class="card-body">
 
                 @* Phần hiển thị lỗi tổng thể *@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-                @* Mã Tài khoản (Hidden Field) - Cần thiết cho việc chỉnh sửa *@
+                @* KHÓA CÁC TRƯỜNG CỐ ĐỊNH *@
                 <input type="hidden" asp-for="MaTk" />
+                <input type="hidden" asp-for="MaNv" />
+                <input type="hidden" asp-for="NgayTao" />
 
                 @* CHIA BIỂU MẪU THÀNH 2 CỘT *@
                 <div class="row">
 
-                    @* --- CỘT 1: THÔNG TIN ĐĂNG NHẬP (6/12) --- *@
+                    @* --- CỘT 1: THÔNG TIN CHUNG (6/12) --- *@
                     <div class="col-md-6 pt-3">
                         <h6 class="text-muted text-uppercase mb-3 mt-0">
-                            <i class='bx bxs-user-account me-1'></i> Thông tin Đăng nhập
+                            <i class='bx bxs-user-account me-1'></i> THÔNG TIN CHUNG
                         </h6>
 
-                        @* Tên Đăng nhập *@
+                        @* Mã Tài khoản (Readonly) *@
+                        <div class="mb-3">
+                            <label asp-for="MaTk" class="form-label">Mã Tài khoản</label>
+                            <input value="@Model.MaTk" class="form-control" readonly disabled />
+                        </div>
+
+                        @* Tên Đăng nhập (READONLY) *@
                         <div class="mb-3">
                             <label asp-for="TenDangNhap" class="form-label">Tên Đăng nhập</label>
-                            <input asp-for="TenDangNhap" class="form-control" />
+                            <input asp-for="TenDangNhap" class="form-control" readonly />
                             <span asp-validation-for="TenDangNhap" class="text-danger"></span>
                         </div>
-
-                        @* Mật khẩu *@
-                        <div class="mb-3">
-                            <label asp-for="MatKhau" class="form-label">Mật khẩu mới</label>
-                            <input asp-for="MatKhau" class="form-control" type="password" placeholder="Bỏ trống nếu không đổi" />
-                            <small class="form-text text-muted">Chỉ nhập nếu bạn muốn thay đổi mật khẩu.</small>
-                            <span asp-validation-for="MatKhau" class="text-danger"></span>
-                        </div>
-
-                        @* Ngày Tạo (Readonly) *@
-                        <div class="mb-3">
-                            <label asp-for="NgayTao" class="form-label">Ngày Tạo</label>
-                            <input asp-for="NgayTao" class="form-control" type="date" value="@Model.NgayTao.ToString("yyyy-MM-dd")" readonly />
-                            <span asp-validation-for="NgayTao" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    @* --- CỘT 2: QUYỀN & LIÊN KẾT (6/12) --- *@
-                    <div class="col-md-6 pt-3">
-                        <h6 class="text-muted text-uppercase mb-3 mt-0">
-                            <i class='bx bx-sitemap me-1'></i> Quyền & Liên kết
-                        </h6>
 
                         @* Vai trò (Select) *@
                         <div class="mb-3">
@@ -78,15 +84,6 @@
                                 <option value="">-- Chọn Vai trò --</option>
                             </select>
                             <span asp-validation-for="MaVt" class="text-danger"></span>
-                        </div>
-
-                        @* Nhân viên (Select) *@
-                        <div class="mb-3">
-                            <label asp-for="MaNv" class="form-label">Nhân viên liên kết</label>
-                            <select asp-for="MaNv" class="form-select" asp-items="ViewBag.MaNv">
-                                <option value="">-- Chọn Nhân viên --</option>
-                            </select>
-                            <span asp-validation-for="MaNv" class="text-danger"></span>
                         </div>
 
                         @* Trạng Thái (Select) *@
@@ -99,7 +96,62 @@
                             <span asp-validation-for="TrangThai" class="text-danger"></span>
                         </div>
                     </div>
-                </div>
+
+                    @* --- CỘT 2: ĐỔI MẬT KHẨU (6/12) --- *@
+                    <div class="col-md-6 pt-3">
+                        <h6 class="text-muted text-uppercase mb-3 mt-0">
+                            <i class='bx bx-lock-alt me-1'></i> ĐỔI MẬT KHẨU
+                        </h6>
+
+                        @* NÚT TOGGLE ĐỂ BẬT/TẮT PHẦN ĐỔI MẬT KHẨU *@
+                        <div class="mb-4">
+                            <label class="form-label">Bạn có muốn đổi mật khẩu?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="togglePasswordChange" />
+                                <label class="form-check-label" for="togglePasswordChange">
+                                    <span id="toggleText" class="text-danger fw-bold">Không đổi mật khẩu</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        @* KHỐI CHỨA CÁC TRƯỜNG MẬT KHẨU (MẶC ĐỊNH ẨN) *@
+                        <div id="passwordFields">
+                            @* Mật khẩu hiện tại (MatKhauHienTai) *@
+                            <div class="mb-3">
+                                @* ĐÃ BỎ form-password-toggle *@
+                                <label for="MatKhauHienTai" class="form-label">Mật khẩu hiện tại</label>
+                                <div class="input-group">
+                                    @* ĐÃ BỎ input-group-merge *@
+                                    <input id="MatKhauHienTai" name="MatKhauHienTai" class="form-control" type="password" placeholder="Nhập mật khẩu hiện tại" autocomplete="off" />
+
+                                    @* 🌟 ĐÃ CHUYỂN SANG NÚT TRONG SUỐT *@
+                                    <button type="button" class="btn border-0 bg-transparent text-secondary show-hide-password" title="Hiển thị/Ẩn mật khẩu" style="box-shadow: none;">
+                                        <i class="bx bx-hide"></i>
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">Bắt buộc nhập mật khẩu hiện tại để đổi mật khẩu mới.</small>
+                                <span id="MatKhauHienTaiError" class="text-danger"></span>
+                            </div>
+
+                            @* Mật khẩu mới (MatKhau) *@
+                            <div class="mb-3">
+                                @* ĐÃ BỎ form-password-toggle *@
+                                <label asp-for="MatKhau" class="form-label">Mật khẩu mới</label>
+                                <div class="input-group">
+                                    @* ĐÃ BỎ input-group-merge *@
+                                    <input asp-for="MatKhau" id="MatKhauMoi" class="form-control" type="password" placeholder="Nhập mật khẩu mới" autocomplete="off" />
+
+                                    @* 🌟 ĐÃ CHUYỂN SANG NÚT TRONG SUỐT *@
+                                    <button type="button" class="btn border-0 bg-transparent text-secondary show-hide-password" title="Hiển thị/Ẩn mật khẩu" style="box-shadow: none;">
+                                        <i class="bx bx-hide"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="MatKhau" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div> @* End row *@
+
             </div> @* End card-body *@
 
             @* FOOTER CỦA CARD: Nút Lưu, Quay lại và Chi tiết *@
@@ -107,7 +159,7 @@
                 <div class="d-flex justify-content-between">
 
                     @* KHỐI NÚT TRÁI (Quay lại) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 
@@ -115,16 +167,15 @@
                     <div class="d-flex gap-2">
 
                         @* NÚT LƯU *@
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary @(canEdit ? "" : "disabled")" id="submitButton">
                             <i class="bx bx-save me-1"></i> Lưu thay đổi
                         </button>
 
                         @* NÚT CHUYỂN QUA CHI TIẾT *@
-                        <a asp-action="Details" asp-route-id="@Model?.MaTk" class="btn btn-success">
+                        <a asp-action="Details" asp-route-id="@Model?.MaTk" class="btn btn-info">
                             <i class="bx bx-detail me-1"></i> Xem chi tiết
                         </a>
                     </div>
-
                 </div>
             </div>
         </form>
@@ -135,5 +186,165 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
 
+    <script>
+        // Hàm hiển thị thông báo lỗi tại chỗ (Không tự động ẩn)
+        function showToast(message, type = 'danger') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            if (!alertPlaceholder) return;
+            alertPlaceholder.innerHTML = '';
+
+            if (type === 'danger') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = [
+                    `<div class="alert alert-danger alert-dismissible" role="alert">`,
+                    `   <div>${message}</div>`,
+                    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                    '</div>'
+                ].join('');
+                alertPlaceholder.appendChild(wrapper);
+            }
+        }
+
+        // 🌟 HÀM TOGGLE MẬT KHẨU MỚI (Đồng bộ với Create)
+        function setupPasswordToggle() {
+            document.querySelectorAll('.show-hide-password').forEach(toggleButton => {
+
+                // Tìm input tương ứng (nằm ngay trước nút button trong input-group)
+                const passwordInput = toggleButton.previousElementSibling;
+
+                if (passwordInput && passwordInput.tagName === 'INPUT') {
+                    toggleButton.addEventListener('click', function () {
+                        const icon = toggleButton.querySelector('i');
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.className = 'bx bx-show';
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.className = 'bx bx-hide';
+                        }
+                    });
+                }
+            });
+        }
+        // ----------------------------------------------------
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const editForm = document.getElementById('editTaiKhoanForm');
+            const submitButton = document.getElementById('submitButton');
+
+            // Các input mật khẩu
+            const MatKhauHienTaiInput = document.getElementById('MatKhauHienTai');
+            const MatKhauMoiInput = document.getElementById('MatKhauMoi');
+            const MatKhauHienTaiError = document.getElementById('MatKhauHienTaiError');
+
+            // Các element mới
+            const togglePasswordChange = document.getElementById('togglePasswordChange');
+            const passwordFields = document.getElementById('passwordFields');
+            const toggleText = document.getElementById('toggleText');
+
+
+            // 1. Logic Toggle Mật khẩu (Không đổi)
+            const updatePasswordToggle = () => {
+                if (togglePasswordChange.checked) {
+                    // HIỂN THỊ
+                    passwordFields.style.display = 'block';
+                    toggleText.textContent = 'Có, tôi muốn đổi mật khẩu';
+                    toggleText.classList.remove('text-danger');
+                    toggleText.classList.add('text-success');
+                } else {
+                    // ẨN
+                    passwordFields.style.display = 'none';
+                    toggleText.textContent = 'Không đổi mật khẩu';
+                    toggleText.classList.remove('text-success');
+                    toggleText.classList.add('text-danger');
+
+                    // QUAN TRỌNG: Xóa giá trị để tránh Controller nhận giá trị trống/null
+                    if (MatKhauHienTaiInput) MatKhauHienTaiInput.value = "";
+                    if (MatKhauMoiInput) MatKhauMoiInput.value = "";
+
+                    // Xóa lỗi validation nếu có
+                    MatKhauHienTaiError.textContent = "";
+                    // Không cần tìm validation error vì nó không dùng jquery validation nữa
+                }
+            };
+
+            // Thiết lập trạng thái ban đầu và sự kiện change
+            updatePasswordToggle(); // Ẩn mặc định (do checkbox không checked khi load)
+            togglePasswordChange.addEventListener('change', updatePasswordToggle);
+
+
+            // 2. Thiết lập nút toggle cho các trường mật khẩu
+            setupPasswordToggle(); // 🌟 ÁP DỤNG HÀM MỚI Ở ĐÂY
+
+            // Xóa giá trị input mật khẩu khi load (đảm bảo chúng clear)
+            if (MatKhauHienTaiInput) MatKhauHienTaiInput.value = "";
+            if (MatKhauMoiInput) MatKhauMoiInput.value = "";
+
+
+            // 3. Logic vô hiệu hóa nút khi submit & Client-side validation cho Mật khẩu hiện tại (Giữ nguyên)
+            if (editForm && submitButton) {
+                editForm.addEventListener('submit', function(e) {
+
+                    // Kiểm tra chỉ khi MatKhau MỚI được nhập (Tức là toggle đã bật)
+                    if (togglePasswordChange.checked) {
+                        if (MatKhauMoiInput.value !== "") {
+                            if (MatKhauHienTaiInput.value === "") {
+                                // Ngăn submit nếu mật khẩu hiện tại trống
+                                e.preventDefault();
+                                MatKhauHienTaiError.textContent = "Bắt buộc nhập mật khẩu hiện tại khi muốn đổi mật khẩu mới.";
+                                return;
+                            }
+                            // Nếu MatKhauHienTai có giá trị, lỗi sẽ được Controller kiểm tra (server-side)
+                            MatKhauHienTaiError.textContent = "";
+                        } else if (MatKhauHienTaiInput.value !== "") {
+                            // Nếu nhập Mật khẩu Hiện tại nhưng Mật khẩu Mới trống
+                            e.preventDefault();
+                            showToast("Vui lòng nhập **Mật khẩu mới** khi đã nhập Mật khẩu hiện tại.");
+                            return;
+                        }
+                    } else {
+                        // Đảm bảo MatKhauMoi và MatKhauHienTai là trống khi toggle OFF
+                        if (MatKhauHienTaiInput) MatKhauHienTaiInput.value = "";
+                        if (MatKhauMoiInput) MatKhauMoiInput.value = "";
+                    }
+
+                    // Nếu validation của jQuery và logic mật khẩu đều OK
+                    // Lưu ý: Cần đảm bảo form valid cho các trường khác ngoài mật khẩu
+                    if ($(editForm).valid()) {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...';
+                    }
+                });
+            }
+
+            // 4. Logic hiển thị thông báo từ TempData (Giữ nguyên)
+            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
+            {
+                        <text>
+                            setTimeout(function() {
+                                const status = '@TempData["StatusMessage"]';
+                                const message = '@Html.Raw(TempData["Message"])';
+
+                                if (status === "danger") {
+                                    showToast(message, status);
+
+                                    // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                                    if (submitButton) {
+                                        submitButton.disabled = false;
+                                        submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
+                                    }
+
+                                    // Nếu lỗi liên quan đến mật khẩu, hãy bật toggle để người dùng thấy input
+                                    if (message.includes("Mật khẩu hiện tại không đúng") || message.includes("Mật khẩu xác nhận không khớp")) {
+                                        togglePasswordChange.checked = true;
+                                        updatePasswordToggle();
+                                    }
+                                }
+                            }, 10);
+                        </text>
+            }
+        });
+    </script>
+}
