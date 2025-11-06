@@ -6,9 +6,18 @@
 }
 
 @* ========================================================================
-   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+   KHỐI 1: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* --- PHẦN HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (Khi Controller return View) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertPlaceholder" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -39,13 +48,6 @@
                             <i class='bx bx-user me-1'></i> Thông tin cá nhân
                         </h6>
 
-                        @* Mã Nhân viên *@
-                        <div class="mb-3">
-                            <label asp-for="MaNv" class="form-label">Mã Nhân viên</label>
-                            <input asp-for="MaNv" class="form-control" />
-                            <span asp-validation-for="MaNv" class="text-danger"></span>
-                        </div>
-
                         @* Họ Đệm *@
                         <div class="mb-3">
                             <label asp-for="HoDem" class="form-label">Họ Đệm</label>
@@ -67,7 +69,7 @@
                             <span asp-validation-for="NgaySinh" class="text-danger"></span>
                         </div>
 
-                        @* Giới Tính (Sử dụng Select) - SỬA LỖI SQL TẠI ĐÂY *@
+                        @* Giới Tính (Sử dụng Select) *@
                         <div class="mb-3">
                             <label asp-for="GioiTinh" class="form-label">Giới Tính</label>
                             <select asp-for="GioiTinh" class="form-select">
@@ -106,10 +108,24 @@
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
-                        @* Phụ trách *@
+                        @* Phụ trách (Dropdownlist + Input text TÍNH NĂNG "KHÁC") *@
                         <div class="mb-3">
                             <label asp-for="PhuTrach" class="form-label">Phụ trách</label>
-                            <input asp-for="PhuTrach" class="form-control" />
+
+                            @* Dropdown hiển thị các giá trị đã có *@
+                            <select id="PhuTrachDropdown" class="form-select" asp-items="@(ViewData["PhuTrachList"] as SelectList)">
+                                <option value="">-- Chọn chức vụ hiện có --</option>
+                                <option value="Khac">-- Khác (Nhập thủ công) --</option> @* <-- Tùy chọn "Khác" *@
+                            </select>
+
+                            @* Input text (PhuTrach) - ẨN MẶC ĐỊNH, CHỈ HIỆN KHI CHỌN "KHÁC" *@
+                            <div id="PhuTrachInputContainer" style="display: none;">
+                                <input type="text" id="PhuTrachInput" class="form-control mt-2" placeholder="Nhập chức vụ mới" />
+                            </div>
+
+                            @* Input Hidden để đảm bảo giá trị luôn được bind, sử dụng cho trường hợp lỗi *@
+                            <input type="hidden" asp-for="PhuTrach" id="PhuTrachHidden" />
+
                             <span asp-validation-for="PhuTrach" class="text-danger"></span>
                         </div>
                     </div>
@@ -118,18 +134,17 @@
 
             @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
             <div class="card-footer border-top pt-3">
-                <div class="d-flex justify-content-start gap-3">
-                    @* Dùng justify-content-start vì chỉ có 2 nút *@
+                <div class="d-flex justify-content-between">
 
-                    @* NÚT TẠO MỚI *@
-                    <button type="submit" value="Create" class="btn btn-primary">
-                        <i class="bx bx-plus me-1"></i> Tạo mới
-                    </button>
-
-                    @* NÚT QUAY LẠI DANH SÁCH *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    @* NÚT QUAY LẠI DANH SÁCH (TRÁI) - Dùng btn-outline-primary *@
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
+
+                    @* NÚT TẠO MỚI (PHẢI) *@
+                    <button type="submit" value="Create" class="btn btn-primary" id="submitButton">
+                        <i class="bx bx-plus me-1"></i> Tạo mới
+                    </button>
                 </div>
             </div>
         </form>
@@ -140,4 +155,110 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Hàm hiển thị thông báo lỗi tại chỗ (Không tự động ẩn)
+        function showToast(message, type = 'danger') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            if (!alertPlaceholder) return;
+            alertPlaceholder.innerHTML = '';
+
+            if (type === 'danger') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = [
+                    `<div class="alert alert-danger alert-dismissible" role="alert">`,
+                    `   <div>${message}</div>`,
+                    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                    '</div>'
+                ].join('');
+                alertPlaceholder.appendChild(wrapper);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[asp-action="Create"]');
+            const submitButton = document.getElementById('submitButton');
+            const phuTrachDropdown = document.getElementById('PhuTrachDropdown');
+            const phuTrachInput = document.getElementById('PhuTrachInput');
+            const phuTrachInputContainer = document.getElementById('PhuTrachInputContainer');
+            const phuTrachHidden = document.getElementById('PhuTrachHidden');
+
+            // Hàm kiểm tra và cập nhật giao diện/giá trị input
+            function updatePhuTrachFields() {
+                const selectedValue = phuTrachDropdown.value;
+                const isOther = selectedValue === "Khac";
+
+                if (isOther) {
+                    // Nếu chọn "Khác", hiển thị ô nhập và sử dụng giá trị của nó cho hidden field
+                    phuTrachInputContainer.style.display = 'block';
+                    phuTrachHidden.value = phuTrachInput.value; // Dùng giá trị người dùng gõ
+                } else {
+                    // Nếu chọn chức vụ cụ thể (hoặc '-- Chọn...'), ẩn ô nhập và sử dụng giá trị dropdown
+                    phuTrachInputContainer.style.display = 'none';
+                    phuTrachInput.value = ''; // Xóa input text để tránh xung đột
+                    phuTrachHidden.value = selectedValue; // Dùng giá trị từ dropdown
+                }
+            }
+
+            // GÁN SỰ KIỆN: Bất cứ khi nào dropdown thay đổi, cập nhật trường ẩn
+            if (phuTrachDropdown) {
+                phuTrachDropdown.addEventListener('change', updatePhuTrachFields);
+            }
+
+            // GÁN SỰ KIỆN: Bất cứ khi nào input text thay đổi (chỉ khi chọn "Khác")
+            if (phuTrachInput) {
+                phuTrachInput.addEventListener('input', function() {
+                    if (phuTrachDropdown.value === "Khac") {
+                        phuTrachHidden.value = this.value; // Cập nhật giá trị gõ vào trường ẩn
+                    }
+                });
+            }
+
+            // KHỞI TẠO (Xử lý khi trang load lại do lỗi)
+            // Nếu Model.PhuTrach có giá trị nhưng không có trong dropdown, chọn "Khác" và hiển thị Input.
+            const initialValue = phuTrachHidden.value;
+            const isInitialValueInDropdown = Array.from(phuTrachDropdown.options).some(opt => opt.value === initialValue && initialValue !== "");
+
+            if (initialValue && !isInitialValueInDropdown) {
+                // Đây là giá trị nhập mới (lỗi). Ta phải chọn "Khác" và gán giá trị đó vào Input text.
+                phuTrachDropdown.value = "Khac";
+                phuTrachInput.value = initialValue;
+            }
+            // Chạy hàm cập nhật lần đầu để thiết lập giao diện (ẩn/hiện input)
+            updatePhuTrachFields();
+
+
+
+            // 1. Logic vô hiệu hóa nút khi submit
+            if (form && submitButton) {
+                form.addEventListener('submit', function() {
+                    // Đảm bảo cập nhật giá trị cuối cùng trước khi submit
+                    updatePhuTrachFields();
+                    if ($(form).valid()) {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
+                    }
+                });
+            }
+
+            // 2. Logic hiển thị thông báo từ TempData (chỉ chạy khi có lỗi)
+            @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
+            {
+                        if (TempData["StatusMessage"].ToString() == "danger")
+                        {
+                                    <text>
+                                        setTimeout(function() {
+                                            showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+
+                                            // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                                            if (submitButton) {
+                                                submitButton.disabled = false;
+                                                submitButton.innerHTML = '<i class="bx bx-plus me-1"></i> Tạo mới';
+                                            }
+                                        }, 10);
+                                    </text>
+                        }
+            }
+        });
+    </script>
 }

@@ -1,25 +1,29 @@
-﻿@* ========================================================================
-   KHỐI 1: KHAI BÁO MODEL VÀ VIEWDATA
-   ======================================================================== *@
-@using PagedList.Core.Mvc
+﻿@using PagedList.Core.Mvc
 @model PagedList.Core.IPagedList<Library_Manager.Models.TNhanVien>
 
 @{
     ViewData["Title"] = "Quản lý Nhân viên";
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var userRole = Context.Session.GetString("UserRole");
-    // Giả định "QTV" (Quản trị viên) và "QLNV" (Quản lý Nhân viên) có quyền chỉnh sửa
-    bool canEdit = (userRole == "QTV" || userRole == "QLNV");
+    bool canEdit = (userRole == "QTV"); // Chỉ QTV mới có quyền Edit/Delete/Create
 }
 
 @* ========================================================================
-   KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-   ======================================================================== *@
+   KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
+   ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* --- KHỐI HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (CHO THÀNH CÔNG/THẤT BẠI) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="indexAlertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
-        <i class='bx bx-user-pin fa-border fs-1 me-2'></i> Quản lý Nhân viên
+        <i class='bx bxs-user-badge fa-border fs-1 me-2'></i> Thông tin Nhân viên
     </h1>
 
     <div class="card">
@@ -27,7 +31,7 @@
         <div class="card-header border-bottom">
             <div class="d-flex justify-content-between align-items-center">
 
-                @* Thanh Tìm kiếm (SearchBar Partial) - Chiếm phần lớn không gian *@
+                @* Thanh Tìm kiếm (SearchBar Partial) *@
                 <div class="flex-grow-1 me-3">
                     <partial name="SearchBar" />
                 </div>
@@ -36,7 +40,7 @@
                 <div class="flex-shrink-0 ">
                     <p class="m-0">
                         <a asp-action="Create" class="btn btn-primary text-nowrap @(canEdit ? "" : "disabled")">
-                            <i class="bx bx-plus me-1"></i> Thêm Nhân viên
+                            <i class="bx bx-plus me-1"></i> Thêm Nhân viên mới
                         </a>
                     </p>
                 </div>
@@ -44,81 +48,62 @@
         </div>
 
         @* ========================================================================
-           KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
-           ======================================================================== *@
+           KHỐI 3: BẢNG DỮ LIỆU VÀ PHÂN TRANG
+           ======================================================================== *@
         <div class="table-responsive">
             <table class="table table-bordered text-nowrap table-hover" id="myTable">
 
                 @* --- PHẦN 3.1: TIÊU ĐỀ BẢNG (THEAD) --- *@
                 <thead id="myTableHead">
                     <tr>
-                        <th>Mã NV</th>
-                        <th style="white-space: nowrap;">Họ Đệm</th>
-                        <th>Tên</th>
-                        <th>Ngày Sinh</th>
-                        <th style="white-space: nowrap;">Giới Tính</th>
-                        <th>SĐT</th>
+                        <th style="min-width: 80px;">Mã NV</th>
+                        <th style="white-space: nowrap;">Họ Tên</th>
+                        <th>Phụ trách</th>
                         <th>Email</th>
+                        <th style="white-space: nowrap;">SĐT</th>
                         <th style="min-width: 120px;">Hành động</th>
                     </tr>
                 </thead>
 
                 @* --- PHẦN 3.2: NỘI DUNG BẢNG (TBODY) --- *@
                 <tbody>
-                    @if (Model.Any())
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.MaNv</td>
-                                <td style="white-space: nowrap;">@item.HoDem</td>
-                                <td>@item.Ten</td>
-                                <td>@item.NgaySinh.ToString("dd/MM/yyyy")</td>
-                                <td style="white-space: nowrap;">
-                                    @{
-                                        var gioiTinh = (item.GioiTinh == "M" ? "Nam" : item.GioiTinh == "F" ? "Nữ" : "-");
-                                        var badgeClass = gioiTinh == "Nam" ? "bg-label-info" :
-                                        gioiTinh == "Nữ" ? "bg-label-danger" :
-                                        "bg-label-secondary";
-                                    }
-                                    <span class="badge @badgeClass">
-                                        @gioiTinh
-                                    </span>
-                                </td>
-                                <td>@item.Sdt</td>
-                                <td>@item.Email</td>
-                                <td>
-                                    <div class="d-flex w-100 justify-content-start">
-
-                                        @* 1. Chi tiết (Details) *@
-                                        <a asp-action="Details" asp-route-id="@item.MaNv"
-                                           class="btn btn-icon btn-label-info waves-effect me-1"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
-                                            <i class='bx bx-detail'></i>
-                                        </a>
-
-                                        @* 2. Sửa (Edit) *@
-                                        <a asp-action="Edit" asp-route-id="@item.MaNv"
-                                           class="btn btn-icon btn-label-primary waves-effect me-1 @(canEdit ? "" : "disabled")"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
-                                            <i class='bx bx-pencil'></i>
-                                        </a>
-
-                                        @* 3. Xóa (Delete) *@
-                                        <a asp-action="Delete" asp-route-id="@item.MaNv"
-                                           class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
-                                            <i class='bx bx-trash'></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
+                    @foreach (var item in Model)
                     {
                         <tr>
-                            <td colspan="8" class="text-center text-muted">Không có dữ liệu</td>
+                            <td>
+                                <span class="badge bg-label-info">
+                                    @Html.DisplayFor(modelItem => item.MaNv)
+                                </span>
+                            </td>
+                            <td style="white-space: nowrap;">@item.HoDem @item.Ten</td>
+                            <td>@Html.DisplayFor(modelItem => item.PhuTrach)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Sdt)</td>
+                            <td>
+                                <div class="d-flex w-100 justify-content-around">
+
+                                    @* 1. Chi tiết (Details) *@
+                                    <a asp-action="Details" asp-route-id="@item.MaNv"
+                                       class="btn btn-icon btn-label-info waves-effect"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết">
+                                        <i class='bx bx-detail'></i>
+                                    </a>
+
+                                    @* 2. Sửa (Edit) *@
+                                    <a asp-action="Edit" asp-route-id="@item.MaNv"
+                                       class="btn btn-icon btn-label-primary waves-effect @(canEdit ? "" : "disabled")"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Sửa">
+                                        <i class='bx bx-pencil'></i>
+                                    </a>
+
+                                    @* 3. Xóa (Delete) *@
+                                    <a asp-action="Delete" asp-route-id="@item.MaNv"
+                                       class="btn btn-icon btn-label-danger waves-effect @(canEdit ? "" : "disabled")"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+                                        <i class='bx bx-trash'></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -132,3 +117,27 @@
     </div>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alertElement = document.getElementById('indexAlertMessage');
+
+            // Chỉ chạy nếu có thông báo và là thông báo thành công
+            @if (TempData["StatusMessage"] != null && TempData["StatusMessage"].ToString() == "success")
+            {
+                    <text>
+                        if (alertElement) {
+                            // Tự động ẩn sau 5 giây (5000ms)
+                            setTimeout(() => {
+                                $(alertElement).alert('close');
+                            }, 5000);
+                        }
+                    </text>
+            }
+        });
+    </script>
+}

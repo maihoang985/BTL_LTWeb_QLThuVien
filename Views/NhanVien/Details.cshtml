@@ -9,7 +9,8 @@
 @{
     var gioiTinh = (Model.GioiTinh == "M" ? "Nam" : Model.GioiTinh == "F" ? "Nữ" : "-");
     var badgeClass = gioiTinh == "Nam" ? "bg-label-info" :
-                        gioiTinh == "Nữ" ? "bg-label-danger" :
+                        gioiTinh == "Nữ" ?
+                        "bg-label-danger" :
                         "bg-label-secondary";
 }
 @{
@@ -133,31 +134,31 @@
 
         </div>
 
-        @* FOOTER CỦA CARD: Chứa các nút Hành động *@
+        @* FOOTER CỦA CARD: Chứa các nút Hành động (Đã sửa bố cục) *@
         <div class="card-footer border-top pt-3">
-            <div class="d-flex gap-3">
-                @* Nút Sửa *@
-                <a asp-action="Edit" asp-route-id="@Model?.MaNv" class="btn btn-primary @(canEdit ? "" : "disabled")">
-                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
-                </a>
+            <div class="d-flex justify-content-between">
+                @* Sửa: Dùng justify-content-between *@
 
-                @* Nút Quay lại *@
+                @* Nút Quay lại (TRÁI) - Dùng btn-outline-primary *@
                 <div>
                     @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                     {
-                        // Nếu có returnUrl, quay lại trang đó
-                        <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
                             <i class="bx bx-arrow-back me-1"></i> Quay lại
                         </a>
                     }
                     else
                     {
-                        // Nếu không, quay về trang Index mặc định của BanDoc
-                        <a asp-action="Index" class="btn btn-secondary">
+                        <a asp-action="Index" class="btn btn-outline-primary">
                             <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                         </a>
                     }
                 </div>
+
+                @* KHỐI NÚT PHẢI (Sửa) *@
+                <a asp-action="Edit" asp-route-id="@Model?.MaNv" class="btn btn-primary @(canEdit ? "" : "disabled")">
+                    <i class="bx bx-pencil me-1"></i> Sửa thông tin
+                </a>
             </div>
         </div>
 
