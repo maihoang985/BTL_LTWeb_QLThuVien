@@ -1,8 +1,9 @@
 ﻿using Library_Manager.Helpers;
 using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // BẮT BUỘC: Thêm using này để có .Include()
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.AspNetCore.Http; // Đảm bảo có using này để dùng HttpContext.Session.GetString
 
 namespace Library_Manager.Controllers
 {
@@ -11,7 +12,6 @@ namespace Library_Manager.Controllers
     {
         private readonly QlthuVienContext _context;
 
-        // Inject DbContext qua constructor
         public AccountController(QlthuVienContext context)
         {
             _context = context;
@@ -26,7 +26,6 @@ namespace Library_Manager.Controllers
         [Route("~/")]
         public IActionResult Login()
         {
-            // SỬA ĐỔI: Kiểm tra Session "MaTk" (hoặc "UserName")
             if (HttpContext.Session.GetString("MaTk") != null)
             {
                 return RedirectToAction("Index", "Home");
@@ -43,8 +42,8 @@ namespace Library_Manager.Controllers
         {
             // --- BƯỚC 1: TRUY VẤN TÀI KHOẢN ---
             var taiKhoan = _context.TTaiKhoan
-                .Include(tk => tk.MaNvNavigation)  // JOIN tới TNhanVien
-                .Include(tk => tk.MaVtNavigation)  // JOIN tới TVaiTro
+                .Include(tk => tk.MaNvNavigation)
+                .Include(tk => tk.MaVtNavigation)
                 .FirstOrDefault(x => x.TenDangNhap == user.TenDangNhap);
 
             if (taiKhoan == null)
@@ -53,7 +52,7 @@ namespace Library_Manager.Controllers
                 return View();
             }
 
-            // --- BƯỚC 2: KIỂM TRA VÀ HASH MẬT KHẨU (Giữ nguyên logic của bạn) ---
+            // --- BƯỚC 2: KIỂM TRA VÀ HASH MẬT KHẨU ---
             if (!PasswordHelper.IsBase64String(taiKhoan.MatKhau))
             {
                 taiKhoan.MatKhau = PasswordHelper.HashPassword(taiKhoan.TenDangNhap, taiKhoan.MatKhau);
@@ -78,17 +77,16 @@ namespace Library_Manager.Controllers
 
                 // 3. LƯU TẤT CẢ THÔNG TIN CẦN THIẾT VÀO SESSION
                 HttpContext.Session.SetString("UserName", taiKhoan.TenDangNhap.ToString());
-                HttpContext.Session.SetString("UserRole", taiKhoan.MaVt.ToString()); // Dùng cho [Authorization]
+                HttpContext.Session.SetString("UserRole", taiKhoan.MaVt.ToString());
 
-                // === BỔ SUNG KEY MA TK VÀ THÔNG TIN CÁ NHÂN ===
-                HttpContext.Session.SetString("MaTk", taiKhoan.MaTk.ToString());     // KEY QUAN TRỌNG CHO HOMECONTROLLER
-                HttpContext.Session.SetString("MaNv", taiKhoan.MaNv ?? "");          // Mã Nhân viên (nếu có)
-                HttpContext.Session.SetString("hoTen", hoTen);                       // Họ tên đầy đủ (cho Navbar)
-                HttpContext.Session.SetString("tenVaiTro", tenVaiTro);               // Tên vai trò (cho Navbar)
+                // === LƯU KEY MA TK VÀ THÔNG TIN CÁ NHÂN ===
+                HttpContext.Session.SetString("MaTk", taiKhoan.MaTk.ToString());     // KEY QUAN TRỌNG ĐÃ ĐƯỢC CHUẨN HÓA
+                HttpContext.Session.SetString("MaNv", taiKhoan.MaNv ?? "");
+                HttpContext.Session.SetString("hoTen", hoTen);
+                HttpContext.Session.SetString("tenVaiTro", tenVaiTro);
                 // ==============================================
 
-                // Lưu tài khoản vào TempData để sử dụng trong HomeController (nếu cần)
-                HttpContext.Session.SetString("MaTk", taiKhoan.MaTk);
+                // BỎ DÒNG LƯU MA_TK LẶP LẠI (HttpContext.Session.SetString("MaTk", taiKhoan.MaTk);)
 
                 // Chuyển về trang chủ
                 return RedirectToAction("Index", "Home");
