@@ -10,12 +10,19 @@
     ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
 
+    @* --- PHẦN HIỂN THỊ THÔNG BÁO LỖI TỪ TEMP DATA (Khi Controller return View) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertPlaceholder" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     @* --- PHẦN 1.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
         <i class='bx bx-plus fs-2 me-2 border p-1 rounded-2'></i> Tạo mới thông tin bạn đọc
     </h1>
-
-    <div id="alertPlaceholder"></div>
 
     @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
     <div class="card">
@@ -110,33 +117,30 @@
                 </div>
             </div> @* End card-body *@
 
-            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại *@
+            @* FOOTER CỦA CARD: Nút Tạo mới và Quay lại (Đã sửa bố cục) *@
             <div class="card-footer border-top pt-3">
-                <div class="d-flex justify-content-start gap-3">
-                    @* Dùng justify-content-start vì chỉ có 2 nút *@
+                <div class="d-flex justify-content-between">
 
-                    @* NÚT TẠO MỚI (Thêm id="submitButton") *@
-                    <button type="submit" value="Create" class="btn btn-primary" id="submitButton">
-                        <i class="bx bx-plus me-1"></i> Tạo mới
-                    </button>
-
-                    @* NÚT QUAY LẠI DANH SÁCH *@
+                    @* NÚT QUAY LẠI DANH SÁCH (TRÁI) - Dùng btn-outline-primary *@
                     <div>
                         @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                         {
-                            // Nếu có returnUrl, quay lại trang đó
-                            <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                            <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
                                 <i class="bx bx-arrow-back me-1"></i> Quay lại
                             </a>
                         }
                         else
                         {
-                            // Nếu không, quay về trang Index mặc định 
-                            <a asp-action="Index" class="btn btn-secondary">
+                            <a asp-action="Index" class="btn btn-outline-primary">
                                 <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                             </a>
                         }
                     </div>
+
+                    @* NÚT TẠO MỚI (PHẢI) *@
+                    <button type="submit" value="Create" class="btn btn-primary" id="submitButton">
+                        <i class="bx bx-plus me-1"></i> Tạo mới
+                    </button>
 
                 </div>
             </div>
@@ -150,6 +154,23 @@
     }
 
     <script>
+        // Hàm hiển thị thông báo (Toast) - Dùng cho Create (khi return View)
+        function showToast(message, type = 'success') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            if (!alertPlaceholder) return;
+            alertPlaceholder.innerHTML = ''; // Xóa thông báo cũ (nếu có)
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('');
+            alertPlaceholder.appendChild(wrapper);
+            // KHÔNG TỰ ĐỘNG ẨN để người dùng đọc lỗi.
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form[asp-action="Create"]');
             const submitButton = document.getElementById('submitButton');
@@ -157,29 +178,31 @@
             // 1. Logic vô hiệu hóa nút khi submit
             if (form && submitButton) {
                 form.addEventListener('submit', function() {
-                    // Chỉ vô hiệu hóa nếu form hợp lệ (theo validation cơ bản của trình duyệt)
-                    if (form.checkValidity()) {
+                    if ($(form).valid()) { // Sử dụng jQuery Validate
                         submitButton.disabled = true;
                         submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
                     }
                 });
             }
 
-            // 2. Logic hiển thị thông báo từ TempData (mã của bạn)
+            // 2. Logic hiển thị thông báo từ TempData (chỉ chạy khi có lỗi)
             @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
             {
-                    <text>
-                    setTimeout(function() {
-                        // Hiển thị toast
-                        showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+                    if (TempData["StatusMessage"].ToString() == "danger")
+                    {
+                            <text>
+                                setTimeout(function() {
+                                    // Hiển thị toast
+                                    showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
 
-                        // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
-                        if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
-                            submitButton.disabled = false;
-                            submitButton.innerHTML = '<i class="bx bx-plus me-1"></i> Tạo mới';
-                        }
-                    }, 10);
-                    </text>
+                                    // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
+                                    if (submitButton) {
+                                        submitButton.disabled = false;
+                                        submitButton.innerHTML = '<i class="bx bx-plus me-1"></i> Tạo mới';
+                                    }
+                                }, 10);
+                            </text>
+                    }
             }
         });
     </script>

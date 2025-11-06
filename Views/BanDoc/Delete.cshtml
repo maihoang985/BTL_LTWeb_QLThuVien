@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Xóa Bạn đọc";
+    var tenDayDu = Model.HoDem + " " + Model.Ten;
 }
 
 @* ========================================================================
@@ -17,7 +18,10 @@
     @* --- KHỐI CẢNH BÁO XÓA --- *@
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">CẢNH BÁO QUAN TRỌNG!</h4>
-        <p>Bạn đang chuẩn bị **xóa vĩnh viễn** bạn đọc **@Model.HoDem @Model.Ten** (Mã: **@Model.MaBd**). Hành động này không thể hoàn tác.</p>
+        <p>
+            Bạn đang chuẩn bị <strong>xóa vĩnh viễn</strong> bạn đọc <strong>@tenDayDu</strong> (Mã: <strong>@Model.MaBd</strong>).
+            Hành động này không thể hoàn tác.
+        </p>
         <p class="mb-0">Vui lòng kiểm tra kỹ thông tin bên dưới trước khi xác nhận.</p>
     </div>
 
@@ -26,10 +30,10 @@
 
         @* HEADER CỦA CARD: Tên bạn đọc *@
         <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Chi tiết bạn đọc: <span class="text-danger fw-bold">@Model.HoDem @Model.Ten</span></h5>
+            <h5 class="card-title mb-0">Chi tiết bạn đọc: <span class="text-danger fw-bold">@tenDayDu</span></h5>
         </div>
 
-        @* BODY CỦA CARD: Hiển thị chi tiết (Dùng cấu trúc 2 cột như Details) *@
+        @* BODY CỦA CARD: Hiển thị chi tiết *@
         <div class="card-body">
 
             <div class="row">
@@ -81,14 +85,14 @@
 
         </div> @* End card-body *@
 
-        @* FOOTER CỦA CARD: Nút Xác nhận và Quay lại *@
+        @* FOOTER CỦA CARD: Nút Xác nhận và Quay lại (Đã sửa bố cục) *@
         <div class="card-footer border-top pt-3">
             <form asp-action="Delete">
                 <input type="hidden" asp-for="MaBd" />
                 <div class="d-flex justify-content-between">
 
-                    @* NÚT QUAY LẠI (TRÁI) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    @* NÚT QUAY LẠI (TRÁI) - Dùng btn-outline-primary *@
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 

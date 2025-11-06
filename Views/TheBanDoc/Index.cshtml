@@ -1,19 +1,22 @@
-﻿@* ========================================================================
-    KHỐI 1: KHAI BÁO MODEL VÀ VIEWDATA
-    ======================================================================== *@
-@using PagedList.Core.Mvc
+﻿@using PagedList.Core.Mvc
 @model PagedList.Core.IPagedList<Library_Manager.Models.TTheBanDoc>
 
 @{
-    ViewData["Title"] = "Quản lý Thẻ Bạn đọc"; // Tiêu đề trang
+    ViewData["Title"] = "Quản lý Thẻ Bạn đọc";
     var userRole = Context.Session.GetString("UserRole");
     bool canEdit = (userRole == "QTV" || userRole == "QLB");
 }
 
-@* ========================================================================
-    KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
-    ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* --- KHỐI HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (CHO THÀNH CÔNG/THẤT BẠI) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="indexAlertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -66,22 +69,20 @@
                         <tr>
                             <td style="white-space: nowrap;">@Html.DisplayFor(modelItem => item.MaTbd)</td>
                             <td style="white-space: nowrap;">
-                                @(item.MaBdNavigation != null
-                                                            ? item.MaBdNavigation.HoDem + " " + item.MaBdNavigation.Ten
-                                                            : "(Không có thông tin)")
-                        </td>
-                        <td>@item.NgayCap.ToString("dd/MM/yyyy")</td>
-                        <td>@item.NgayHetHan?.ToString("dd/MM/yyyy")</td>
-                        <td style="white-space: nowrap;">
-                            @{
-                                    var trangThai = item.TrangThai; // Giả sử TrangThai là string
-                                    var badgeClass = "bg-label-secondary"; // Mặc định
+                                @(item.MaBdNavigation != null ? item.MaBdNavigation.HoDem + " " + item.MaBdNavigation.Ten : "(Không có thông tin)")
+                            </td>
+                            <td>@item.NgayCap.ToString("dd/MM/yyyy")</td>
+                            <td>@item.NgayHetHan?.ToString("dd/MM/yyyy")</td>
+                            <td style="white-space: nowrap;">
+                                @{
+                                    var trangThai = item.TrangThai;
+                                    var badgeClass = "bg-label-secondary";
 
                                     if (trangThai == "Hoạt động" || trangThai == "Còn hạn")
                                     {
                                         badgeClass = "bg-label-success";
                                     }
-                                    else if (trangThai == "Đã khóa" || trangThai == "Hết hạn")
+                                    else if (trangThai == "Đã khóa" || trangThai == "Hết hạn" || trangThai == "Khóa")
                                     {
                                         badgeClass = "bg-label-danger";
                                     }
@@ -93,11 +94,11 @@
                             <td>
                                 <div class="d-flex w-100 justify-content-around">
 
-                                    @* 1. Chi tiết Bạn đọc (Link to TBanDoc) *@
+                                    @* 1. Chi tiết Thẻ (Details TTheBanDoc) *@
                                     <a asp-action="Details" asp-route-id="@item.MaTbd"
-                                       class="btn btn-icon btn-label-info waves-effect "
-                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết Thẻ bạn đọc">
-                                        <i class='bx bx-user'></i>
+                                       class="btn btn-icon btn-label-info waves-effect"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Chi tiết Thẻ">
+                                        <i class='bx bx-detail'></i>
                                     </a>
 
                                     @* 2. Sửa Thẻ (Edit TTheBanDoc) *@
@@ -127,3 +128,29 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alertElement = document.getElementById('indexAlertMessage');
+
+            // Chỉ chạy nếu có thông báo và là thông báo thành công
+            @if (TempData["StatusMessage"] != null && TempData["StatusMessage"].ToString() == "success")
+            {
+                    <text>
+                        if (alertElement) {
+                            // Tự động ẩn sau 5 giây (5000ms)
+                            setTimeout(() => {
+                                // Sử dụng Bootstrap/jQuery để ẩn alert
+                                $(alertElement).alert('close');
+                            }, 5000);
+                        }
+                    </text>
+            }
+        });
+    </script>
+}

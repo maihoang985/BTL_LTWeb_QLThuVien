@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Chỉnh sửa Thẻ Bạn đọc";
+    var userRole = Context.Session.GetString("UserRole");
+    bool canEdit = (userRole == "QTV" || userRole == "QLB");
 }
 
 @* ========================================================================
@@ -15,14 +17,20 @@
     </h1>
 
     @* Vị trí hiển thị thông báo (Toast/Alert) *@
-    <div id="alertPlaceholder"></div>
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertPlaceholder" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- KHỐI: CARD BAO QUANH BIỂU MẪU --- *@
     <div class="card">
 
         @* HEADER CỦA CARD: Tên biểu mẫu đang chỉnh sửa *@
         <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Chỉnh sửa thông tin cho thẻ: <span class="text-info fw-bold">@Model.MaTbd</span></h5>
+            <h5 class="card-title mb-0">Chỉnh sửa thông tin cho thẻ: <span class="text-primary fw-bold">@Model.MaTbd</span></h5>
         </div>
 
         @* ID "editTheBanDocForm" cho form *@
@@ -49,7 +57,7 @@
                         <div class="mb-3">
                             <label asp-for="MaBd" class="form-label">Bạn đọc</label>
                             <input type="hidden" asp-for="MaBd" />
-                            <input type="text" class="form-control" value="@ViewBag.HoTenBanDoc" readonly />
+                            <input type="text" class="form-control" value="@ViewBag.HoTenBanDoc (@Model.MaBd)" readonly />
                         </div>
 
                         @* Trạng Thái (Dropdown) *@
@@ -69,14 +77,15 @@
                             <i class='bx bx-calendar me-1'></i> Thông tin thời hạn
                         </h6>
 
-                        @* Ngày Cấp *@
+                        @* Ngày Cấp (READONLY) *@
                         <div class="mb-3">
                             <label asp-for="NgayCap" class="form-label">Ngày Cấp</label>
-                            <input asp-for="NgayCap" class="form-control" type="date" value="@Model.NgayCap.ToString("yyyy-MM-dd")" />
+                            @* Thêm readonly vào input *@
+                            <input asp-for="NgayCap" class="form-control" type="date" value="@Model.NgayCap.ToString("yyyy-MM-dd")" readonly />
                             <span asp-validation-for="NgayCap" class="text-danger"></span>
                         </div>
 
-                        @* Ngày Hết Hạn *@
+                        @* Ngày Hết Hạn (CÓ THỂ SỬA) *@
                         <div class="mb-3">
                             <label asp-for="NgayHetHan" class="form-label">Ngày Hết Hạn</label>
                             <input asp-for="NgayHetHan" class="form-control" type="date" value="@Model.NgayHetHan?.ToString("yyyy-MM-dd")" />
@@ -86,106 +95,92 @@
                 </div>
             </div> @* End card-body *@
 
-            @* FOOTER CỦA CARD: Nút Lưu, Quay lại và Chi tiết *@
+            @* FOOTER CỦA CARD: Nút Lưu, Quay lại và Chi tiết (Đã sửa bố cục) *@
             <div class="card-footer border-top pt-3">
                 <div class="d-flex justify-content-between">
 
                     @* KHỐI NÚT TRÁI (Quay lại) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 
                     @* KHỐI NÚT PHẢI (Lưu và Chi tiết) *@
                     <div class="d-flex gap-2">
 
-                        @* ID "submitButton" cho nút Lưu *@
-                        <button type="submit" class="btn btn-primary" id="submitButton">
+                        @* NÚT LƯU *@
+                        <button type="submit" class="btn btn-primary @(canEdit ? "" : "disabled")" id="submitButton">
                             <i class="bx bx-save me-1"></i> Lưu thay đổi
                         </button>
 
                         @* NÚT CHUYỂN QUA CHI TIẾT THẺ *@
-                        <a asp-action="Details" asp-route-id="@Model?.MaTbd" class="btn btn-success">
+                        <a asp-action="Details" asp-route-id="@Model?.MaTbd" class="btn btn-info">
                             <i class="bx bx-detail me-1"></i> Xem chi tiết thẻ
                         </a>
                     </div>
-
                 </div>
             </div>
-
         </form>
     </div> @* End card *@
 </div> @* End container-xxl *@
 
-@* ========================================================================
-    PHẦN SCRIPT (ĐÃ ĐƯỢC TÙY BIẾN THEO LOGIC CỦA TAI LIEU)
-    ======================================================================== *@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-        // 1. HÀM SHOWTOAST (Giữ nguyên từ TaiLieu)
-        // Hàm hiển thị thông báo (Toast)
-        function showToast(message, type = 'success') {
+        // 1. HÀM SHOWTOAST (Không tự động ẩn lỗi)
+        function showToast(message, type = 'danger') {
             const alertPlaceholder = document.getElementById('alertPlaceholder');
+            if (!alertPlaceholder) return;
             alertPlaceholder.innerHTML = '';
 
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = [
-                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-                `  <div>${message}</div>`,
-                '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-                '</div>'
-            ].join('');
-
-            alertPlaceholder.appendChild(wrapper);
-            // Tự động ẩn sau 5 giây (Yêu cầu jQuery để .alert('close') hoạt động)
-            setTimeout(() => {
-                $(wrapper).alert('close');
-            }, 5000);
+            if (type === 'danger') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = [
+                    `<div class="alert alert-danger alert-dismissible" role="alert">`,
+                    `   <div>${message}</div>`,
+                    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                    '</div>'
+                ].join('');
+                alertPlaceholder.appendChild(wrapper);
+            }
         }
 
-        // 2. LOGIC XỬ LÝ FORM (Giữ nguyên từ TaiLieu)
+        // 2. LOGIC XỬ LÝ FORM
         document.addEventListener('DOMContentLoaded', function () {
 
-            // ==========================================================
-            // LOGIC FORM SUBMIT (Kiểm tra và báo cáo kết quả)
-            // ==========================================================
-
-            // Trỏ tới ID của form TheBanDoc
             const editForm = document.getElementById('editTheBanDocForm');
             const submitButton = document.getElementById('submitButton');
 
-            // 1. Logic chặn submit và đổi text nút
+            // Logic chặn submit và đổi text nút
             if (editForm && submitButton) {
                 editForm.addEventListener('submit', function (e) {
-                    // Kiểm tra validation client-side
                     if ($(editForm).valid()) {
-                        // Vô hiệu hóa nút Submit
                         submitButton.disabled = true;
                         submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...';
                     }
                 });
             }
 
-            // 2. Logic hiển thị thông báo từ TempData (CHUẨN HÓA - Giống hệt TaiLieu)
-            // (Đã loại bỏ khối $(document).ready() kiểm tra SuccessMessage/ErrorMessage riêng lẻ)
+            // Logic hiển thị thông báo từ TempData
             @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
             {
-                    <text>
-                        setTimeout(function() {
-                            // Hiển thị toast với nội dung và kiểu (success/danger) từ Controller
-                            showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
+                    // Chỉ gọi showToast và kích hoạt lại nút nếu là lỗi (danger)
+                    if (TempData["StatusMessage"].ToString() == "danger")
+                    {
+                            <text>
+                                setTimeout(function() {
+                                    showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
 
-                            // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
-                            if ('@TempData["StatusMessage"]' === 'danger' && submitButton) {
-                                submitButton.disabled = false;
-                                submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
-                            }
-
-                        }, 10);
-                    </text>
+                                    // Kích hoạt lại nút submit
+                                    if (submitButton) {
+                                        submitButton.disabled = false;
+                                        submitButton.innerHTML = '<i class="bx bx-save me-1"></i> Lưu thay đổi';
+                                    }
+                                }, 10);
+                            </text>
+                    }
             }
         });
     </script>

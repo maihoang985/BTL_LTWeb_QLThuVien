@@ -3,13 +3,12 @@ using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using PagedList.Core; // Thêm dòng này
+using PagedList.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Library_Manager.Models;
-using PagedList.Core;
+using Microsoft.Data.SqlClient; // Giữ nếu có sử dụng SQL Parameter, mặc dù BanDoc không dùng sinh mã
 
 namespace Library_Manager.Controllers
 {
@@ -23,18 +22,16 @@ namespace Library_Manager.Controllers
             _context = context;
         }
 
-        // GET: TBanDoc
-        
-        public IActionResult Index(int? page, string searchString, string returnUrl) // Bỏ async và await
+        // GET: TBanDoc/Index
+        public IActionResult Index(int? page, string searchString, string returnUrl)
         {
             var pageNumber = page ?? 1;
             var pageSize = 6;
-
-            // 1. Giữ ở dạng IQueryable (Không dùng ToList() hoặc ToListAsync())
             IQueryable<TBanDoc> banDocs = _context.TBanDoc;
 
             if (!string.IsNullOrEmpty(searchString))
             {
+                // Giữ nguyên logic tìm kiếm
                 banDocs = banDocs.Where(t =>
                 t.Ten.ToLower().Contains(searchString) ||
                 t.HoDem.ToLower().Contains(searchString) ||
@@ -46,46 +43,25 @@ namespace Library_Manager.Controllers
                 EF.Functions.Like(t.NgaySinh.Year.ToString(), $"%{searchString}%"));
             }
 
-            // Sắp xếp
             banDocs = banDocs.OrderBy(bd => bd.MaBd);
-
-            // 2. ToPagedList() sẽ tự xử lý việc thực thi truy vấn phân trang
             var pagedBanDocs = new PagedList<TBanDoc>(banDocs, pageNumber, pageSize);
 
-            // Hoặc sử dụng ToPagedList() nếu bạn đã cài đặt package PagedList.Core.Mvc
-            // var pagedBanDocs = banDocs.ToPagedList(pageNumber, pageSize);
-
-            // Truyền lại giá trị tìm kiếm để hiển thị lại trong View
             ViewBag.CurrentFilter = searchString;
-
             ViewBag.ReturnUrl = returnUrl;
 
             return View(pagedBanDocs);
         }
 
-        //[Authorization("QLB")]
         // GET: TBanDoc/Details/5
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tBanDoc = await _context.TBanDoc
-                .FirstOrDefaultAsync(m => m.MaBd == id);
-            if (tBanDoc == null)
-            {
-                return NotFound();
-            }
-
-            // Dùng ViewBag hoặc ViewData để truyền returnUrl sang View
+            if (id == null) { return NotFound(); }
+            var tBanDoc = await _context.TBanDoc.FirstOrDefaultAsync(m => m.MaBd == id);
+            if (tBanDoc == null) { return NotFound(); }
             ViewBag.ReturnUrl = returnUrl;
-
             return View(tBanDoc);
         }
 
-        //[Authorization("QLB")]
         // GET: TBanDoc/Create
         public IActionResult Create(string returnUrl)
         {
@@ -94,129 +70,157 @@ namespace Library_Manager.Controllers
         }
 
         // POST: TBanDoc/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorization("QLB")]
         public async Task<IActionResult> Create([Bind("MaBd,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email")] TBanDoc tBanDoc)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tBanDoc);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(tBanDoc);
+                    await _context.SaveChangesAsync();
+
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = $"Đã tạo mới Bạn đọc: <strong>{tBanDoc.HoDem} {tBanDoc.Ten}</strong> (Mã: <strong>{tBanDoc.MaBd}</strong>) thành công.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    // Lỗi DB (Trùng mã MaBd hoặc lỗi ràng buộc khác)
+                    TempData["StatusMessage"] = "danger";
+                    if (dbEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601))
+                    {
+                        // Giả định lỗi trùng lặp là do MaBd (Primary Key)
+                        TempData["Message"] = $"Không thể lưu. Mã Bạn đọc <strong>{tBanDoc.MaBd}</strong> đã tồn tại.";
+                    }
+                    else
+                    {
+                        string innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                        TempData["Message"] = $"Lỗi hệ thống khi tạo mới: <strong>{innerMessage}</strong>";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["StatusMessage"] = "danger";
+                    string errorMessage = ex.InnerException?.Message ?? ex.Message;
+                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: <strong>" + errorMessage + "</strong>";
+                }
             }
+            // LUỒNG THẤT BẠI: Lỗi Validation
+            else
+            {
+                TempData["StatusMessage"] = "danger";
+                var errors = ModelState.Where(x => x.Value.Errors.Any()).Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
+            }
+            // Trả về View để hiển thị lỗi (Dùng TempData để hiển thị thông báo)
             return View(tBanDoc);
         }
 
-        //[Authorization("QLB")]
         // GET: TBanDoc/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) { return NotFound(); }
             var tBanDoc = await _context.TBanDoc.FindAsync(id);
-            if (tBanDoc == null)
-            {
-                return NotFound();
-            }
+            if (tBanDoc == null) { return NotFound(); }
             return View(tBanDoc);
         }
 
         // POST: TBanDoc/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorization("QLB")]
         public async Task<IActionResult> Edit(string id, [Bind("MaBd,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email")] TBanDoc tBanDoc)
         {
-            if (id != tBanDoc.MaBd)
-            {
-                return NotFound();
-            }
+            if (id != tBanDoc.MaBd) { return NotFound(); }
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Lấy bản ghi gốc để tránh lỗi Concurrency/Tracking
+                    var originalBanDoc = await _context.TBanDoc.AsNoTracking().FirstOrDefaultAsync(m => m.MaBd == id);
+                    if (originalBanDoc == null) { return NotFound(); }
+
+                    // Cập nhật các trường
                     _context.Update(tBanDoc);
                     await _context.SaveChangesAsync();
 
-                    // THAY ĐỔI: Sử dụng TempData và return View
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = "Thông tin Bạn đọc đã được lưu thành công.";
-
-                    return View(tBanDoc);
-                    // return RedirectToAction(nameof(Index)); // Bỏ dòng này
+                    TempData["Message"] = $"Thông tin Bạn đọc <strong>{tBanDoc.HoDem} {tBanDoc.Ten}</strong> (Mã: <strong>{tBanDoc.MaBd}</strong>) đã được cập nhật thành công.";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TBanDocExists(tBanDoc.MaBd))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        // THAY ĐỔI: Thêm TempData cho lỗi xung đột
-                        TempData["StatusMessage"] = "danger";
-                        TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng tải lại trang và thử lại.";
-                        // throw; // Bỏ dòng này
-                    }
+                    // Lỗi xung đột
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng tải lại trang và thử lại.";
                 }
-                // THAY ĐỔI: Thêm catch tổng quát
+                catch (DbUpdateException dbEx)
+                {
+                    // Lỗi DB (Trùng mã MaBd hoặc lỗi ràng buộc khác)
+                    TempData["StatusMessage"] = "danger";
+                    string innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                    TempData["Message"] = $"Lỗi hệ thống khi lưu: <strong>{innerMessage}</strong>";
+                }
                 catch (Exception ex)
                 {
                     TempData["StatusMessage"] = "danger";
-                    TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: " + ex.Message;
+                    TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: <strong>" + ex.Message + "</strong>";
                 }
             }
-            // THAY ĐỔI: Thêm TempData cho lỗi validation
+            // LUỒNG THẤT BẠI: Lỗi Validation
             else
             {
                 TempData["StatusMessage"] = "danger";
                 var errors = ModelState.Where(x => x.Value.Errors.Any()).Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
-                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
+            // Trả về View để hiển thị lỗi
             return View(tBanDoc);
         }
 
-        //[Authorization("QLB")]
         // GET: TBanDoc/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tBanDoc = await _context.TBanDoc
-                .FirstOrDefaultAsync(m => m.MaBd == id);
-            if (tBanDoc == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) { return NotFound(); }
+            var tBanDoc = await _context.TBanDoc.FirstOrDefaultAsync(m => m.MaBd == id);
+            if (tBanDoc == null) { return NotFound(); }
             return View(tBanDoc);
         }
 
         // POST: TBanDoc/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        //[Authorization("QLB")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tBanDoc = await _context.TBanDoc.FindAsync(id);
             if (tBanDoc != null)
             {
-                _context.TBanDoc.Remove(tBanDoc);
-            }
+                try
+                {
+                    _context.TBanDoc.Remove(tBanDoc);
+                    await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = $"Đã xóa Bạn đọc có Mã: <strong>{id}</strong> thành công.";
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    // LUỒNG THẤT BẠI (Khóa ngoại): Redirect về Index
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = $"Không thể xóa Bạn đọc <strong>{id}</strong> vì đang có giao dịch/tài liệu tham chiếu đến. Vui lòng xóa các mục liên quan trước.";
+                }
+                catch (Exception ex)
+                {
+                    // LUỒNG THẤT BẠI (Hệ thống): Redirect về Index
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = $"Lỗi hệ thống khi xóa: <strong>{ex.Message}</strong>";
+                }
+            }
             return RedirectToAction(nameof(Index));
         }
 

@@ -456,7 +456,10 @@ public partial class QlthuVienContext : DbContext
                 .HasColumnName("MaTK");
             entity.Property(e => e.TrangThai)
                 .HasMaxLength(30)
-                .HasDefaultValue("Ho?t d?ng");
+                .HasDefaultValue("Ho?t d?ng")
+                .ValueGeneratedNever(); 
+
+            // NgayCap và NgayHetHan không cần ValueGeneratedNever nếu không có default trong DB
 
             entity.HasOne(d => d.MaBdNavigation).WithMany(p => p.TTheBanDoc)
                 .HasForeignKey(d => d.MaBd)

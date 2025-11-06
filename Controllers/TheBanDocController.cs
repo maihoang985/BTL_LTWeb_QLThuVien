@@ -6,8 +6,9 @@ using PagedList.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Library_Manager.Controllers
 {
@@ -20,9 +21,24 @@ namespace Library_Manager.Controllers
             _context = context;
         }
 
-        // GET: TheBanDoc
+        // =======================================================
+        // GET: TheBanDoc/Index (Kích hoạt thủ tục tự động khóa)
+        // =======================================================
         public IActionResult Index(int? page, string searchString)
         {
+            // === KÍCH HOẠT TỰ ĐỘNG KHÓA THẺ DO HẾT HẠN (Thay thế SQL Agent/Express) ===
+            try
+            {
+                // Gọi thủ tục khóa thẻ đã hết hạn mỗi khi trang Index được truy cập
+                _context.Database.ExecuteSqlRaw("EXEC SP_LockExpiredCards");
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần, nhưng không chặn người dùng
+                Console.WriteLine($"Lỗi khi chạy SP_LockExpiredCards: {ex.Message}");
+            }
+            // =============================================================================
+
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
@@ -47,7 +63,9 @@ namespace Library_Manager.Controllers
             return View(pagedTheBanDocs);
         }
 
+        // =======================================================
         // GET: TheBanDoc/Details/5
+        // =======================================================
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null) { return NotFound(); }
@@ -64,57 +82,131 @@ namespace Library_Manager.Controllers
             return View(tTheBanDoc);
         }
 
+        // =======================================================
         // GET: TheBanDoc/Create
+        // =======================================================
         public async Task<IActionResult> Create()
         {
+            // Lấy thông tin người tạo từ Session
+            ViewBag.MaTkDangNhap = HttpContext.Session.GetString("MaTk");
+            ViewBag.HoTenNhanVien = HttpContext.Session.GetString("hoTen");
+
+            // Tự động gán NgayCap là ngày hiện tại cho Model
+            var tTheBanDoc = new TTheBanDoc { NgayCap = DateOnly.FromDateTime(DateTime.Today) };
+
             await PopulateBanDocChuaCoTheDropDownList();
-            return View();
+            return View(tTheBanDoc); // Truyền model đã có NgayCap mặc định
         }
 
+        // =======================================================
         // POST: TheBanDoc/Create
+        // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaTbd,MaBd,NgayCap,NgayHetHan,TrangThai")] TTheBanDoc tTheBanDoc)
+        public async Task<IActionResult> Create([Bind("MaBd,NgayHetHan,TrangThai")] TTheBanDoc tTheBanDoc)
         {
             var maTk = HttpContext.Session.GetString("MaTk");
-            ModelState.Remove("MaTk");
 
+            // Loại bỏ Navigation Properties khỏi Validation (KHẮC PHỤC LỖI Navigation Required)
+            ModelState.Remove("MaBdNavigation");
+            ModelState.Remove("MaTkNavigation");
+            // Loại bỏ các trường sẽ được gán
+            ModelState.Remove("MaTk");
+            ModelState.Remove("MaTbd");
+
+            // 1. Kiểm tra Mã Tài khoản (Người tạo)
             if (string.IsNullOrEmpty(maTk))
             {
-                ModelState.AddModelError(string.Empty, "Bạn phải đăng nhập để thực hiện chức năng này.");
-            }
-            else
-            {
-                tTheBanDoc.MaTk = maTk;
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = "Lỗi: Bạn phải đăng nhập để tạo thẻ.";
+                // Tải lại ViewBag và NgayCap mặc định
+                tTheBanDoc.NgayCap = DateOnly.FromDateTime(DateTime.Today);
+                await PopulateBanDocChuaCoTheDropDownList(tTheBanDoc.MaBd);
+                ViewBag.MaTkDangNhap = HttpContext.Session.GetString("MaTk");
+                ViewBag.HoTenNhanVien = HttpContext.Session.GetString("hoTen");
+                return View(tTheBanDoc);
             }
 
-            ModelState.Remove("MaTk");
+            tTheBanDoc.MaTk = maTk; // Gán Mã TK đang đăng nhập
+            tTheBanDoc.NgayCap = DateOnly.FromDateTime(DateTime.Today); // **TỰ ĐỘNG GÁN NGÀY CẤP**
 
             if (ModelState.IsValid)
             {
-                _context.Add(tTheBanDoc);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+                // === LOGIC SINH MÃ TỰ ĐỘNG VÀ KIỂM TRA TÍNH DUY NHẤT ===
+                var newMaTbdParam = new SqlParameter("@NewMaTBD", SqlDbType.Char, 12) { Direction = ParameterDirection.Output };
+                var maBdParam = new SqlParameter("@MaBD", SqlDbType.Char, 9) { Value = tTheBanDoc.MaBd };
+                var errorStatusParam = new SqlParameter("@ErrorStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
 
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC SP_GenerateNewMaTBD @MaBD, @NewMaTBD OUTPUT, @ErrorStatus OUTPUT",
+                    maBdParam,
+                    newMaTbdParam,
+                    errorStatusParam
+                );
+
+                var newMaTbdValue = newMaTbdParam.Value;
+                var errorStatus = (int)errorStatusParam.Value;
+
+                string errorMessage = null;
+                if (errorStatus == 1) errorMessage = $"Mã Bạn đọc '{tTheBanDoc.MaBd}' không tồn tại trong hệ thống.";
+                else if (errorStatus == 2) errorMessage = $"Bạn đọc có mã '{tTheBanDoc.MaBd}' đã có thẻ. Vui lòng chọn bạn đọc khác.";
+                else if (errorStatus != 0 || newMaTbdValue == DBNull.Value || string.IsNullOrEmpty(newMaTbdValue.ToString())) errorMessage = "Không thể sinh mã Thẻ Bạn đọc mới (Lỗi định dạng/Hệ thống).";
+
+                if (errorMessage != null)
+                {
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = errorMessage;
+                    // Tải lại ViewBag và trả về View
+                    await PopulateBanDocChuaCoTheDropDownList(tTheBanDoc.MaBd);
+                    ViewBag.MaTkDangNhap = HttpContext.Session.GetString("MaTk");
+                    ViewBag.HoTenNhanVien = HttpContext.Session.GetString("hoTen");
+                    return View(tTheBanDoc);
+                }
+
+                tTheBanDoc.MaTbd = newMaTbdValue.ToString();
+                // ===========================================
+
+                try
+                {
+                    _context.Add(tTheBanDoc);
+                    await _context.SaveChangesAsync();
+
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = $"Đã tạo mới Thẻ: <strong>{tTheBanDoc.MaTbd}</strong> thành công.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    TempData["StatusMessage"] = "danger";
+                    string innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                    TempData["Message"] = $"Lỗi hệ thống khi tạo mới: <strong>{innerMessage}</strong>";
+                }
+                catch (Exception ex)
+                {
+                    TempData["StatusMessage"] = "danger";
+                    string errorMessageFinal = ex.InnerException?.Message ?? ex.Message;
+                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: <strong>" + errorMessageFinal + "</strong>";
+                }
+            }
+            // LUỒNG THẤT BẠI: Lỗi Validation
+            else
+            {
+                TempData["StatusMessage"] = "danger";
+                var errors = ModelState.Where(x => x.Value.Errors.Any()).Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
+            }
+            // Trả về View để hiển thị lỗi
+            tTheBanDoc.NgayCap = DateOnly.FromDateTime(DateTime.Today); // Gán lại NgayCap mặc định trước khi return
             await PopulateBanDocChuaCoTheDropDownList(tTheBanDoc.MaBd);
+            ViewBag.MaTkDangNhap = HttpContext.Session.GetString("MaTk");
+            ViewBag.HoTenNhanVien = HttpContext.Session.GetString("hoTen");
             return View(tTheBanDoc);
         }
 
-        // Helper private
-        private async Task PopulateBanDocChuaCoTheDropDownList(object selectedBanDoc = null)
-        {
-            var maBdDaCoThe = _context.TTheBanDoc.Select(t => t.MaBd);
-            var banDocChuaCoThe = await _context.TBanDoc
-                .Where(b => !maBdDaCoThe.Contains(b.MaBd))
-                .Select(b => new { MaBd = b.MaBd, HoTen = b.HoDem + " " + b.Ten })
-                .OrderBy(b => b.HoTen)
-                .ToListAsync();
-            ViewData["MaBd"] = new SelectList(banDocChuaCoThe, "MaBd", "HoTen", selectedBanDoc);
-        }
-
-
+        // =======================================================
         // GET: TheBanDoc/Edit/5
+        // =======================================================
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -122,35 +214,30 @@ namespace Library_Manager.Controllers
             var tTheBanDoc = await _context.TTheBanDoc.FindAsync(id);
             if (tTheBanDoc == null) { return NotFound(); }
 
-            // Logic lấy Họ Tên Bạn đọc (Giữ nguyên)
+            // Logic lấy Họ Tên Bạn đọc (Hiển thị)
             var banDoc = await _context.TBanDoc.FindAsync(tTheBanDoc.MaBd);
-            if (banDoc != null)
-            {
-                ViewBag.HoTenBanDoc = banDoc.HoDem + " " + banDoc.Ten;
-            }
-            else
-            {
-                ViewBag.HoTenBanDoc = "Lỗi: Không tìm thấy bạn đọc";
-            }
+            ViewBag.HoTenBanDoc = banDoc != null ? (banDoc.HoDem + " " + banDoc.Ten) : "Lỗi";
 
             return View(tTheBanDoc);
         }
 
+        // =======================================================
         // POST: TheBanDoc/Edit/5
+        // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("MaTbd,MaBd,NgayCap,NgayHetHan,TrangThai")] TTheBanDoc tTheBanDoc)
         {
             if (id != tTheBanDoc.MaTbd) { return NotFound(); }
 
-            // 1. Loại trừ Navigation Properties (giống TaiLieu)
-            ModelState.Remove("MaTk"); // MaTk không có trên form
+            // Loại bỏ Navigation Properties và MaTk
             ModelState.Remove("MaBdNavigation");
             ModelState.Remove("MaTkNavigation");
+            ModelState.Remove("MaTk");
 
             if (ModelState.IsValid)
             {
-                // Logic quan trọng: Phải lấy lại MaTk (người tạo thẻ) gốc vì nó không được post lên
+                // Lấy lại MaTk gốc (Người tạo thẻ)
                 var originalMaTk = await _context.TTheBanDoc
                     .Where(t => t.MaTbd == id)
                     .Select(t => t.MaTk)
@@ -159,10 +246,9 @@ namespace Library_Manager.Controllers
 
                 if (originalMaTk == null)
                 {
-                    // Thẻ đã bị xóa
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = "Lỗi: Không tìm thấy thẻ gốc để cập nhật.";
-                    // Vẫn phải trả về View với thông tin
+                    // Phải tải lại ViewBag để View hiển thị đúng
                     var banDocDisplay = await _context.TBanDoc.FindAsync(tTheBanDoc.MaBd);
                     ViewBag.HoTenBanDoc = banDocDisplay != null ? (banDocDisplay.HoDem + " " + banDocDisplay.Ten) : "Lỗi";
                     return View(tTheBanDoc);
@@ -170,49 +256,46 @@ namespace Library_Manager.Controllers
 
                 try
                 {
-                    // Gán lại MaTk gốc cho đối tượng
-                    tTheBanDoc.MaTk = originalMaTk;
+                    tTheBanDoc.MaTk = originalMaTk; // Gán lại MaTk gốc
 
-                    // Cập nhật thẻ
                     _context.Update(tTheBanDoc);
                     await _context.SaveChangesAsync();
 
-                    // THÀNH CÔNG: Sử dụng TempData và return View (giống TaiLieu)
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = "Thông tin Thẻ Bạn đọc đã được lưu thành công.";
+                    TempData["Message"] = $"Thông tin Thẻ <strong>{tTheBanDoc.MaTbd}</strong> đã được cập nhật thành công.";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.TTheBanDoc.Any(e => e.MaTbd == id)) { return NotFound(); }
-
                     TempData["StatusMessage"] = "danger";
                     TempData["Message"] = "Lỗi xung đột dữ liệu. Thẻ này vừa được chỉnh sửa bởi người khác. Vui lòng tải lại trang.";
                 }
                 catch (Exception ex)
                 {
                     TempData["StatusMessage"] = "danger";
-                    TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: " + ex.Message;
+                    TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: <strong>" + ex.Message + "</strong>";
                 }
             }
+            // LUỒNG THẤT BẠI: Lỗi Validation
             else
             {
-                // Lỗi Model Binding/Validation (giống TaiLieu)
                 TempData["StatusMessage"] = "danger";
                 var errors = ModelState.Where(x => x.Value.Errors.Any())
                     .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
-                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", errors)}</strong></li></ul>";
             }
 
-            // Xử lý khi THẤT BẠI hoặc THÀNH CÔNG (luôn return View)
-            // Tải lại HoTen cho ô input readonly
+            // Xử lý khi THẤT BẠI
             var banDoc = await _context.TBanDoc.FindAsync(tTheBanDoc.MaBd);
             ViewBag.HoTenBanDoc = banDoc != null ? (banDoc.HoDem + " " + banDoc.Ten) : "Lỗi";
 
             return View(tTheBanDoc);
         }
 
-        #region Hàm Delete (Giữ nguyên)
+        // =======================================================
         // GET: TheBanDoc/Delete/5
+        // =======================================================
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -226,7 +309,9 @@ namespace Library_Manager.Controllers
             return View(tTheBanDoc);
         }
 
+        // =======================================================
         // POST: TheBanDoc/Delete/5
+        // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
@@ -234,10 +319,29 @@ namespace Library_Manager.Controllers
             var tTheBanDoc = await _context.TTheBanDoc.FindAsync(id);
             if (tTheBanDoc != null)
             {
-                _context.TTheBanDoc.Remove(tTheBanDoc);
+                try
+                {
+                    _context.TTheBanDoc.Remove(tTheBanDoc);
+                    await _context.SaveChangesAsync();
+
+                    // LUỒNG THÀNH CÔNG: Redirect về Index
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = $"Đã xóa Thẻ có Mã: <strong>{id}</strong> thành công.";
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    // LUỒNG THẤT BẠI (Khóa ngoại): Redirect về Index
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = $"Không thể xóa Thẻ <strong>{id}</strong> vì đang có giao dịch tham chiếu đến. Vui lòng xóa các mục liên quan trước.";
+                }
+                catch (Exception ex)
+                {
+                    // LUỒNG THẤT BẠI (Hệ thống): Redirect về Index
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = $"Lỗi hệ thống khi xóa: <strong>{ex.Message}</strong>";
+                }
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -245,6 +349,17 @@ namespace Library_Manager.Controllers
         {
             return _context.TTheBanDoc.Any(e => e.MaTbd == id);
         }
-        #endregion
+
+        // Helper private: Populate BanDoc chưa có thẻ
+        private async Task PopulateBanDocChuaCoTheDropDownList(object selectedBanDoc = null)
+        {
+            var maBdDaCoThe = _context.TTheBanDoc.Select(t => t.MaBd);
+            var banDocChuaCoThe = await _context.TBanDoc
+                .Where(b => !maBdDaCoThe.Contains(b.MaBd))
+                .Select(b => new { MaBd = b.MaBd, HoTen = b.HoDem + " " + b.Ten })
+                .OrderBy(b => b.HoTen)
+                .ToListAsync();
+            ViewData["MaBd"] = new SelectList(banDocChuaCoThe, "MaBd", "HoTen", selectedBanDoc);
+        }
     }
 }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Xóa Thẻ Bạn đọc";
 }
 
-@* Logic hiển thị badge Trạng Thái (Copy từ Details.cshtml) *@
+@* Logic hiển thị badge Trạng Thái *@
 @{
     var trangThai = Model.TrangThai;
     var badgeClass = "bg-label-secondary"; // Mặc định
@@ -13,7 +13,7 @@
     {
         badgeClass = "bg-label-success";
     }
-    else if (trangThai == "Đã khóa" || trangThai == "Hết hạn")
+    else if (trangThai == "Đã khóa" || trangThai == "Hết hạn" || trangThai == "Khóa")
     {
         badgeClass = "bg-label-danger";
     }
@@ -33,7 +33,7 @@
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">CẢNH BÁO QUAN TRỌNG!</h4>
         <p>
-            Bạn đang chuẩn bị **xóa vĩnh viễn** thẻ **@Model.MaTbd**.
+            Bạn đang chuẩn bị <strong>xóa vĩnh viễn</strong> thẻ <strong>@Model.MaTbd</strong>.
             Hành động này không thể hoàn tác.
         </p>
         <p class="mb-0">Vui lòng kiểm tra kỹ thông tin bên dưới trước khi xác nhận.</p>
@@ -89,14 +89,14 @@
 
         </div> @* End card-body *@
 
-        @* FOOTER CỦA CARD: Nút Xác nhận và Quay lại *@
+        @* FOOTER CỦA CARD: Nút Xác nhận và Quay lại (ĐÃ SỬA BỐ CỤC) *@
         <div class="card-footer border-top pt-3">
             <form asp-action="Delete">
                 <input type="hidden" asp-for="MaTbd" />
                 <div class="d-flex justify-content-between">
 
                     @* NÚT QUAY LẠI (TRÁI) *@
-                    <a asp-action="Index" class="btn btn-secondary">
+                    <a asp-action="Index" class="btn btn-outline-primary">
                         <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                     </a>
 
