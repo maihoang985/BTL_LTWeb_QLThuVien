@@ -24,10 +24,12 @@
 
     // Logic cho Badge Vai Trò
     var vaiTro = Model.MaVtNavigation?.MaVt; // Giả sử MaVt là "QTV", "QLB", "NV"
+    var tenVaiTro = Model.MaVtNavigation?.TenVt ?? "(Chưa gán)";
     var badgeVaiTroClass = "bg-label-secondary"; // Mặc định
     if (vaiTro == "QTV") { badgeVaiTroClass = "bg-label-primary"; }
     else if (vaiTro == "QLB") { badgeVaiTroClass = "bg-label-info"; }
-    else if (vaiTro == "NV") { badgeVaiTroClass = "bg-label-warning"; }
+    else if (vaiTro == "QLT") { badgeVaiTroClass = "bg-label-warning"; }
+    else if (vaiTro == "QLM") { badgeVaiTroClass = "bg-label-primary"; }
 }
 
 
@@ -38,7 +40,7 @@
 
     @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
-        <i class='bx bxs-user-detail fs-2 me-2'></i> Chi tiết Tài khoản
+        <i class='bx bxs-user-detail fs-2 me-2 border p-1 rounded-2'></i> Chi tiết Tài khoản
     </h1>
 
     @* --- KHỐI: CARD BAO QUANH DỮ LIỆU --- *@
@@ -74,10 +76,18 @@
                         <p class="fw-semibold mb-0">@Model.TenDangNhap</p>
                     </div>
 
-                    @* Mật khẩu (Bảo mật) *@
+                    @* Mật khẩu (Dùng nút trong suốt) *@
                     <div class="mb-3">
-                        <label class="form-label d-block text-secondary">Mật khẩu</label>
-                        <p class="text-muted fst-italic mb-0">(Không hiển thị vì lý do bảo mật)</p>
+                        <label class="form-label d-block text-secondary">Mật khẩu (Đã Hash)</label>
+                        <div class="input-group w-75">
+                            <input id="MatKhauHashed" value="@Model.MatKhau" class="form-control" type="password" readonly />
+
+                            @* Nút trong suốt, không viền *@
+                            <button type="button" class="btn border-0 bg-transparent text-secondary show-hide-password"
+                                    title="Hiển thị/Ẩn mật khẩu" style="box-shadow: none;">
+                                <i class="bx bx-hide"></i>
+                            </button>
+                        </div>
                     </div>
 
                     @* Ngày tạo *@
@@ -96,7 +106,7 @@
                     @* Vai trò *@
                     <div class="mb-3">
                         <label class="form-label d-block text-secondary">Vai trò</label>
-                        <p class="mb-0"><span class="badge @badgeVaiTroClass fs-6">@vaiTro</span></p>
+                        <p class="mb-0"><span class="badge @badgeVaiTroClass fs-6">@tenVaiTro</span></p>
                     </div>
 
                     @* Trạng thái *@
@@ -113,11 +123,10 @@
                             <p class="mb-0">
                                 @Model.MaNvNavigation.HoDem @Model.MaNvNavigation.Ten
 
-                                @* TODO: Cập nhật asp-controller nếu tên Controller là TNhanVien *@
-                                <a asp-controller="NhanVien" 
-                                asp-action="Details" 
-                                asp-route-id="@Model.MaNv"
-                                asp-route-returnUrl="@currentUrl"
+                                <a asp-controller="NhanVien"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.MaNv"
+                                   asp-route-returnUrl="@currentUrl"
                                    class="btn btn-xs btn-outline-info ms-2 py-0 px-1"
                                    data-bs-toggle="tooltip" title="Xem chi tiết Nhân viên">
                                     <i class='bx bx-link-external'></i>
@@ -136,34 +145,63 @@
 
         @* FOOTER CỦA CARD: Chứa các nút Hành động *@
         <div class="card-footer border-top pt-3">
-            <div class="d-flex gap-3">
+            <div class="d-flex justify-content-between">
 
-                @* Nút Sửa (Chỉ QTV) *@
-                <a asp-action="Edit" asp-route-id="@Model?.MaTk" class="btn btn-primary @(canEdit ? "" : "disabled")">
-                    <i class="bx bx-pencil me-1"></i> Sửa tài khoản
-                </a>
-
-                @* Nút Quay lại *@
+                @* KHỐI NÚT TRÁI (Quay lại) - Dùng btn-outline-primary *@
                 <div>
                     @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                     {
-                        // Nếu có returnUrl, quay lại trang đó
-                        <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                        <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
                             <i class="bx bx-arrow-back me-1"></i> Quay lại
                         </a>
                     }
                     else
                     {
-                        // Nếu không, quay về trang Index mặc định của BanDoc
-                        <a asp-action="Index" class="btn btn-secondary">
+                        <a asp-action="Index" class="btn btn-outline-primary">
                             <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                         </a>
                     }
                 </div>
 
+                @* KHỐI NÚT PHẢI (Sửa) - Dùng btn-primary *@
+                <a asp-action="Edit" asp-route-id="@Model?.MaTk"
+                   asp-route-returnUrl="@currentUrl"
+                   class="btn btn-primary @(canEdit ? "" : "disabled")">
+                    <i class="bx bx-pencil me-1"></i> Sửa tài khoản
+                </a>
             </div>
         </div>
 
     </div>
 </div>
 
+@section Scripts {
+    <script>
+        // Hàm bật/tắt hiển thị mật khẩu (Lấy từ view Create)
+        function setupPasswordToggle() {
+            document.querySelectorAll('.show-hide-password').forEach(toggleButton => {
+
+                // Tìm input tương ứng (nằm ngay trước nút button trong input-group)
+                const passwordInput = toggleButton.previousElementSibling;
+
+                if (passwordInput && passwordInput.tagName === 'INPUT') {
+                    toggleButton.addEventListener('click', function () {
+                        const icon = toggleButton.querySelector('i');
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.className = 'bx bx-show';
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.className = 'bx bx-hide';
+                        }
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Áp dụng hàm toggle cho trường mật khẩu (đã hash)
+            setupPasswordToggle();
+        });
+    </script>
+}
