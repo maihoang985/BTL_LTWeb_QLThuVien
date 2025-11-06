@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Tai-lieu-Tac-gia")]
     public class TaiLieu_TacGiaController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -20,6 +21,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu_TacGia
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
         {
             int pageNumber = page ?? 1;
@@ -54,6 +56,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu_TacGia/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null)
@@ -78,6 +81,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu_TacGia/Create
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             ViewData["MaTg"] = new SelectList(_context.TTacGia, "MaTg", "MaTg");
@@ -90,6 +94,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaTl,MaTg,VaiTro")] TTaiLieuTacGia tTaiLieuTacGia)
         {
             if (ModelState.IsValid)
@@ -104,6 +109,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu_TacGia/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -126,6 +132,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaTl,MaTg,VaiTro")] TTaiLieuTacGia tTaiLieuTacGia)
         {
             if (id != tTaiLieuTacGia.MaTl)
@@ -159,6 +166,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu_TacGia/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -182,6 +190,7 @@ namespace Library_Manager.Controllers
         // POST: TaiLieu_TacGia/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTaiLieuTacGia = await _context.TTaiLieuTacGia.FindAsync(id);

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Ban-sao")]
     public class BanSaoController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -20,6 +21,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: BanSao
+        [Route("Danh-sach")]
         public IActionResult Index(string id, int? page, string searchString)
         {
             var pageNumber = page ?? 1;
@@ -65,6 +67,7 @@ namespace Library_Manager.Controllers
 
 
         // GET: BanSao/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -84,12 +87,14 @@ namespace Library_Manager.Controllers
         }
 
         // GET: BanSao/Create
+        [Route("Them-moi")]
         public IActionResult Create()
         {
             ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl");
             return View();
         }
         // GET: BanSao/Create
+        [Route("Them-moi/{MaTl}")]
         public IActionResult Create(string MaTl = null)
         {
             // Nếu có MaTl được truyền vào từ Dashboard, pre-select mã đó
@@ -105,6 +110,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Them-moi")]
         public async Task<IActionResult> Create([Bind("MaBs,MaTl,TinhTrang")] TBanSao tBanSao)
         {
             if (ModelState.IsValid)
@@ -118,6 +124,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: BanSao/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, string returnUrl)
         {
             if (id == null)
@@ -140,6 +147,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaBs,MaTl,TinhTrang")] TBanSao tBanSao)
         {
             if (id != tBanSao.MaBs)
@@ -172,6 +180,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: BanSao/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -193,6 +202,7 @@ namespace Library_Manager.Controllers
         // POST: BanSao/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tBanSao = await _context.TBanSao.FindAsync(id);

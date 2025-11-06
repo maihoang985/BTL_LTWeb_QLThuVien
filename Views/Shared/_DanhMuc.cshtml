@@ -38,11 +38,15 @@
             @foreach (var category in categories)
             {
                 var isActive = (currentController == category.Value) ? "active" : "";
-                var linkUrl = $"/{category.Value}/Index";
+
+                // XÓA: Dòng var linkUrl = $"/{category.Value}/Index";
 
                 @* ĐIỀU CHỈNH: Sử dụng mx-1 để tạo khoảng cách nhỏ giữa các pill *@
                 <li class="nav-item mx-1 mb-1">
-                    <a href="@linkUrl"
+
+                    <!-- SỬA ĐỔI: Thay thế href bằng asp-controller và asp-action -->
+                    <a asp-controller="@category.Value"
+                       asp-action="Index"
                        class="nav-link @isActive"
                        role="tab"
                        aria-selected="@(currentController == category.Value ? "true" : "false")">

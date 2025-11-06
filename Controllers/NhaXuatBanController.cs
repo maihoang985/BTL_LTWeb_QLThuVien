@@ -12,6 +12,7 @@ using System.Data;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Nha-xuat-ban")]
     public class NhaXuatBanController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -24,6 +25,8 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhaXuatBan
         // =======================================================
+        [Route("")]
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string maQg)
         {
             var pageNumber = page ?? 1;
@@ -61,6 +64,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhaXuatBan/Details/5
         // =======================================================
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null) { return NotFound(); }
@@ -74,6 +78,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhaXuatBan/Create
         // =======================================================
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             ViewData["MaQg"] = new SelectList(_context.TQuocGia.OrderBy(q => q.TenQg), "MaQg", "TenQg");
@@ -85,6 +90,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaQg,TenNxb")] TNhaXuatBan tNhaXuatBan)
         {
             ViewData["MaQg"] = new SelectList(_context.TQuocGia.OrderBy(q => q.TenQg), "MaQg", "TenQg", tNhaXuatBan.MaQg);
@@ -147,6 +153,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhaXuatBan/Edit/5
         // =======================================================
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -162,6 +169,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaNxb,MaQg,TenNxb")] TNhaXuatBan tNhaXuatBan)
         {
             if (id != tNhaXuatBan.MaNxb) { return NotFound(); }
@@ -251,6 +259,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhaXuatBan/Delete/5
         // =======================================================
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -268,6 +277,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tNhaXuatBan = await _context.TNhaXuatBan.FindAsync(id);

@@ -13,6 +13,7 @@ using Microsoft.Data.SqlClient; // Giữ nếu có sử dụng SQL Parameter, m�
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
+    [Route("Ban-doc")]
     public class BanDocController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -23,6 +24,8 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TBanDoc/Index
+        [Route("")]
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string returnUrl)
         {
             var pageNumber = page ?? 1;
@@ -53,6 +56,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TBanDoc/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null) { return NotFound(); }
@@ -63,6 +67,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TBanDoc/Create
+        [Route("Tao-moi")]
         public IActionResult Create(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -72,6 +77,7 @@ namespace Library_Manager.Controllers
         // POST: TBanDoc/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaBd,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email")] TBanDoc tBanDoc)
         {
             if (ModelState.IsValid)
@@ -120,6 +126,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TBanDoc/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -131,6 +138,7 @@ namespace Library_Manager.Controllers
         // POST: TBanDoc/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaBd,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email")] TBanDoc tBanDoc)
         {
             if (id != tBanDoc.MaBd) { return NotFound(); }
@@ -183,6 +191,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TBanDoc/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -194,6 +203,7 @@ namespace Library_Manager.Controllers
         // POST: TBanDoc/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tBanDoc = await _context.TBanDoc.FindAsync(id);

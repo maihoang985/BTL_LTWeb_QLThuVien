@@ -67,7 +67,8 @@
 
         <!-- 1. Dashboard - Trang chủ -->
         <li class="menu-item @IsActive("Home", "Index")">
-            <a href="/Home/Index" class="menu-link">
+            @* <a href="/Home/Index" class="menu-link"> *@
+            <a asp-controller="Home" asp-action="Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div>Trang chủ</div>
             </a>

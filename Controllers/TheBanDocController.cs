@@ -12,6 +12,7 @@ using System.Data;
 
 namespace Library_Manager.Controllers
 {
+    [Route("The-ban-doc")]
     public class TheBanDocController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -24,6 +25,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheBanDoc/Index (Kích hoạt thủ tục tự động khóa)
         // =======================================================
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
         {
             // === KÍCH HOẠT TỰ ĐỘNG KHÓA THẺ DO HẾT HẠN (Thay thế SQL Agent/Express) ===
@@ -66,6 +68,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheBanDoc/Details/5
         // =======================================================
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null) { return NotFound(); }
@@ -85,6 +88,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheBanDoc/Create
         // =======================================================
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create()
         {
             // Lấy thông tin người tạo từ Session
@@ -103,6 +107,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaBd,NgayHetHan,TrangThai")] TTheBanDoc tTheBanDoc)
         {
             var maTk = HttpContext.Session.GetString("MaTk");
@@ -207,6 +212,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheBanDoc/Edit/5
         // =======================================================
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -226,6 +232,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaTbd,MaBd,NgayCap,NgayHetHan,TrangThai")] TTheBanDoc tTheBanDoc)
         {
             if (id != tTheBanDoc.MaTbd) { return NotFound(); }
@@ -296,6 +303,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TheBanDoc/Delete/5
         // =======================================================
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -314,6 +322,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTheBanDoc = await _context.TTheBanDoc.FindAsync(id);

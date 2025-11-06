@@ -9,6 +9,7 @@ using Library_Manager.Models;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Giao-dich-Ban-sao")]
     public class GiaoDich_BanSaoController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -19,6 +20,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichBanSao
+        [Route("Danh-sach")]
         public async Task<IActionResult> Index()
         {
             var qlthuVienContext = _context.TGiaoDichBanSao.Include(t => t.MaBsNavigation).Include(t => t.MaGdNavigation);
@@ -26,6 +28,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichBanSao/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null)
@@ -53,6 +56,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichBanSao/Create
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             ViewData["MaBs"] = new SelectList(_context.TBanSao, "MaBs", "MaBs");
@@ -65,6 +69,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaGd,MaBs,TinhTrangMuon,TinhTrangTra")] TGiaoDichBanSao tGiaoDichBanSao)
         {
             if (ModelState.IsValid)
@@ -79,6 +84,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichBanSao/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -101,6 +107,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaGd,MaBs,TinhTrangMuon,TinhTrangTra")] TGiaoDichBanSao tGiaoDichBanSao)
         {
             if (id != tGiaoDichBanSao.MaGd)
@@ -134,6 +141,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: GiaoDichBanSao/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -156,6 +164,7 @@ namespace Library_Manager.Controllers
         // POST: GiaoDichBanSao/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tGiaoDichBanSao = await _context.TGiaoDichBanSao.FindAsync(id);

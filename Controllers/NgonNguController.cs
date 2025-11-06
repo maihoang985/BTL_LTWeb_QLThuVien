@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Ngon-ngu")]
     public class NgonNguController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -20,6 +21,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TNgonNgu
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
         {
             var pageNumber = page ?? 1;
@@ -51,6 +53,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TNgonNgus/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -69,6 +72,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TNgonNgus/Create
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             return View();
@@ -79,6 +83,7 @@ namespace Library_Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("MaNn,TenNn")] TNgonNgu tNgonNgu)
         {
             if (ModelState.IsValid)
@@ -91,6 +96,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TNgonNgus/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -109,6 +115,7 @@ namespace Library_Manager.Controllers
         // POST: TNgonNgus/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaNn,TenNn")] TNgonNgu tNgonNgu)
         {
             if (id != tNgonNgu.MaNn)
@@ -161,6 +168,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TNgonNgus/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -181,6 +189,7 @@ namespace Library_Manager.Controllers
         // POST: TNgonNgus/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tNgonNgu = await _context.TNgonNgu.FindAsync(id);

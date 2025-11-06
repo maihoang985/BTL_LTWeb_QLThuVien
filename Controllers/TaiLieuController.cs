@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
+    [Route("Tai-lieu")]
     public class TaiLieuController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -22,6 +23,7 @@ namespace Library_Manager.Controllers
 
         #region Các chức năng cơ bản (Index, Details, PopulateSelectList, Delete)
         // GET: TaiLieu
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string category, string publisher, string language, string returnUrl)
         {
             var pageNumber = page ?? 1;
@@ -69,6 +71,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
@@ -102,6 +105,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Edit/5
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, string returnUrl)
         {
             if (id == null) { return NotFound(); }
@@ -119,6 +123,7 @@ namespace Library_Manager.Controllers
         // POST: TaiLieu/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTaiLieu = await _context.TTaiLieu.FindAsync(id);
@@ -136,6 +141,7 @@ namespace Library_Manager.Controllers
         // ------------------------------------------------------------------------------------------------
         // GET: TaiLieu/Create
         // ------------------------------------------------------------------------------------------------
+        [Route("Tao-moi")]
         public IActionResult Create(string returnUrl)
         {
             PopulateSelectList();
@@ -149,6 +155,7 @@ namespace Library_Manager.Controllers
         // ------------------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create(
             [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
             ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
@@ -230,6 +237,7 @@ namespace Library_Manager.Controllers
         // ------------------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, 
             [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
             ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
@@ -300,6 +308,7 @@ namespace Library_Manager.Controllers
         }
 
         // GET: TaiLieu/Delete/5
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             // 1. Kiểm tra ID

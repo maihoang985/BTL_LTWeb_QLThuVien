@@ -12,6 +12,7 @@ using System.Data;
 
 namespace Library_Manager.Controllers
 {
+    [Route("Dinh-dang")]
     public class DinhDangController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -24,6 +25,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: DinhDang/Index
         // =======================================================
+        [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString)
         {
             var pageNumber = page ?? 1;
@@ -49,6 +51,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: DinhDang/Details/5
         // =======================================================
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null) { return NotFound(); }
@@ -63,6 +66,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: DinhDang/Create
         // =======================================================
+        [Route("Tao-moi")]
         public IActionResult Create()
         {
             return View();
@@ -73,6 +77,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
         public async Task<IActionResult> Create([Bind("TenDd")] TDinhDang tDinhDang)
         {
             ModelState.Remove("MaDd");
@@ -137,6 +142,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: DinhDang/Edit/5
         // =======================================================
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -151,6 +157,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, [Bind("MaDd,TenDd")] TDinhDang tDinhDang)
         {
             if (id != tDinhDang.MaDd) { return NotFound(); }
@@ -215,6 +222,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: DinhDang/Delete/5
         // =======================================================
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -231,6 +239,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tDinhDang = await _context.TDinhDang.FindAsync(id);

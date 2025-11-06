@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace Library_Manager.Controllers
 {
+    //[Authorization("QTV")]
+    [Route("Tai-khoan")]
     // [Authorization("QTV")] 
     public class TaiKhoanController : Controller
     {
@@ -25,6 +27,9 @@ namespace Library_Manager.Controllers
             _context = context;
         }
 
+        // GET: TTaiKhoans
+        [Route("Danh-sach")]
+        public IActionResult Index(int? page, string searchString, string roleFilter)
         // =======================================================
         // GET: TTaiKhoans/Index, Details, Edit (GET)
         // =======================================================
@@ -55,6 +60,8 @@ namespace Library_Manager.Controllers
             return View(pagedTaiKhoans);
         }
 
+        // GET: TTaiKhoans/Details/5
+        [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null) { return NotFound(); }
@@ -69,6 +76,9 @@ namespace Library_Manager.Controllers
             return View(tTaiKhoan);
         }
 
+        // GET: TTaiKhoans/Create
+        [Route("Tao-moi")]
+        public IActionResult Create()
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -95,6 +105,8 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Tao-moi")]
+        public async Task<IActionResult> Create([Bind("MaTk,MaNv,MaVt,TenDangNhap,MatKhau,TrangThai,NgayTao")] TTaiKhoan tTaiKhoan)
         public async Task<IActionResult> Edit(string id, [Bind("MaTk,MaVt,TenDangNhap,MatKhau,TrangThai")] TTaiKhoan tTaiKhoan, [FromForm] string MatKhauHienTai)
         {
             if (id != tTaiKhoan.MaTk) { return NotFound(); }
@@ -102,6 +114,11 @@ namespace Library_Manager.Controllers
             var existing = await _context.TTaiKhoan.AsNoTracking().FirstOrDefaultAsync(x => x.MaTk == id);
             if (existing == null) { return NotFound(); }
 
+        // GET: TTaiKhoans/Edit/5
+        [Route("Chinh-sua/{id}")]
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null)
             // Gán lại các giá trị cố định từ bản ghi gốc
             tTaiKhoan.MaNv = existing.MaNv;
             tTaiKhoan.NgayTao = existing.NgayTao;
@@ -248,6 +265,8 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("Chinh-sua/{id}")]
+        public async Task<IActionResult> Edit(string id, [Bind("MaTk,MaNv,MaVt,TenDangNhap,MatKhau,TrangThai,NgayTao")] TTaiKhoan tTaiKhoan)
         public async Task<IActionResult> Create([Bind("TenDangNhap,MatKhau,MaVt,MaNv")] TTaiKhoan tTaiKhoan)
         {
             // Loại bỏ các trường tự sinh/gán khỏi validation
@@ -348,6 +367,9 @@ namespace Library_Manager.Controllers
             return View(tTaiKhoan);
         }
 
+
+        // GET: TTaiKhoans/Delete/5
+        [Route("Xoa/{id}")]
         // =======================================================
         // GET & POST: TTaiKhoans/Delete/5
         // =======================================================
@@ -366,6 +388,7 @@ namespace Library_Manager.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tTaiKhoan = await _context.TTaiKhoan.FindAsync(id);
