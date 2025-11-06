@@ -14,7 +14,7 @@ using System.Data;
 namespace Library_Manager.Controllers
 {
     [Authorization("QTV,QLB,QLT,QLM")]
-    [Route("Nhan-vien")]
+    [Route("Nhan-vien")] // THÊM: Route cho Controller
     public class NhanVienController : Controller
     {
         private readonly QlthuVienContext _context;
@@ -25,9 +25,10 @@ namespace Library_Manager.Controllers
         }
 
         // =======================================================
-        // GET: NhanVien/Index & Details & Edit (Giữ nguyên)
+        // GET: NhanVien/Index
         // =======================================================
-        [Route("Danh-sach")]
+        [Route("Danh-sach")] // THÊM
+        [Route("")] // THÊM
         public IActionResult Index(int? page, string searchString)
         {
             var pageNumber = page ?? 1;
@@ -53,7 +54,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Details/5
         // =======================================================
-        [Route("Chi-tiet/{id}")]
+        [Route("Chi-tiet/{id}")] // THÊM
         public async Task<IActionResult> Details(string id, string returnUrl = null)
         {
             if (id == null) { return NotFound(); }
@@ -64,19 +65,12 @@ namespace Library_Manager.Controllers
             return View(tNhanVien);
         }
 
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null) { return NotFound(); }
-            var tNhanVien = await _context.TNhanVien.FindAsync(id);
-            if (tNhanVien == null) { return NotFound(); }
-            await PopulatePhuTrachDropDownList(tNhanVien.PhuTrach);
-            return View(tNhanVien);
-        }
+        // XÓA: Đã xóa phương thức Edit(GET) bị trùng lặp ở đây
 
         // =======================================================
         // GET: NhanVien/Create (Giữ nguyên)
         // =======================================================
-        [Route("Tao-moi")]
+        [Route("Them-moi")] // THÊM
         public async Task<IActionResult> Create()
         {
             await PopulatePhuTrachDropDownList();
@@ -89,7 +83,7 @@ namespace Library_Manager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorization("QTV")]
-        [Route("Tao-moi")]
+        [Route("Them-moi")] // THÊM
         public async Task<IActionResult> Create([Bind("HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
             // Loại bỏ MaNv khỏi ModelState vì nó được sinh tự động
@@ -167,7 +161,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: NhanVien/Edit/5
         // =======================================================
-        [Route("Chinh-sua/{id}")]
+        [Route("Cap-nhat/{id}")] // THÊM
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) { return NotFound(); }
@@ -183,7 +177,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Chinh-sua/{id}")]
+        [Route("Cap-nhat/{id}")] // THÊM
         public async Task<IActionResult> Edit(string id, [Bind("MaNv,HoDem,Ten,NgaySinh,GioiTinh,DiaChi,Sdt,Email,PhuTrach")] TNhanVien tNhanVien)
         {
             if (id != tNhanVien.MaNv) { return NotFound(); }
@@ -245,7 +239,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET & POST: NhanVien/Delete/5 (Giữ nguyên)
         // =======================================================
-        [Route("Xoa/{id}")]
+        [Route("Xoa/{id}")] // THÊM
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) { return NotFound(); }
@@ -256,7 +250,7 @@ namespace Library_Manager.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Route("Xoa/{id}")]
+        [Route("Xoa/{id}")] // THÊM
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tNhanVien = await _context.TNhanVien.FindAsync(id);
