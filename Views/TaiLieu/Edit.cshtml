@@ -510,122 +510,138 @@
             }
 
 
-            // Hàm Helper để xử lý AJAX chung cho các danh mục đơn lẻ (CẬP NHẬT LOGIC LẤY THÊM FIELDS)
-            function handleAjaxCreation(formId, apiUrl, inputId, selectId, alertId, nameKey, maKey, modalId, additionalFields = []) {
-                const form = document.getElementById(formId);
-                const btnSave = document.getElementById(`btnSave${selectId.substring(6)}`);
-                const alertBox = document.getElementById(alertId);
-                const selectElement = document.getElementById(selectId);
-                // inputElement có thể là HoDemInput, TenNxbInput, TenThLInput, TenDdInput
-                // Tuy nhiên, đối với Tác giả (HoDem + Ten), ta sẽ dùng logic additionalFields
-                const inputElement = document.getElementById(inputId);
-                const modalElement = document.getElementById(modalId);
-                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                // Hàm Helper để xử lý AJAX chung (ĐỒNG BỘ VỚI CREATE)
+                function handleAjaxCreation(formId, apiUrl, selectId, alertId, nameKey, maKey, modalId, additionalFields = []) {
+                    const form = document.getElementById(formId);
+                    const btnSave = document.getElementById(`btnSave${selectId.substring(6)}`);
+                    const alertBox = document.getElementById(alertId);
+                    const selectElement = document.getElementById(selectId);
+                    const modalElement = document.getElementById(modalId);
+                    const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
 
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
 
-                    alertBox.classList.add('d-none');
-                    btnSave.disabled = true;
-                    btnSave.textContent = 'Đang xử lý...';
+                        alertBox.classList.add('d-none');
+                        btnSave.disabled = true;
+                        btnSave.textContent = 'Đang xử lý...';
 
-                    const payload = {};
+                        const payload = {};
 
-                    // Nếu là trường đơn (ThL, Dd) hoặc trường tên chính (Nxb), sử dụng inputElement
-                    if (inputElement && inputElement.value) {
-                         payload[nameKey] = inputElement.value;
-                    }
-
-                    // Bắt buộc sử dụng additionalFields cho Tác giả (HoDem, Ten, MaQg)
-                    // và Nhà xuất bản (MaQg)
-                    additionalFields.forEach(field => {
-                        const fieldElement = document.getElementById(field.id);
-                        if (fieldElement) {
-                             payload[field.key] = fieldElement.value;
-                        }
-                    });
-
-                    // console.log('Payload gửi đi:', JSON.stringify(payload));
-
-                    fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const displayText = data.fullName || data[nameKey];
-                            const newOption = new Option(displayText, data[maKey], true, true);
-                            selectElement.appendChild(newOption);
-
-                            modal.hide();
-                            if(inputElement) inputElement.value = ''; // Reset input chính
-
+                        // Xây dựng payload từ additionalFields
+                        if (additionalFields.length > 0) {
                             additionalFields.forEach(field => {
                                 const fieldElement = document.getElementById(field.id);
-                                if (fieldElement) fieldElement.value = '';
+                                if (fieldElement) {
+                                    payload[field.key] = fieldElement.value;
+                                }
                             });
-
-                            // Sử dụng showToast (tự động ẩn sau 5s)
-                            showToast(`Đã thêm ${displayText} thành công!`, 'info');
-
-                        } else {
-                            alertBox.textContent = data.message || 'Lỗi không xác định khi thêm mới.';
-                            alertBox.classList.remove('d-none');
                         }
-                    })
-                    .catch(error => {
-                        console.error('Lỗi AJAX:', error);
-                        alertBox.textContent = 'Lỗi kết nối Server.';
-                        alertBox.classList.remove('d-none');
-                    })
-                    .finally(() => {
-                        btnSave.disabled = false;
-                        btnSave.textContent = 'Lưu';
+
+                        // Debug: Log payload
+                        console.log('Payload gửi đi:', JSON.stringify(payload));
+
+                        fetch(apiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const displayText = data.fullName || data[nameKey];
+                                const newOption = new Option(displayText, data[maKey], true, true);
+                                selectElement.appendChild(newOption);
+
+                                modal.hide();
+
+                                // Reset form
+                                additionalFields.forEach(field => {
+                                    document.getElementById(field.id).value = '';
+                                });
+
+                                showToast(`Đã thêm ${displayText} thành công!`, 'info');
+                            } else {
+                                alertBox.textContent = data.message || 'Lỗi không xác định khi thêm mới.';
+                                alertBox.classList.remove('d-none');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi AJAX:', error);
+                            alertBox.textContent = 'Lỗi kết nối Server.';
+                            alertBox.classList.remove('d-none');
+                        })
+                        .finally(() => {
+                            btnSave.disabled = false;
+                            btnSave.textContent = 'Lưu';
+                        });
                     });
-                });
-            }
+                }
 
-            // ------------------------------------------------------------------------------------------------
-            // Khởi tạo AJAX cho 5 Danh mục (ĐÃ CẬP NHẬT additionalFields CHO TÁC GIẢ VÀ NXB)
-            // ------------------------------------------------------------------------------------------------
+                // ------------------------------------------------------------------------------------------------
+                // Khởi tạo AJAX cho các Danh mục (ĐỒNG BỘ VỚI CREATE)
+                // ------------------------------------------------------------------------------------------------
 
-            // 1. TÁC GIẢ
-            handleAjaxCreation(
-                'formCreateTacGia', '/TaiLieu/CreateNewTacGiaAjax', 'TenInput', 'selectTacGia', 'TacGiaAlert',
-                'fullName', 'maTg', 'addNewTacGiaModal',
-                [
-                    { key: 'HoDem', id: 'HoDemInput' },
-                    { key: 'Ten', id: 'TenInput' },
-                    { key: 'MaQg', id: 'MaQgInput' } // ĐÃ THÊM: Mã Quốc gia
-                ]
-            );
+                // 1. TÁC GIẢ
+                handleAjaxCreation(
+                    'formCreateTacGia',
+                    '/Tai-lieu/CreateNewTacGiaAjax',
+                    'selectTacGia',
+                    'TacGiaAlert',
+                    'fullName',
+                    'maTg',
+                    'addNewTacGiaModal',
+                    [
+                        { key: 'HoDem', id: 'HoDemInput' },
+                        { key: 'Ten', id: 'TenInput' },
+                        { key: 'MaQg', id: 'MaQgInput' }
+                    ]
+                );
 
-            // 2. NHÀ XUẤT BẢN
-            handleAjaxCreation(
-                'formCreateNxb', '/TaiLieu/CreateNewNxbAjax', 'TenNxbInput', 'selectNxb', 'NxbAlert',
-                'tenNxb', 'maNxb', 'addNewNxbModal',
-                [
-                    { key: 'MaQg', id: 'MaQgNxbInput' } // ĐÃ THÊM: Mã Quốc gia
-                ]
-            );
+                // 2. NHÀ XUẤT BẢN
+                handleAjaxCreation(
+                    'formCreateNxb',
+                    '/Tai-lieu/CreateNewNxbAjax',
+                    'selectNxb',
+                    'NxbAlert',
+                    'tenNxb',
+                    'maNxb',
+                    'addNewNxbModal',
+                    [
+                        { key: 'MaQg', id: 'MaQgNxbInput' },
+                        { key: 'TenNxb', id: 'TenNxbInput' }
+                    ]
+                );
 
-            // 3. THỂ LOẠI
-            handleAjaxCreation(
-                'formCreateThL', '/TaiLieu/CreateNewTheLoaiAjax', 'TenThLInput', 'selectThL', 'ThLAlert',
-                'tenThL', 'maThL', 'addNewThLModal'
-            );
+                // 3. THỂ LOẠI
+                handleAjaxCreation(
+                    'formCreateThL',
+                    '/Tai-lieu/CreateNewTheLoaiAjax',
+                    'selectThL',
+                    'ThLAlert',
+                    'tenThL',
+                    'maThL',
+                    'addNewThLModal',
+                    [
+                        { key: 'TenThL', id: 'TenThLInput' }
+                    ]
+                );
 
-            // 4. NGÔN NGỮ (KHÔNG CẦN)
-
-            // 5. ĐỊNH DẠNG
-            handleAjaxCreation(
-                'formCreateDd', '/TaiLieu/CreateNewDinhDangAjax', 'TenDdInput', 'selectDd', 'DdAlert',
-                'tenDd', 'maDd', 'addNewDdModal'
-            );
+                // 4. ĐỊNH DẠNG
+                handleAjaxCreation(
+                    'formCreateDd',
+                    '/Tai-lieu/CreateNewDinhDangAjax',
+                    'selectDd',
+                    'DdAlert',
+                    'tenDd',
+                    'maDd',
+                    'addNewDdModal',
+                    [
+                        { key: 'TenDd', id: 'TenDdInput' }
+                    ]
+                );
 
             // ==========================================================
             // LOGIC QUẢN LÝ TÁC GIẢ (Thêm/Xóa khỏi bảng) (GIỮ NGUYÊN)

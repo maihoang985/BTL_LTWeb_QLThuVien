@@ -1,6 +1,7 @@
 ﻿using Library_Manager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PagedList.Core;
 using System;
@@ -20,166 +21,186 @@ namespace Library_Manager.Controllers
             _context = context;
         }
 
-        // GET: BanSao
-        [Route("Danh-sach")]
+        private bool TBanSaoExists(string id)
+        {
+            return _context.TBanSao.Any(e => e.MaBs == id);
+        }
+
+        // =======================================================
+        // 1. INDEX: Danh sách Bản sao (chỉ theo MaTl)
+        // =======================================================
+        [Route("Danh-sach/{id}")]
         public IActionResult Index(string id, int? page, string searchString)
         {
+            var maTl = id;
+
+            if (string.IsNullOrEmpty(maTl))
+            {
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = "Vui lòng chọn Tài liệu gốc để xem danh sách Bản sao.";
+                return RedirectToAction("Index", "TaiLieu");
+            }
+
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
-            // Ban đầu lấy tất cả bản sao
-            IQueryable<TBanSao> banSaos = _context.TBanSao.Include(t => t.MaTlNavigation);
+            IQueryable<TBanSao> banSaos = _context.TBanSao
+                .Include(t => t.MaTlNavigation)
+                .Where(bs => bs.MaTl == maTl);
 
-            // Nếu có mã tài liệu truyền vào thì lọc theo mã đó
-            if (!string.IsNullOrEmpty(id))
-            {
-                banSaos = banSaos.Where(bs => bs.MaTl == id);
-                ViewBag.TenTaiLieu = _context.TTaiLieu
-                    .Where(t => t.MaTl == id)
-                    .Select(t => t.TenTl)
-                    .FirstOrDefault();
+            ViewBag.TenTaiLieu = _context.TTaiLieu
+                .Where(t => t.MaTl == maTl)
+                .Select(t => t.TenTl)
+                .FirstOrDefault();
 
-                ViewBag.MaTl = id;
-            }
+            ViewBag.MaTl = maTl;
+            TempData["LastMaTl"] = maTl;
 
-
-
-            // Nếu có từ khóa tìm kiếm
             if (!string.IsNullOrEmpty(searchString))
             {
                 banSaos = banSaos.Where(bs =>
-                    bs.MaTlNavigation.TenTl.ToLower().Contains(searchString.ToLower()) ||
-                    bs.MaTl.Contains(searchString));
+                    bs.MaBs.ToLower().Contains(searchString.ToLower()) ||
+                    bs.TrangThai.ToLower().Contains(searchString.ToLower()));
             }
 
             banSaos = banSaos.OrderBy(bs => bs.MaBs);
 
             var pagedBanSaos = new PagedList<TBanSao>(banSaos, pageNumber, pageSize);
             ViewBag.CurrentFilter = searchString;
-            if (!string.IsNullOrEmpty(id))
-            {
-                ViewBag.MaTl = id; // Lưu mã tài liệu để sử dụng trong View
-            }
-
 
             return View(pagedBanSaos);
         }
 
-
-        // GET: BanSao/Details/5
-        [Route("Chi-tiet/{id}")]
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tBanSao = await _context.TBanSao
-                .Include(t => t.MaTlNavigation)
-                .FirstOrDefaultAsync(m => m.MaBs == id);
-            if (tBanSao == null)
-            {
-                return NotFound();
-            }
-
-            return View(tBanSao);
-        }
-
-        // GET: BanSao/Create
-        [Route("Them-moi")]
-        public IActionResult Create()
-        {
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl");
-            return View();
-        }
-        // GET: BanSao/Create
+        // =======================================================
+        // 2. CREATE (GET): Hiển thị form tạo mới
+        // =======================================================
         [Route("Them-moi/{MaTl}")]
-        public IActionResult Create(string MaTl = null)
+        public IActionResult Create(string MaTl)
         {
-            // Nếu có MaTl được truyền vào từ Dashboard, pre-select mã đó
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", MaTl);
-            ViewBag.SelectedMaTl = MaTl; // Lưu lại để sử dụng trong View Create
+            if (string.IsNullOrEmpty(MaTl) || !_context.TTaiLieu.Any(t => t.MaTl == MaTl))
+            {
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = "Không tìm thấy Tài liệu gốc. Vui lòng thử lại.";
+                return RedirectToAction("Index", "TaiLieu");
+            }
 
-            // Nếu bạn muốn tạo nhiều bản sao cho 1 MaTl, bạn có thể chuyển hướng sang view Create chung
+            var taiLieuList = _context.TTaiLieu
+                .Select(t => new
+                {
+                    Value = t.MaTl,
+                    Text = t.MaTl + " - " + t.TenTl
+                })
+                .ToList();
+
+            ViewData["MaTl"] = new SelectList(taiLieuList, "Value", "Text", MaTl);
+            ViewBag.SelectedMaTl = MaTl;
+
             return View();
         }
 
-        // POST: BanSao/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // =======================================================
+        // 2. CREATE (POST): Sinh mã và Lưu
+        // =======================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Them-moi")]
-        public async Task<IActionResult> Create([Bind("MaBs,MaTl,TinhTrang")] TBanSao tBanSao)
+        [Route("Them-moi/{MaTl?}")]
+        public async Task<IActionResult> Create([Bind("MaTl,TrangThai")] TBanSao tBanSao)
         {
-            if (ModelState.IsValid)
+            // ✅ XÓA CÁC TRƯỜNG NAVIGATION KHỎI MODELSTATE
+            ModelState.Remove("MaTlNavigation");
+            ModelState.Remove("MaBs");
+
+            // ✅ KIỂM TRA MaTl
+            if (string.IsNullOrEmpty(tBanSao.MaTl))
             {
+                ModelState.AddModelError("MaTl", "Vui lòng chọn Tài liệu gốc.");
+            }
+
+            // ✅ KIỂM TRA TRANG THÁI
+            if (string.IsNullOrEmpty(tBanSao.TrangThai))
+            {
+                ModelState.AddModelError("TrangThai", "Vui lòng chọn Tình trạng.");
+            }
+
+            // ✅ KIỂM TRA MODELSTATE
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = $"Dữ liệu không hợp lệ: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+                goto OnError;
+            }
+
+            var maTl = tBanSao.MaTl;
+
+            try
+            {
+                // ✅ SINH MÃ BẢN SAO TỪ STORED PROCEDURE
+                var newMaBsParam = new SqlParameter
+                {
+                    ParameterName = "@NewMaBS",
+                    SqlDbType = System.Data.SqlDbType.Char,
+                    Size = 14,
+                    Direction = System.Data.ParameterDirection.Output
+                };
+                var maTlParam = new SqlParameter("@MaTL", maTl);
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC SP_GenerateNewMaBS @MaTL, @NewMaBS OUT",
+                    maTlParam, newMaBsParam);
+
+                var generatedMaBs = newMaBsParam.Value?.ToString()?.Trim();
+
+                if (string.IsNullOrEmpty(generatedMaBs))
+                {
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi hệ thống: Stored Procedure không thể tạo mã bản sao. Vui lòng kiểm tra dữ liệu hoặc liên hệ quản trị viên.";
+                    goto OnError;
+                }
+
+                // ✅ GÁN MÃ VÀ LƯU VÀO DATABASE
+                tBanSao.MaBs = generatedMaBs;
                 _context.Add(tBanSao);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tBanSao.MaTl);
-            return View(tBanSao);
-        }
 
-        // GET: BanSao/Edit/5
-        [Route("Chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(string id, string returnUrl)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                // ✅ THÀNH CÔNG
+                TempData["StatusMessage"] = "success";
+                TempData["Message"] = $"Tạo Bản sao <strong>{generatedMaBs}</strong> thành công!";
+                return RedirectToAction(nameof(Index), new { id = maTl });
             }
-
-            var tBanSao = await _context.TBanSao.FindAsync(id);
-            if (tBanSao == null)
+            catch (SqlException sqlEx)
             {
-                return NotFound();
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = $"Lỗi cơ sở dữ liệu: {sqlEx.Message}";
+                System.Diagnostics.Debug.WriteLine($"SQL Error: {sqlEx}");
+                goto OnError;
             }
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tBanSao.MaTl);
-            ViewBag.ReturnUrl = returnUrl;
-            return View(tBanSao);
-        }
-
-        // POST: BanSao/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("Chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(string id, [Bind("MaBs,MaTl,TinhTrang")] TBanSao tBanSao)
-        {
-            if (id != tBanSao.MaBs)
+            catch (Exception ex)
             {
-                return NotFound();
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = $"Lỗi hệ thống: {ex.InnerException?.Message ?? ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"Error: {ex}");
+                goto OnError;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
+        OnError:
+            // ✅ TẠO LẠI SELECTLIST
+            var taiLieuList = _context.TTaiLieu
+                .Select(t => new
                 {
-                    _context.Update(tBanSao);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TBanSaoExists(tBanSao.MaBs))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["MaTl"] = new SelectList(_context.TTaiLieu, "MaTl", "MaTl", tBanSao.MaTl);
+                    Value = t.MaTl,
+                    Text = t.MaTl + " - " + t.TenTl
+                })
+                .ToList();
+            ViewData["MaTl"] = new SelectList(taiLieuList, "Value", "Text", tBanSao.MaTl);
+            ViewBag.SelectedMaTl = tBanSao.MaTl;
+
             return View(tBanSao);
         }
 
-        // GET: BanSao/Delete/5
+        // =======================================================
+        // 3. DELETE (GET): Hiển thị chi tiết xác nhận xóa
+        // =======================================================
         [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -191,33 +212,39 @@ namespace Library_Manager.Controllers
             var tBanSao = await _context.TBanSao
                 .Include(t => t.MaTlNavigation)
                 .FirstOrDefaultAsync(m => m.MaBs == id);
+
             if (tBanSao == null)
             {
                 return NotFound();
             }
 
+            ViewBag.MaTlGoc = tBanSao.MaTl;
             return View(tBanSao);
         }
 
-        // POST: BanSao/Delete/5
+        // =======================================================
+        // 3. DELETE (POST): Xác nhận xóa
+        // =======================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Route("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tBanSao = await _context.TBanSao.FindAsync(id);
+            string maTl = null;
+
             if (tBanSao != null)
             {
+                maTl = tBanSao.MaTl;
                 _context.TBanSao.Remove(tBanSao);
+                await _context.SaveChangesAsync();
+
+                TempData["StatusMessage"] = "success";
+                TempData["Message"] = $"Xóa Bản sao <strong>{id}</strong> thành công!";
+                return RedirectToAction(nameof(Index), new { id = maTl });
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool TBanSaoExists(string id)
-        {
-            return _context.TBanSao.Any(e => e.MaBs == id);
+            return RedirectToAction(nameof(Index), new { id = TempData["LastMaTl"] });
         }
     }
 }
