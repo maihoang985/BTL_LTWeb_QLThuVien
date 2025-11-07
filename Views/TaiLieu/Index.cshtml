@@ -7,7 +7,7 @@
 @{
     ViewData["Title"] = "Quản lý Tài liệu"; // Tiêu đề trang
     var userRole = Context.Session.GetString("UserRole"); // Lấy vai trò người dùng từ Session
-    bool canEdit = (userRole == "QTV" || userRole == "QLT"); 
+    bool canEdit = (userRole == "QTV" || userRole == "QLT");
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -19,6 +19,15 @@
     KHỐI 2: CẤU TRÚC BỐ CỤC CHÍNH (CONTAINER)
     ======================================================================== *@
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    @* --- KHỐI HIỂN THỊ THÔNG BÁO TỪ TEMP DATA (CHO THÀNH CÔNG/THẤT BẠI) --- *@
+    @if (TempData["Message"] != null)
+    {
+        <div id="indexAlertMessage" class="alert alert-@(TempData["StatusMessage"]) alert-dismissible" role="alert">
+            @Html.Raw(TempData["Message"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @* --- PHẦN 2.1: TIÊU ĐỀ TRANG --- *@
     <h1 class="fw-bold text-primary mb-4">
@@ -83,7 +92,7 @@
                                 </div>
                             </div>
                         </th>
-                        
+
                         <th class="filterable-header" data-filter="publisher" style="width: 250px; white-space: nowrap;">
                             Nhà xuất bản
                             @if (!string.IsNullOrEmpty(ViewBag.SelectedPublisher))
@@ -138,7 +147,7 @@
                                 </div>
                             </div>
                         </th>
-                            
+
                         <th style="width: 120px; white-space: nowrap;">Hành động</th>
                     </tr>
                 </thead>
@@ -154,7 +163,7 @@
         <div class="card-footer pt-0">
             <partial name="_Pagination" />
         </div>
-        
+
         <div>
             @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
             {
@@ -168,23 +177,11 @@
     </div>
 </div>
 
-@* <script>
-    function applyFilter(filterName, filterValue) {
-        const url = new URL(window.location.href);
-        if (filterValue) {
-            url.searchParams.set(filterName, filterValue);
-        } else {
-            url.searchParams.delete(filterName);
-        }
-        url.searchParams.delete("page"); // Quay lại trang đầu khi thay đổi lọc
-        window.location.href = url.toString();
-    }
-</script> *@
-
 @section Scripts {
     <script src="~/Assets/js/custom-filter.js"></script>
 
     <script>
+        // LOGIC LỌC AJAX (GIỮ NGUYÊN)
         function filterTaiLieu() {
             const searchString = $('#searchString').val();
             const category = $('#category').val();
@@ -210,7 +207,23 @@
         $('.filter-option').click(function () {
             filterTaiLieu();
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const alertElement = document.getElementById('indexAlertMessage');
+
+            // Chỉ chạy nếu có thông báo và là thông báo thành công (success/info)
+            @if (TempData["StatusMessage"] != null && TempData["StatusMessage"].ToString() == "success")
+            {
+                    <text>
+                        if (alertElement) {
+                            // Tự động ẩn sau 5 giây (5000ms)
+                            setTimeout(() => {
+                                // Sử dụng Bootstrap/jQuery để ẩn alert
+                                $(alertElement).alert('close');
+                            }, 5000);
+                        }
+                    </text>
+            }
+        });
     </script>
 }
-
-

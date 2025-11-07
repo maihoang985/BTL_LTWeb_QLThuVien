@@ -1,5 +1,6 @@
 ﻿using Library_Manager.Filters;
 using Library_Manager.Models;
+using Library_Manager.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
+using System.IO;
 
 namespace Library_Manager.Controllers
 {
@@ -15,14 +19,20 @@ namespace Library_Manager.Controllers
     public class TaiLieuController : Controller
     {
         private readonly QlthuVienContext _context;
+        private readonly IBufferedFileUploadService _fileUploadService;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public TaiLieuController(QlthuVienContext context)
+        public TaiLieuController(QlthuVienContext context,
+                                 IBufferedFileUploadService fileUploadService,
+                                 IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
+            _fileUploadService = fileUploadService;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         #region Các chức năng cơ bản (Index, Details, PopulateSelectList, Delete)
-        // GET: TaiLieu
+
         [Route("Danh-sach")]
         public IActionResult Index(int? page, string searchString, string category, string publisher, string language, string returnUrl)
         {
@@ -56,21 +66,17 @@ namespace Library_Manager.Controllers
             var pagedTaiLieus = new PagedList.Core.PagedList<TTaiLieu>(taiLieus, pageNumber, pageSize);
 
             ViewBag.CurrentFilter = searchString;
-
             ViewBag.Categories = _context.TTheLoai.Select(c => c.TenThL).Distinct().ToList();
             ViewBag.Publishers = _context.TNhaXuatBan.Select(p => p.TenNxb).Distinct().ToList();
             ViewBag.Languages = _context.TNgonNgu.Select(l => l.TenNn).Distinct().ToList();
-
             ViewBag.SelectedCategory = category;
             ViewBag.SelectedPublisher = publisher;
             ViewBag.SelectedLanguage = language;
-
             ViewBag.ReturnUrl = returnUrl;
 
             return View(pagedTaiLieus);
         }
 
-        // GET: TaiLieu/Details/5
         [Route("Chi-tiet/{id}")]
         public async Task<IActionResult> Details(string id, string returnUrl)
         {
@@ -89,7 +95,6 @@ namespace Library_Manager.Controllers
             return View(tTaiLieu);
         }
 
-        // HÀM CHUNG: Tải các danh sách SelectList
         private void PopulateSelectList(TTaiLieu tTaiLieu = null)
         {
             ViewData["MaDd"] = new SelectList(_context.TDinhDang, "MaDd", "TenDd", tTaiLieu?.MaDd);
@@ -97,14 +102,13 @@ namespace Library_Manager.Controllers
             ViewData["MaNxb"] = new SelectList(_context.TNhaXuatBan, "MaNxb", "TenNxb", tTaiLieu?.MaNxb);
             ViewData["MaThL"] = new SelectList(_context.TTheLoai, "MaThL", "TenThL", tTaiLieu?.MaThL);
             ViewData["MaTk"] = new SelectList(_context.TTaiKhoan, "MaTk", "MaTk", tTaiLieu?.MaTk);
-
+            ViewData["QuocGiaList"] = new SelectList(_context.TQuocGia.OrderBy(q => q.TenQg), "MaQg", "TenQg");
             ViewData["TacGiaList"] = new SelectList(
                 _context.TTacGia.Select(tg => new { tg.MaTg, FullName = tg.HoDem + " " + tg.Ten }).OrderBy(x => x.FullName),
                 "MaTg", "FullName"
             );
         }
 
-        // GET: TaiLieu/Edit/5
         [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id, string returnUrl)
         {
@@ -120,7 +124,6 @@ namespace Library_Manager.Controllers
             return View(tTaiLieu);
         }
 
-        // POST: TaiLieu/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Route("Xoa/{id}")]
@@ -132,92 +135,147 @@ namespace Library_Manager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Route("Xoa/{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null) { return NotFound(); }
+            var tTaiLieu = await _context.TTaiLieu
+                .Include(t => t.MaNxbNavigation)
+                .Include(t => t.MaThLNavigation)
+                .Include(t => t.MaNnNavigation)
+                .Include(t => t.MaDdNavigation)
+                .Include(t => t.MaTkNavigation)
+                .Include(t => t.TBanSao)
+                .FirstOrDefaultAsync(m => m.MaTl == id);
+
+            if (tTaiLieu == null) { return NotFound(); }
+            return View(tTaiLieu);
+        }
+
         private bool TTaiLieuExists(string id)
         {
             return _context.TTaiLieu.Any(e => e.MaTl == id);
         }
         #endregion
 
-        // ------------------------------------------------------------------------------------------------
-        // GET: TaiLieu/Create
-        // ------------------------------------------------------------------------------------------------
+        #region Create & Edit Actions
+
         [Route("Tao-moi")]
         public IActionResult Create(string returnUrl)
         {
             PopulateSelectList();
             ViewBag.ReturnUrl = returnUrl;
-            // Khởi tạo Model rỗng để View không bị lỗi NullReferenceException
-            return View(new TTaiLieu());
+            var maTk = HttpContext.Session.GetString("MaTk");
+            var newTaiLieu = new TTaiLieu();
+            if (!string.IsNullOrEmpty(maTk))
+            {
+                newTaiLieu.MaTk = maTk;
+            }
+            return View(newTaiLieu);
         }
 
-        // ------------------------------------------------------------------------------------------------
-        // POST: TaiLieu/Create (ĐÃ SỬA VÀ TỐI ƯU HÓA)
-        // ------------------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Tao-moi")]
         public async Task<IActionResult> Create(
-            [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
-            ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
+            [Bind("MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo")] TTaiLieu tTaiLieu,
+            ICollection<TTaiLieuTacGia> TTaiLieuTacGia,
+            IFormFile imageFile)
         {
-            // 1. LOẠI TRỪ các thuộc tính điều hướng khỏi ModelState
-            ModelState.Remove("MaDdNavigation"); ModelState.Remove("MaNnNavigation"); ModelState.Remove("MaTkNavigation");
-            ModelState.Remove("MaNxbNavigation"); ModelState.Remove("MaThLNavigation");
+            var maTkSession = HttpContext.Session.GetString("MaTk");
 
-            for (int i = 0; i < TTaiLieuTacGia?.Count; i++)
+            if (string.IsNullOrEmpty(maTkSession))
             {
-                ModelState.Remove($"TTaiLieuTacGia[{i}].MaTgNavigation");
-                ModelState.Remove($"TTaiLieuTacGia[{i}].MaTlNavigation");
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = "Lỗi: Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.";
+                PopulateSelectList(tTaiLieu);
+                return View(tTaiLieu);
+            }
+
+            tTaiLieu.MaTk = maTkSession;
+
+            ModelState.Remove("MaTl");
+            ModelState.Remove("MaTk");
+            ModelState.Remove("MaDdNavigation");
+            ModelState.Remove("MaNnNavigation");
+            ModelState.Remove("MaTkNavigation");
+            ModelState.Remove("MaNxbNavigation");
+            ModelState.Remove("MaThLNavigation");
+
+            if (string.IsNullOrEmpty(tTaiLieu.MaNxb)) ModelState.AddModelError("MaNxb", "Nhà xuất bản là bắt buộc.");
+            if (string.IsNullOrEmpty(tTaiLieu.MaNn)) ModelState.AddModelError("MaNn", "Ngôn ngữ là bắt buộc.");
+            if (string.IsNullOrEmpty(tTaiLieu.MaThL)) ModelState.AddModelError("MaThL", "Thể loại là bắt buộc.");
+            if (string.IsNullOrEmpty(tTaiLieu.MaDd)) ModelState.AddModelError("MaDd", "Định dạng là bắt buộc.");
+
+            if (TTaiLieuTacGia != null)
+            {
+                for (int i = 0; i < TTaiLieuTacGia.Count; i++)
+                {
+                    ModelState.Remove($"TTaiLieuTacGia[{i}].MaTgNavigation");
+                    ModelState.Remove($"TTaiLieuTacGia[{i}].MaTlNavigation");
+                    ModelState.Remove($"TTaiLieuTacGia[{i}].MaTl");
+                }
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Đảm bảo MaTl có giá trị (tự động tạo nếu người dùng không nhập)
-                    if (string.IsNullOrEmpty(tTaiLieu.MaTl))
+                    string newMaTl = await GenerateNewMaTlBySP(tTaiLieu.MaNn);
+
+                    if (string.IsNullOrEmpty(newMaTl))
                     {
-                        tTaiLieu.MaTl = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+                        throw new Exception("Lỗi sinh mã tài liệu: Stored Procedure trả về giá trị rỗng.");
                     }
 
-                    // Thêm Tài liệu chính
+                    tTaiLieu.MaTl = newMaTl;
+
+                    if (imageFile != null)
+                    {
+                        string relativePath = await _fileUploadService.UploadFile(imageFile, tTaiLieu.MaTl);
+                        tTaiLieu.Anh = relativePath;
+                    }
+
                     _context.Add(tTaiLieu);
 
-                    // Thêm các tác giả vào Collection
                     if (TTaiLieuTacGia != null)
                     {
                         foreach (var author in TTaiLieuTacGia)
                         {
-                            author.MaTl = tTaiLieu.MaTl; // Gán khóa ngoại MaTl
+                            author.MaTl = tTaiLieu.MaTl;
                             _context.TTaiLieuTacGia.Add(author);
                         }
                     }
 
                     await _context.SaveChangesAsync();
 
-                    // THÀNH CÔNG: Chuyển hướng về trang Index
-                    return RedirectToAction(nameof(Index), new { saveSuccess = true });
+                    TempData["StatusMessage"] = "success";
+                    TempData["Message"] = $"Tài liệu **{tTaiLieu.MaTl}** ({tTaiLieu.TenTl}) đã được tạo mới thành công.";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    // Lỗi DB khi lưu
+                    if (!string.IsNullOrEmpty(tTaiLieu.Anh))
+                    {
+                        string filePath = Path.Combine(_hostingEnvironment.WebRootPath, tTaiLieu.Anh.TrimStart('/'));
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
+
                     TempData["StatusMessage"] = "danger";
-                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: " + ex.Message;
+                    TempData["Message"] = "Lỗi hệ thống khi tạo mới: " + (ex.InnerException?.Message ?? ex.Message);
                 }
             }
             else
             {
-                // Lỗi Model Binding/Validation
                 TempData["StatusMessage"] = "danger";
                 var errors = ModelState.Where(x => x.Value.Errors.Any())
                    .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
-
                 TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
             }
 
-            // Trả về View khi thất bại
-
-            // Gán lại dữ liệu Tác giả từ form (để View hiển thị đúng)
             if (TTaiLieuTacGia != null)
             {
                 tTaiLieu.TTaiLieuTacGia = new List<TTaiLieuTacGia>();
@@ -232,22 +290,50 @@ namespace Library_Manager.Controllers
             return View(tTaiLieu);
         }
 
-        // ------------------------------------------------------------------------------------------------
-        // POST: TaiLieu/Edit/5 (Đã được Fix)
-        // ------------------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(string id, 
-            [Bind("MaTl,MaNxb,MaNn,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,MaTk")] TTaiLieu tTaiLieu,
-            ICollection<TTaiLieuTacGia> TTaiLieuTacGia)
+        public async Task<IActionResult> Edit(string id,
+            [Bind("MaTl,MaNxb,MaThL,MaDd,TenTl,LanXuatBan,NamXuatBan,SoTrang,KhoCo,Anh")] TTaiLieu tTaiLieu,
+            ICollection<TTaiLieuTacGia> TTaiLieuTacGia,
+            IFormFile imageFile)
         {
             if (id != tTaiLieu.MaTl) { return NotFound(); }
 
-            // 1. Loại trừ Navigation Properties
-            ModelState.Remove("MaDdNavigation"); ModelState.Remove("MaNnNavigation"); ModelState.Remove("MaTkNavigation");
-            ModelState.Remove("MaNxbNavigation"); ModelState.Remove("MaThLNavigation");
-            for (int i = 0; i < TTaiLieuTacGia?.Count; i++) { ModelState.Remove($"TTaiLieuTacGia[{i}].MaTgNavigation"); ModelState.Remove($"TTaiLieuTacGia[{i}].MaTlNavigation"); }
+            var maTkSession = HttpContext.Session.GetString("MaTk");
+            if (string.IsNullOrEmpty(maTkSession))
+            {
+                TempData["StatusMessage"] = "danger";
+                TempData["Message"] = "Lỗi: Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.";
+                PopulateSelectList(tTaiLieu);
+                return View(tTaiLieu);
+            }
+
+            var originalTaiLieuForMaNn = await _context.TTaiLieu.AsNoTracking().FirstOrDefaultAsync(m => m.MaTl == id);
+            string maNnOriginal = originalTaiLieuForMaNn?.MaNn;
+
+            ModelState.Remove("MaDdNavigation");
+            ModelState.Remove("MaNnNavigation");
+            ModelState.Remove("MaTkNavigation");
+            ModelState.Remove("MaNxbNavigation");
+            ModelState.Remove("MaThLNavigation");
+            ModelState.Remove("MaNn");
+            ModelState.Remove("MaTk");
+
+            var tacGiaKeys = ModelState.Keys.Where(k => k.StartsWith("TTaiLieuTacGia")).ToList();
+            foreach (var key in tacGiaKeys) { ModelState.Remove(key); }
+
+            if (imageFile == null && ModelState.ContainsKey("imageFile") && ModelState["imageFile"].Errors.Any())
+            {
+                ModelState["imageFile"].Errors.Clear();
+            }
+
+            if (string.IsNullOrEmpty(tTaiLieu.MaNxb)) ModelState.AddModelError("MaNxb", "Nhà xuất bản là bắt buộc.");
+            if (string.IsNullOrEmpty(tTaiLieu.MaThL)) ModelState.AddModelError("MaThL", "Thể loại là bắt buộc.");
+            if (string.IsNullOrEmpty(tTaiLieu.MaDd)) ModelState.AddModelError("MaDd", "Định dạng là bắt buộc.");
+
+            var remainingErrors = ModelState.Where(x => x.Value.Errors.Any()).ToList();
+            if (!remainingErrors.Any()) { ModelState.Clear(); }
 
             if (ModelState.IsValid)
             {
@@ -257,107 +343,346 @@ namespace Library_Manager.Controllers
 
                 try
                 {
-                    // Cập nhật thuộc tính đơn lẻ an toàn
+                    if (imageFile != null)
+                    {
+                        if (!string.IsNullOrEmpty(originalTaiLieu.Anh))
+                        {
+                            string oldFilePath = Path.Combine(_hostingEnvironment.WebRootPath, originalTaiLieu.Anh.TrimStart('/'));
+                            if (System.IO.File.Exists(oldFilePath)) { System.IO.File.Delete(oldFilePath); }
+                        }
+                        string newRelativePath = await _fileUploadService.UploadFile(imageFile, originalTaiLieu.MaTl);
+                        tTaiLieu.Anh = newRelativePath;
+                    }
+                    else
+                    {
+                        tTaiLieu.Anh = originalTaiLieu.Anh;
+                    }
+
+                    tTaiLieu.MaNn = maNnOriginal;
+                    tTaiLieu.MaTk = maTkSession;
+
                     _context.Entry(originalTaiLieu).CurrentValues.SetValues(tTaiLieu);
 
-                    // Xử lý Collection Tác giả
                     originalTaiLieu.TTaiLieuTacGia.Clear();
                     if (TTaiLieuTacGia != null && TTaiLieuTacGia.Any())
                     {
-                        foreach (var author in TTaiLieuTacGia) { author.MaTl = originalTaiLieu.MaTl; originalTaiLieu.TTaiLieuTacGia.Add(author); }
+                        foreach (var author in TTaiLieuTacGia)
+                        {
+                            author.MaTl = originalTaiLieu.MaTl;
+                            originalTaiLieu.TTaiLieuTacGia.Add(author);
+                        }
                     }
                     await _context.SaveChangesAsync();
 
-                    // THAY ĐỔI: Sử dụng TempData và return View để hiển thị thông báo ngay tại trang Edit
                     TempData["StatusMessage"] = "success";
-                    TempData["Message"] = "Thông tin Tài liệu đã được lưu thành công.";
-
-                    // Reload đối tượng để View hiển thị đúng trạng thái mới
-                    originalTaiLieu = await _context.TTaiLieu
-                        .Include(t => t.TTaiLieuTacGia).ThenInclude(ttg => ttg.MaTgNavigation).FirstOrDefaultAsync(m => m.MaTl == id);
-
-                    PopulateSelectList(originalTaiLieu);
-                    
-                    return View(originalTaiLieu);
-
-                    // Hoặc uncomment dòng dưới nếu bạn muốn về Index:
-                    // return RedirectToAction(nameof(Index), new { saveSuccess = true });
+                    TempData["Message"] = $"Thông tin Tài liệu <strong>{tTaiLieu.TenTl}</strong> đã được cập nhật thành công.";
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException) { TempData["StatusMessage"] = "danger"; TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng thử lại."; }
-                catch (Exception ex) { TempData["StatusMessage"] = "danger"; TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: " + ex.Message; }
-            }
-            else
-            {
-                TempData["StatusMessage"] = "danger";
-                var errors = ModelState.Where(x => x.Value.Errors.Any()).Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}");
-                TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li>{string.Join("</li><li>", errors)}</li></ul>";
+                catch (DbUpdateConcurrencyException)
+                {
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi xung đột dữ liệu. Vui lòng thử lại.";
+                }
+                catch (Exception ex)
+                {
+                    if (imageFile != null && !string.IsNullOrEmpty(tTaiLieu.Anh))
+                    {
+                        string newFilePath = Path.Combine(_hostingEnvironment.WebRootPath, tTaiLieu.Anh.TrimStart('/'));
+                        if (System.IO.File.Exists(newFilePath)) { System.IO.File.Delete(newFilePath); }
+                    }
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = "Lỗi hệ thống khi lưu dữ liệu: <strong>" + (ex.InnerException?.Message ?? ex.Message) + "</strong>";
+                }
             }
 
-            // Xử lý khi Validation thất bại
+            tTaiLieu.MaNn = maNnOriginal;
+            tTaiLieu.MaTk = maTkSession;
+
+            if (TempData["StatusMessage"] == null)
+            {
+                var actualErrors = ModelState
+                    .Where(x => x.Value.Errors.Any() && !x.Key.Contains("Navigation"))
+                    .Select(x => $"{x.Key}: {string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+
+                if (actualErrors.Any())
+                {
+                    TempData["StatusMessage"] = "danger";
+                    TempData["Message"] = $"Dữ liệu không hợp lệ. Vui lòng kiểm tra: <ul><li><strong>{string.Join("</strong></li><li><strong>", actualErrors)}</strong></li></ul>";
+                }
+            }
+
             if (TTaiLieuTacGia != null)
             {
                 var tTaiLieuDisplay = new TTaiLieu();
                 _context.Entry(tTaiLieuDisplay).CurrentValues.SetValues(tTaiLieu);
+
+                var currentTaiLieu = await _context.TTaiLieu
+                    .Include(t => t.MaNnNavigation)
+                    .AsNoTracking().FirstOrDefaultAsync(m => m.MaTl == id);
+
+                tTaiLieuDisplay.MaNnNavigation = currentTaiLieu?.MaNnNavigation;
+                tTaiLieuDisplay.MaTkNavigation = await _context.TTaiKhoan
+                    .Include(tk => tk.MaNvNavigation)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(tk => tk.MaTk == tTaiLieu.MaTk);
+
                 tTaiLieuDisplay.TTaiLieuTacGia = new List<TTaiLieuTacGia>();
-                foreach (var item in TTaiLieuTacGia) { item.MaTgNavigation = await _context.TTacGia.AsNoTracking().FirstOrDefaultAsync(t => t.MaTg == item.MaTg); tTaiLieuDisplay.TTaiLieuTacGia.Add(item); }
+                foreach (var item in TTaiLieuTacGia)
+                {
+                    item.MaTgNavigation = await _context.TTacGia.AsNoTracking().FirstOrDefaultAsync(t => t.MaTg == item.MaTg);
+                    tTaiLieuDisplay.TTaiLieuTacGia.Add(item);
+                }
                 tTaiLieu = tTaiLieuDisplay;
             }
+
             PopulateSelectList(tTaiLieu);
-            
             return View(tTaiLieu);
         }
 
-        // GET: TaiLieu/Delete/5
-        [Route("Xoa/{id}")]
-        public async Task<IActionResult> Delete(string id)
+        #endregion
+
+        #region Stored Procedure Helpers
+
+        private async Task<string> GenerateNewMaTlBySP(string maNn)
         {
-            // 1. Kiểm tra ID
-            if (id == null)
+            if (string.IsNullOrEmpty(maNn)) { maNn = "VI"; }
+            var newMaTlParam = new SqlParameter("@NewMaTl", System.Data.SqlDbType.Char, 10)
             {
-                return NotFound();
-            }
-
-            // 2. Truy vấn tài liệu và các thông tin liên quan cần thiết cho View xác nhận
-            var tTaiLieu = await _context.TTaiLieu
-                .Include(t => t.MaNxbNavigation)
-                .Include(t => t.MaThLNavigation)
-                .Include(t => t.MaNnNavigation)
-                .Include(t => t.MaDdNavigation)
-                .Include(t => t.MaTkNavigation)
-                .Include(t => t.TBanSao) // Cần include TBanSaos để đếm số lượng bản sao hiển thị trên trang Delete
-                .FirstOrDefaultAsync(m => m.MaTl == id);
-
-            // 3. Kiểm tra tài liệu tồn tại
-            if (tTaiLieu == null)
-            {
-                return NotFound();
-            }
-
-            // 4. Trả về View Delete.cshtml
-            return View(tTaiLieu);
+                Direction = System.Data.ParameterDirection.Output
+            };
+            var maNnParam = new SqlParameter("@MaNN", maNn);
+            await _context.Database.ExecuteSqlRawAsync("EXEC SP_GenerateNewMaTl @MaNN, @NewMaTl OUTPUT", maNnParam, newMaTlParam);
+            return newMaTlParam.Value?.ToString();
         }
 
-        #region Code giữ nguyên cho AJAX Actions
-        // 1. Tác giả
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewTacGiaAjax([FromBody] TacGiaModel model) { if (string.IsNullOrEmpty(model.HoDem) || string.IsNullOrEmpty(model.Ten)) { return Json(new { success = false, message = "Họ đệm và Tên không được để trống." }); } var newMaTg = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newTacGia = new TTacGia { MaTg = newMaTg, HoDem = model.HoDem, Ten = model.Ten }; try { _context.TTacGia.Add(newTacGia); await _context.SaveChangesAsync(); return Json(new { success = true, maTg = newTacGia.MaTg, hoDem = newTacGia.HoDem, ten = newTacGia.Ten, fullName = newTacGia.HoDem + " " + newTacGia.Ten }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        private async Task<string> GenerateNewMaTgBySP(string maQg)
+        {
+            if (string.IsNullOrEmpty(maQg)) { return null; }
+            var newMaTgParam = new SqlParameter("@NewMaTg", System.Data.SqlDbType.NVarChar, 50)
+            {
+                Direction = System.Data.ParameterDirection.Output
+            };
+            var maQgParam = new SqlParameter("@MaQg", maQg);
+            await _context.Database.ExecuteSqlRawAsync("EXEC SP_GenerateNewMaTg @MaQg, @NewMaTg OUTPUT", maQgParam, newMaTgParam);
+            return newMaTgParam.Value?.ToString();
+        }
 
-        // 2. Nhà Xuất Bản
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewNxbAjax([FromBody] NxbModel model) { if (string.IsNullOrEmpty(model.TenNxb)) { return Json(new { success = false, message = "Tên Nhà xuất bản không được để trống." }); } var newMaNxb = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newNxb = new TNhaXuatBan { MaNxb = newMaNxb, TenNxb = model.TenNxb }; try { _context.TNhaXuatBan.Add(newNxb); await _context.SaveChangesAsync(); return Json(new { success = true, maNxb = newNxb.MaNxb, tenNxb = newNxb.TenNxb }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        private async Task<string> GenerateNewMaNxbBySP(string maQg)
+        {
+            if (string.IsNullOrEmpty(maQg)) { return null; }
+            var newMaNxbParam = new SqlParameter("@NewMaNxb", System.Data.SqlDbType.NVarChar, 50)
+            {
+                Direction = System.Data.ParameterDirection.Output
+            };
+            var maQgParam = new SqlParameter("@MaQg", maQg);
+            await _context.Database.ExecuteSqlRawAsync("EXEC SP_GenerateNewMaNxb @MaQg, @NewMaNxb OUTPUT", maQgParam, newMaNxbParam);
+            return newMaNxbParam.Value?.ToString();
+        }
 
-        // 3. Ngôn ngữ
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewNgonNguAjax([FromBody] NnModel model) { if (string.IsNullOrEmpty(model.TenNn)) { return Json(new { success = false, message = "Tên Ngôn ngữ không được để trống." }); } var newMaNn = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newNn = new TNgonNgu { MaNn = newMaNn, TenNn = model.TenNn }; try { _context.TNgonNgu.Add(newNn); await _context.SaveChangesAsync(); return Json(new { success = true, maNn = newNn.MaNn, tenNn = newNn.TenNn }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        private async Task<string> GenerateNewMaThLBySP()
+        {
+            var newMaThLParam = new SqlParameter("@NewMaThL", System.Data.SqlDbType.Char, 6)
+            {
+                Direction = System.Data.ParameterDirection.Output
+            };
+            await _context.Database.ExecuteSqlRawAsync("EXEC SP_GenerateNewMaThL @NewMaThL OUTPUT", newMaThLParam);
+            return newMaThLParam.Value?.ToString();
+        }
 
-        // 4. Thể loại
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewTheLoaiAjax([FromBody] ThLModel model) { if (string.IsNullOrEmpty(model.TenThL)) { return Json(new { success = false, message = "Tên Thể loại không được để trống." }); } var newMaThL = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newThL = new TTheLoai { MaThL = newMaThL, TenThL = model.TenThL }; try { _context.TTheLoai.Add(newThL); await _context.SaveChangesAsync(); return Json(new { success = true, maThL = newThL.MaThL, tenThL = newThL.TenThL }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        private async Task<string> GenerateNewMaDdBySP()
+        {
+            var newMaDdParam = new SqlParameter("@NewMaDD", System.Data.SqlDbType.Char, 5)
+            {
+                Direction = System.Data.ParameterDirection.Output
+            };
+            await _context.Database.ExecuteSqlRawAsync("EXEC SP_GenerateNewMaDD @NewMaDD OUTPUT", newMaDdParam);
+            return newMaDdParam.Value?.ToString();
+        }
 
-        // 5. Định dạng
-        [HttpPost][Authorization("QLT")] public async Task<IActionResult> CreateNewDinhDangAjax([FromBody] DdModel model) { if (string.IsNullOrEmpty(model.TenDd)) { return Json(new { success = false, message = "Tên Định dạng không được để trống." }); } var newMaDd = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(); var newDd = new TDinhDang { MaDd = newMaDd, TenDd = model.TenDd }; try { _context.TDinhDang.Add(newDd); await _context.SaveChangesAsync(); return Json(new { success = true, maDd = newDd.MaDd, tenDd = newDd.TenDd }); } catch (Exception ex) { return Json(new { success = false, message = "Lỗi Database: " + ex.Message }); } }
+        #endregion
 
-        public class TacGiaModel { public string HoDem { get; set; } public string Ten { get; set; } }
-        public class NxbModel { public string TenNxb { get; set; } }
-        public class NnModel { public string TenNn { get; set; } }
-        public class ThLModel { public string TenThL { get; set; } }
-        public class DdModel { public string TenDd { get; set; } }
+        #region AJAX Actions
+
+        // ***** SỬA CHÍNH: THÊM MaQg VÀO TTacGia *****
+        [HttpPost]
+        [Authorization("QLT")]
+        [Route(nameof(CreateNewTacGiaAjax))]
+        public async Task<IActionResult> CreateNewTacGiaAjax([FromBody] TacGiaModel model)
+        {
+            // Debug log
+            System.Diagnostics.Debug.WriteLine($"Received - HoDem: {model?.HoDem}, Ten: {model?.Ten}, MaQg: {model?.MaQg}");
+
+            if (string.IsNullOrEmpty(model?.HoDem) || string.IsNullOrEmpty(model.Ten) || string.IsNullOrEmpty(model.MaQg))
+            {
+                return Json(new { success = false, message = "Họ đệm, Tên và Quốc gia không được để trống." });
+            }
+
+            try
+            {
+                string newMaTg = await GenerateNewMaTgBySP(model.MaQg);
+
+                if (string.IsNullOrEmpty(newMaTg))
+                {
+                    return Json(new { success = false, message = "Lỗi sinh mã Tác giả. Đã đạt giới hạn (999) hoặc MaQg không hợp lệ." });
+                }
+
+                var newTacGia = new TTacGia
+                {
+                    MaTg = newMaTg,
+                    HoDem = model.HoDem,
+                    Ten = model.Ten,
+                    MaQg = model.MaQg  // *** QUAN TRỌNG: THÊM DÒNG NÀY ***
+                };
+
+                _context.TTacGia.Add(newTacGia);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    maTg = newTacGia.MaTg,
+                    hoDem = newTacGia.HoDem,
+                    ten = newTacGia.Ten,
+                    fullName = newTacGia.HoDem + " " + newTacGia.Ten
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating TacGia: {ex.Message}");
+                return Json(new { success = false, message = "Lỗi Database: " + (ex.InnerException?.Message ?? ex.Message) });
+            }
+        }
+
+        // ***** SỬA CHÍNH: THÊM MaQg VÀO TNhaXuatBan *****
+        [HttpPost]
+        [Authorization("QLT")]
+        [Route(nameof(CreateNewNxbAjax))]
+        public async Task<IActionResult> CreateNewNxbAjax([FromBody] NxbModel model)
+        {
+            System.Diagnostics.Debug.WriteLine($"Received NXB - TenNxb: {model?.TenNxb}, MaQg: {model?.MaQg}");
+
+            if (string.IsNullOrEmpty(model?.TenNxb) || string.IsNullOrEmpty(model.MaQg))
+            {
+                return Json(new { success = false, message = "Tên Nhà xuất bản và Quốc gia không được để trống." });
+            }
+
+            try
+            {
+                string newMaNxb = await GenerateNewMaNxbBySP(model.MaQg);
+
+                if (string.IsNullOrEmpty(newMaNxb))
+                {
+                    return Json(new { success = false, message = "Lỗi sinh mã Nhà xuất bản. Đã đạt giới hạn (999) hoặc MaQg không hợp lệ." });
+                }
+
+                var newNxb = new TNhaXuatBan
+                {
+                    MaNxb = newMaNxb,
+                    TenNxb = model.TenNxb,
+                    MaQg = model.MaQg  // *** QUAN TRỌNG: THÊM DÒNG NÀY (nếu TNhaXuatBan có trường MaQg) ***
+                };
+
+                _context.TNhaXuatBan.Add(newNxb);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, maNxb = newNxb.MaNxb, tenNxb = newNxb.TenNxb });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating NXB: {ex.Message}");
+                return Json(new { success = false, message = "Lỗi Database: " + (ex.InnerException?.Message ?? ex.Message) });
+            }
+        }
+
+        [HttpPost]
+        [Authorization("QLT")]
+        [Route(nameof(CreateNewTheLoaiAjax))]
+        public async Task<IActionResult> CreateNewTheLoaiAjax([FromBody] ThLModel model)
+        {
+            if (string.IsNullOrEmpty(model?.TenThL))
+            {
+                return Json(new { success = false, message = "Tên Thể loại không được để trống." });
+            }
+
+            try
+            {
+                string newMaThL = await GenerateNewMaThLBySP();
+
+                if (string.IsNullOrEmpty(newMaThL))
+                {
+                    return Json(new { success = false, message = "Lỗi sinh mã Thể loại. Đã đạt giới hạn (999)." });
+                }
+
+                var newThL = new TTheLoai { MaThL = newMaThL, TenThL = model.TenThL };
+
+                _context.TTheLoai.Add(newThL);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, maThL = newThL.MaThL, tenThL = newThL.TenThL });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi Database: " + (ex.InnerException?.Message ?? ex.Message) });
+            }
+        }
+
+        [HttpPost]
+        [Authorization("QLT")]
+        [Route(nameof(CreateNewDinhDangAjax))]
+        public async Task<IActionResult> CreateNewDinhDangAjax([FromBody] DdModel model)
+        {
+            if (string.IsNullOrEmpty(model?.TenDd))
+            {
+                return Json(new { success = false, message = "Tên Định dạng không được để trống." });
+            }
+
+            try
+            {
+                string newMaDd = await GenerateNewMaDdBySP();
+
+                if (string.IsNullOrEmpty(newMaDd))
+                {
+                    return Json(new { success = false, message = "Lỗi sinh mã Định dạng. Đã đạt giới hạn (999)." });
+                }
+
+                var newDd = new TDinhDang { MaDd = newMaDd, TenDd = model.TenDd };
+
+                _context.TDinhDang.Add(newDd);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, maDd = newDd.MaDd, tenDd = newDd.TenDd });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi Database: " + (ex.InnerException?.Message ?? ex.Message) });
+            }
+        }
+
+        #endregion
+
+        #region AJAX Models
+
+        public class TacGiaModel
+        {
+            public string HoDem { get; set; }
+            public string Ten { get; set; }
+            public string MaQg { get; set; }
+        }
+
+        public class NxbModel
+        {
+            public string TenNxb { get; set; }
+            public string MaQg { get; set; }
+        }
+
+        public class ThLModel
+        {
+            public string TenThL { get; set; }
+        }
+
+        public class DdModel
+        {
+            public string TenDd { get; set; }
+        }
+
         #endregion
     }
 }

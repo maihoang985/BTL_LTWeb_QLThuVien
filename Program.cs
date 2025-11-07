@@ -23,7 +23,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Thêm dịch vụ upload file
+// Đăng ký Service với Lifetime phù hợp (Singleton, Scoped, Transient)
+// Transient thường phù hợp cho các service xử lý tác vụ ngắn như upload file
 builder.Services.AddTransient<IBufferedFileUploadService, BufferedFileUploadLocalService>();
 
 var app = builder.Build();

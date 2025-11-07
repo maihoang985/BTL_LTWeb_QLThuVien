@@ -102,6 +102,7 @@
 
   <ItemGroup>
     <Folder Include="ViewComponents\" />
+    <Folder Include="wwwroot\Assets\img\TaiLieu\" />
   </ItemGroup>
 
 </Project>
