@@ -221,19 +221,19 @@ VALUES
 INSERT INTO tNhanVien (MaNV, HoDem, Ten, NgaySinh, GioiTinh, DiaChi, SDT, Email, PhuTrach)
 VALUES
 -- MaNV = NV + Dãy số tăng dần từ 01
-('NV01', N'Nguyễn Đức', N'Dư', '1988-09-25', 'M', N'Hà Nội', '0912363245', 'nducdu@utc.edu.vn', 'Giám đốc'),
-('NV02', N'Nguyễn Thanh', N'Thủy', '1985-09-27', 'F', N'Hà Nội', '0912424955', 'nthanhthuy@utc.edu.vn', 'Phó Giám đốc'),
-('NV03', N'Nguyễn Thị', N'Hòa', '1989-07-31', 'F', N'Hà Nội', '0327902799', 'nthhoa@utc.edu.vn', 'Phòng Nghiệp Vụ'),
-('NV04', N'Trần Thị Thu', N'Hương', '1987-08-16', 'F', N'Tuyên Quang', '0331356271', 'tthhuong@utc.edu.vn', 'Phòng Nghiệp Vụ'),
-('NV05', N'Bùi Thị Yến', N'Hường', '1988-03-12', 'F', N'Thái Nguyên', '0897878469', 'btyhuong@utc.edu.vn', 'Phòng Nghiệp Vụ'),
-('NV06', N'Phạm Thị Thúy', N'Nga', '1998-05-08', 'F', N'Hà Nội', '0786561875', 'pttnga@utc.edu.vn', 'Phòng đọc Luận văn, Luận Án, Đề tài NCKH, Báo, Tạp chí'),
-('NV07', N'Phạm Ngọc Thanh', N'Quang', '1996-03-12', 'M', N'Hà Nội', '0388577967', 'pnquang@utc.edu.vn', 'Phòng đọc Luận văn, Luận Án, Đề tài NCKH, Báo, Tạp chí'),
-('NV08', N'Nguyễn Thị Hồng', N'Khoa', '1982-10-13', 'F', N'Lào Cai', '0972936189', 'nthkhoa@utc.edu.vn', 'Phòng đọc Luận văn, Luận Án, Đề tài NCKH, Báo, Tạp chí'),
-('NV09', N'Phạm Thiên', N'Thu', '1999-04-24', 'F', N'Hà Nội', '0794854606', 'pthu@utc.edu.vn', 'Phòng Mượn'),
-('NV10', N'Vũ Thị Hà', N'Vân', '1996-05-06', 'F', N'Ninh Bình', '0875306860', 'vthvan@utc.edu.vn', 'Phòng Mượn'),
-('NV11', N'Châu Mạnh', N'Quang', '2000-03-29', 'M', N'Phú Thọ', '0829773751', 'cmquang@utc.edu.vn', 'Phòng đọc Tiếng Việt'),
-('NV12', N'Cù Việt', N'Hằng', '1995-05-09', 'F', N'Hà Nội', '0787795092', 'cvhang@utc.edu.vn', 'Phòng đọc Tiếng Việt'),
-('NV13', N'Kim Thị', N'Hoa', '1995-03-06', 'F', N'Quảng Ninh', '0376054504', 'kthhoa@utc.edu.vn', 'Nhà sách');
+('NV01', N'Nguyễn Đức', N'Dư', '1988-09-25', 'M', N'Hà Nội', '0912363245', 'nducdu@utc.edu.vn', N'Giám đốc'),
+('NV02', N'Nguyễn Thanh', N'Thủy', '1985-09-27', 'F', N'Hà Nội', '0912424955', 'nthanhthuy@utc.edu.vn', N'Phó Giám đốc'),
+('NV03', N'Nguyễn Thị', N'Hòa', '1989-07-31', 'F', N'Hà Nội', '0327902799', 'nthhoa@utc.edu.vn', N'Phòng Nghiệp Vụ'),
+('NV04', N'Trần Thị Thu', N'Hương', '1987-08-16', 'F', N'Tuyên Quang', '0331356271', 'tthhuong@utc.edu.vn', N'Phòng Nghiệp Vụ'),
+('NV05', N'Bùi Thị Yến', N'Hường', '1988-03-12', 'F', N'Thái Nguyên', '0897878469', 'btyhuong@utc.edu.vn', N'Phòng Nghiệp Vụ'),
+('NV06', N'Phạm Thị Thúy', N'Nga', '1998-05-08', 'F', N'Hà Nội', '0786561875', 'pttnga@utc.edu.vn', N'Phòng đọc Luận văn, Luận Án, Đề tài NCKH, Báo, Tạp chí'),
+('NV07', N'Phạm Ngọc Thanh', N'Quang', '1996-03-12', 'M', N'Hà Nội', '0388577967', 'pnquang@utc.edu.vn', N'Phòng đọc Luận văn, Luận Án, Đề tài NCKH, Báo, Tạp chí'),
+('NV08', N'Nguyễn Thị Hồng', N'Khoa', '1982-10-13', 'F', N'Lào Cai', '0972936189', 'nthkhoa@utc.edu.vn', N'Phòng đọc Luận văn, Luận Án, Đề tài NCKH, Báo, Tạp chí'),
+('NV09', N'Phạm Thiên', N'Thu', '1999-04-24', 'F', N'Hà Nội', '0794854606', 'pthu@utc.edu.vn', N'Phòng Mượn'),
+('NV10', N'Vũ Thị Hà', N'Vân', '1996-05-06', 'F', N'Ninh Bình', '0875306860', 'vthvan@utc.edu.vn', N'Phòng Mượn'),
+('NV11', N'Châu Mạnh', N'Quang', '2000-03-29', 'M', N'Phú Thọ', '0829773751', 'cmquang@utc.edu.vn', N'Phòng đọc Tiếng Việt'),
+('NV12', N'Cù Việt', N'Hằng', '1995-05-09', 'F', N'Hà Nội', '0787795092', 'cvhang@utc.edu.vn', N'Phòng đọc Tiếng Việt'),
+('NV13', N'Kim Thị', N'Hoa', '1995-03-06', 'F', N'Quảng Ninh', '0376054504', 'kthhoa@utc.edu.vn', N'Nhà sách');
 
 -- Data Bảng tài khoản
 INSERT INTO tTaiKhoan (MaTK, MaNV, MaVT, TenDangNhap, MatKhau, TrangThai, NgayTao)
