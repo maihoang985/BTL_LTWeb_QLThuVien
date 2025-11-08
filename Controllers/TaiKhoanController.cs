@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Library_Manager.Controllers
 {
-    [Authorization("QTV")] // Chỉ QTV mới được truy cập controller này
+    
     [Route("Tai-khoan")]
     public class TaiKhoanController : Controller
     {
@@ -29,6 +29,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TTaiKhoans/Index
         // =======================================================
+        [Authorization("QTV")]
         [Route("Danh-sach")]
         [Route("")]
         public IActionResult Index(int? page, string searchString, string roleFilter)
@@ -90,6 +91,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TTaiKhoans/Create
         // =======================================================
+        [Authorization("QTV")]
         [Route("Tao-moi")]
         public async Task<IActionResult> Create()
         {
@@ -103,6 +105,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // POST: TTaiKhoans/Create
         // =======================================================
+        [Authorization("QTV")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Tao-moi")]
@@ -202,6 +205,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TTaiKhoans/Edit/5
         // =======================================================
+        [Authorization("QTV")]
         [Route("Chinh-sua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
@@ -226,6 +230,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // POST: TTaiKhoans/Edit/5
         // =======================================================
+        [Authorization("QTV")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Chinh-sua/{id}")]
@@ -334,6 +339,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // GET: TTaiKhoans/Delete/5
         // =======================================================
+        [Authorization("QTV")]
         [Route("Xoa/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -351,6 +357,7 @@ namespace Library_Manager.Controllers
         // =======================================================
         // POST: TTaiKhoans/Delete/5
         // =======================================================
+        [Authorization("QTV")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Route("Xoa/{id}")]

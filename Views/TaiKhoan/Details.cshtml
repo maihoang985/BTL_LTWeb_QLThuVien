@@ -15,8 +15,13 @@
     ======================================================================== *@
 @{
     var userRole = Context.Session.GetString("UserRole");
-    // CHỈ QUẢN TRỊ VIÊN MỚI CÓ QUYỀN CHỈNH SỬA TÀI KHOẢN
-    bool canEdit = (userRole == "QTV");
+
+    var currentMaTk = Context.Session.GetString("MaTk");
+    bool isSelfAccount = (currentMaTk == Model.MaTk);
+
+    bool canEdit = (userRole == "QTV" || isSelfAccount);
+
+    bool isSelfViewFromHome = isSelfAccount && string.IsNullOrEmpty(ViewBag.ReturnUrl);
 
     // Logic cho Badge Trạng Thái
     var trangThai = Model.TrangThai;
@@ -149,14 +154,23 @@
 
                 @* KHỐI NÚT TRÁI (Quay lại) - Dùng btn-outline-primary *@
                 <div>
-                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    @if (isSelfViewFromHome) // <--- LOGIC MỚI: Nếu xem tài khoản của chính mình TỪ HOME
                     {
+                        // Chỉ hiển thị nút Quay lại về Trang chủ
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="bx bx-arrow-back me-1"></i> Quay lại Trang chủ
+                        </a>
+                    }
+                    else if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        // Quay lại URL trước đó (Nếu có)
                         <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
                             <i class="bx bx-arrow-back me-1"></i> Quay lại
                         </a>
                     }
                     else
                     {
+                        // Quay lại Danh sách Tài khoản (Mặc định cho QTV)
                         <a asp-action="Index" class="btn btn-outline-primary">
                             <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                         </a>
@@ -164,14 +178,16 @@
                 </div>
 
                 @* KHỐI NÚT PHẢI (Sửa) - Dùng btn-primary *@
-                <a asp-action="Edit" asp-route-id="@Model?.MaTk"
-                   asp-route-returnUrl="@currentUrl"
-                   class="btn btn-primary @(canEdit ? "" : "disabled")">
-                    <i class="bx bx-pencil me-1"></i> Sửa tài khoản
-                </a>
+                @if (!isSelfViewFromHome) // <--- LOGIC MỚI: Chỉ hiển thị nút Sửa nếu KHÔNG phải chế độ xem nhanh từ Home
+                {
+                    <a asp-action="Edit" asp-route-id="@Model?.MaTk"
+                       asp-route-returnUrl="@currentUrl"
+                       class="btn btn-primary @(canEdit ? "" : "disabled")">
+                        <i class="bx bx-pencil me-1"></i> Sửa tài khoản
+                    </a>
+                }
             </div>
         </div>
-
     </div>
 </div>
 
