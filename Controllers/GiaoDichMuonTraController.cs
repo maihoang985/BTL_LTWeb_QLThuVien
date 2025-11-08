@@ -239,52 +239,56 @@ namespace Library_Manager.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(searchTerm))
+                // 1. Lấy truy vấn cơ bản: Thẻ đang "hoạt động"
+                var query = _context.TTheBanDoc
+                                    .Include(t => t.MaBdNavigation)
+                                    .Where(t => t.TrangThai.ToLower() == "hoạt động")
+                                    .AsQueryable();
+
+                // 2. [ĐÃ SỬA] Chỉ áp dụng bộ lọc TÌM KIẾM nếu searchTerm CÓ NỘI DUNG
+                if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    return Json(new { success = false, message = "Vui lòng nhập từ khóa tìm kiếm." });
+                    var searchLower = searchTerm.Trim().ToLower();
+
+                    query = query.Where(t =>
+                        // Tìm theo Mã Thẻ
+                        t.MaTbd.ToLower().Contains(searchLower) ||
+
+                        // [ĐÃ SỬA] Tìm theo Họ Tên đầy đủ (ghép 2 cột)
+                        (t.MaBdNavigation != null &&
+                            (t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten).ToLower().Contains(searchLower))
+                    );
                 }
 
-                var searchLower = searchTerm.Trim().ToLower();
-
-                // 1. Lọc an toàn trên DB
-                var activeCardsQuery = await _context.TTheBanDoc
-                    .Include(t => t.MaBdNavigation)
-                    .Where(t => t.TrangThai.ToLower() == "hoạt động" && (
-                        t.MaTbd.ToLower().Contains(searchLower) ||
-                        // Kỹ thuật kiểm tra NULL an toàn cho EF Core
-                        (t.MaBdNavigation != null && (
-                             t.MaBdNavigation.Ten.ToLower().Contains(searchLower) ||
-                             t.MaBdNavigation.HoDem.ToLower().Contains(searchLower)
-                        ))
-                    ))
+                // 3. Lấy kết quả từ DB
+                var activeCardsQuery = await query
+                    .OrderBy(t => t.MaBdNavigation.Ten) // Sắp xếp theo Tên
                     .Select(t => new
                     {
                         t.MaTbd,
-                        // Kỹ thuật kiểm tra NULL an toàn khi tạo đối tượng ẩn danh
                         HoTen = t.MaBdNavigation != null
                                 ? t.MaBdNavigation.HoDem + " " + t.MaBdNavigation.Ten
                                 : "(Bạn đọc không rõ)",
                         t.NgayHetHan
                     })
-                    .Take(10)
+                    .Take(50) // Lấy 50 kết quả (nên lấy nhiều hơn 10)
                     .ToListAsync();
 
-                // 2. Định dạng dữ liệu (in-memory) và trả về Json
+                // 4. Định dạng dữ liệu (giữ nguyên logic DateOnly? của bạn)
                 var formattedCards = activeCardsQuery.Select(t => new
                 {
                     t.MaTbd,
                     t.HoTen,
                     NgayHetHan = t.NgayHetHan.HasValue
-                                 ? t.NgayHetHan.Value.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")
-                                 : ""
+                                    ? t.NgayHetHan.Value.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")
+                                    : ""
                 }).ToList();
 
                 return Json(new { success = true, data = formattedCards });
             }
             catch (Exception ex)
             {
-                // BẮT LỖI: Chuyển lỗi 500 thành phản hồi JSON success: false
-                return Json(new { success = false, message = "Lỗi server khi tìm kiếm Thẻ Bạn đọc: " + ex.Message });
+                return Json(new { success = false, message = "Lỗi server khi tìm kiếm: " + ex.Message });
             }
         }
 

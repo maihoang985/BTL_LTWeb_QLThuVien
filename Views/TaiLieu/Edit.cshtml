@@ -262,25 +262,29 @@
 
             </div>
 
+            @* FOOTER CỦA CARD: Chứa các nút Hành động (Bố cục Trái/Phải cho trang Edit) *@
             <div class="card-footer border-top pt-3">
+
+                @* Dùng justify-content-between để đẩy 2 khối nút ra xa nhau *@
                 <div class="d-flex justify-content-between">
 
+                    @* KHỐI BÊN TRÁI: Nút Quay lại (Đã sửa style) *@
                     <div>
                         @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                         {
-                            <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                            <a href="@ViewBag.ReturnUrl" class="btn btn-outline-primary">
                                 <i class="bx bx-arrow-back me-1"></i> Quay lại
                             </a>
                         }
                         else
                         {
-                            <a asp-action="Index" class="btn btn-secondary">
+                            <a asp-action="Index" class="btn btn-outline-primary">
                                 <i class="bx bx-arrow-back me-1"></i> Quay lại danh sách
                             </a>
                         }
                     </div>
 
-
+                    @* KHỐI BÊN PHẢI: Các nút hành động chính (Lưu, Chi tiết) *@
                     <div class="d-flex gap-2">
 
                         <button type="submit" class="btn btn-primary" id="submitButton">
