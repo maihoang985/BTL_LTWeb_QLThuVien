@@ -1,25 +1,23 @@
 ﻿// File: wwwroot/js/document-statistics.js
 
 const DocumentStatistics = (function () {
-    // Private variables
-    let totalGiaoTrinhEl = null;
-    let totalTaiLieuEl = null;
-    let availableGiaoTrinhEl = null;
-    let availableTaiLieuEl = null;
+    let totalBanSaoEl = null;
+    let totalCoSanEl = null;
+    let totalDangMuonEl = null;
+    let tyLeCoSanEl = null;
     let categoryTableBody = null;
     let toggleDetailBtn = null;
     let categoryDetail = null;
+    let summaryCards = null;
     let toggleIcon = null;
     let toggleText = null;
-    let isDetailVisible = false;
+    let isDetailVisible = false; // Mặc định ẨN chi tiết
 
-    // MỚI: Biến cho Modal
     let categoryDetailModalEl = null;
     let categoryDetailModal = null;
     let modalCategoryTitleEl = null;
     let modalCategoryBodyEl = null;
 
-    // Private methods
     function showLoadingCard(element) {
         element.innerHTML = `
             <div class="spinner-border spinner-border-sm" role="status">
@@ -32,6 +30,7 @@ const DocumentStatistics = (function () {
     }
 
     function showLoadingTable() {
+        if (!categoryTableBody) return;
         categoryTableBody.innerHTML = `
             <tr>
                 <td colspan="5" class="text-center">
@@ -43,6 +42,7 @@ const DocumentStatistics = (function () {
     }
 
     function showTableError(message) {
+        if (!categoryTableBody) return;
         categoryTableBody.innerHTML = `
             <tr>
                 <td colspan="5" class="text-center text-danger">
@@ -53,6 +53,7 @@ const DocumentStatistics = (function () {
     }
 
     function showNoDataTable() {
+        if (!categoryTableBody) return;
         categoryTableBody.innerHTML = `
             <tr>
                 <td colspan="5" class="text-center text-muted">
@@ -62,7 +63,8 @@ const DocumentStatistics = (function () {
             </tr>`;
     }
 
-    function animateNumber(element, targetNumber, duration = 1000) {
+    function animateNumber(element, targetNumber, duration = 1000, suffix = '') {
+        if (!element) return;
         const start = 0;
         const increment = targetNumber / (duration / 16);
         let current = start;
@@ -70,10 +72,10 @@ const DocumentStatistics = (function () {
         const timer = setInterval(() => {
             current += increment;
             if (current >= targetNumber) {
-                element.textContent = targetNumber.toLocaleString('vi-VN');
+                element.textContent = targetNumber.toLocaleString('vi-VN') + suffix;
                 clearInterval(timer);
             } else {
-                element.textContent = Math.floor(current).toLocaleString('vi-VN');
+                element.textContent = Math.floor(current).toLocaleString('vi-VN') + suffix;
             }
         }, 16);
     }
@@ -104,22 +106,34 @@ const DocumentStatistics = (function () {
     }
 
     function renderSummaryCards(data) {
-        // ... (Giữ nguyên code)
-        if (data.tongGiaoTrinh !== undefined) {
-            animateNumber(totalGiaoTrinhEl, data.tongGiaoTrinh);
+        const tongGiaoTrinh = data.tongGiaoTrinh || 0;
+        const tongTaiLieu = data.tongTaiLieu || 0;
+        const tongBanSao = tongGiaoTrinh + tongTaiLieu;
+
+        const giaoTrinhCoSan = data.giaoTrinhCoSan || 0;
+        const taiLieuCoSan = data.taiLieuCoSan || 0;
+        const tongCoSan = giaoTrinhCoSan + taiLieuCoSan;
+
+        const tongDangMuon = tongBanSao - tongCoSan;
+        const tyLe = calculatePercentage(tongCoSan, tongBanSao);
+
+        if (totalBanSaoEl) {
+            animateNumber(totalBanSaoEl, tongBanSao);
         }
-        if (data.tongTaiLieu !== undefined) {
-            animateNumber(totalTaiLieuEl, data.tongTaiLieu);
+        if (totalCoSanEl) {
+            animateNumber(totalCoSanEl, tongCoSan);
         }
-        if (data.giaoTrinhCoSan !== undefined) {
-            animateNumber(availableGiaoTrinhEl, data.giaoTrinhCoSan);
+        if (totalDangMuonEl) {
+            animateNumber(totalDangMuonEl, tongDangMuon);
         }
-        if (data.taiLieuCoSan !== undefined) {
-            animateNumber(availableTaiLieuEl, data.taiLieuCoSan);
+        if (tyLeCoSanEl) {
+            animateNumber(tyLeCoSanEl, parseFloat(tyLe), 1000, '%');
         }
     }
 
     function renderCategoryTable(categories) {
+        if (!categoryTableBody) return;
+
         if (!categories || categories.length === 0) {
             showNoDataTable();
             return;
@@ -150,14 +164,11 @@ const DocumentStatistics = (function () {
 
         combinedCategories.sort((a, b) => b.tongSoLuong - a.tongSoLuong);
 
-        // TẠO HÀNG (ROWS)
         const rows = combinedCategories.map(item => {
             const cat = item.apiData;
-            const catDef = item;
-            const categoryCode = item.code; // 'GT', 'TK', etc.
+            const categoryCode = item.code;
             const categoryName = item.name;
 
-            // Thêm class "category-row-clickable" và data- attributes
             const rowClass = "class='category-row-clickable' style='cursor: pointer;'";
             const rowData = `data-category-code="${categoryCode}" data-category-name="${categoryName}"`;
 
@@ -190,7 +201,7 @@ const DocumentStatistics = (function () {
                         <td>
                             <div class="d-flex align-items-center">
                                 <i class="bx bx-folder me-2 text-muted"></i>
-                                <span class="text-muted">${catDef.name}</span>
+                                <span class="text-muted">${categoryName}</span>
                             </div>
                         </td>
                         <td class="text-center">
@@ -208,20 +219,17 @@ const DocumentStatistics = (function () {
         }).join('');
 
         categoryTableBody.innerHTML = rows;
-
-        // MỚI: Thêm event listeners cho các hàng vừa tạo
         addTableClickListeners();
     }
 
-    // MỚI: Hàm thêm event listener vào các hàng
     function addTableClickListeners() {
+        if (!categoryTableBody) return;
         const clickableRows = categoryTableBody.querySelectorAll('.category-row-clickable');
         clickableRows.forEach(row => {
             row.addEventListener('click', handleCategoryRowClick);
         });
     }
 
-    // MỚI: Hàm xử lý khi click vào hàng
     function handleCategoryRowClick(event) {
         const row = event.currentTarget;
         const code = row.dataset.categoryCode;
@@ -229,7 +237,6 @@ const DocumentStatistics = (function () {
 
         if (!code || !categoryDetailModal) return;
 
-        // Cập nhật modal và hiển thị
         modalCategoryTitleEl.textContent = `Chi tiết: ${name}`;
         modalCategoryBodyEl.innerHTML = `
             <div class="d-flex justify-content-center p-3">
@@ -239,11 +246,9 @@ const DocumentStatistics = (function () {
             </div>`;
         categoryDetailModal.show();
 
-        // Tải dữ liệu chi tiết
         fetchCategoryDetails(code);
     }
 
-    // MỚI: Hàm gọi API lấy chi tiết
     async function fetchCategoryDetails(code) {
         try {
             const response = await fetch(`/ThongKe/GetChiTietTheLoai?maTheLoai=${code}`);
@@ -258,7 +263,6 @@ const DocumentStatistics = (function () {
         }
     }
 
-    // MỚI: Hàm render bảng chi tiết trong Modal
     function renderCategoryDetailsTable(details) {
         if (!details || details.length === 0) {
             modalCategoryBodyEl.innerHTML = `<div class="alert alert-info">Không có dữ liệu chi tiết cho thể loại này.</div>`;
@@ -290,16 +294,17 @@ const DocumentStatistics = (function () {
                     </thead>
                     <tbody>
                         ${tableRows}
-                    <tbody>
+                    </tbody>
                 </table>
             </div>
         `;
     }
 
-
     function toggleCategoryDetail() {
-        // ... (Giữ nguyên code)
+        if (!categoryDetail || !toggleIcon || !toggleText) return;
+
         isDetailVisible = !isDetailVisible;
+
         if (isDetailVisible) {
             categoryDetail.style.display = 'block';
             toggleIcon.className = 'bx bx-chevron-up';
@@ -312,7 +317,6 @@ const DocumentStatistics = (function () {
     }
 
     async function fetchStatistics() {
-        // ... (Giữ nguyên code)
         try {
             const response = await fetch('/ThongKe/GetThongKeTaiLieu');
             if (!response.ok) {
@@ -325,63 +329,67 @@ const DocumentStatistics = (function () {
     }
 
     function loadStatistics() {
-        // ... (Giữ nguyên code)
-        showLoadingCard(totalGiaoTrinhEl);
-        showLoadingCard(totalTaiLieuEl);
-        showLoadingCard(availableGiaoTrinhEl);
-        showLoadingCard(availableTaiLieuEl);
+        showLoadingCard(totalBanSaoEl);
+        showLoadingCard(totalCoSanEl);
+        showLoadingCard(totalDangMuonEl);
+        showLoadingCard(tyLeCoSanEl);
         showLoadingTable();
 
         fetchStatistics()
             .then(data => {
+                console.log('Statistics data:', data);
                 renderSummaryCards(data);
                 renderCategoryTable(data.chiTietTheoDanhMuc);
             })
             .catch(error => {
                 console.error('Error loading statistics:', error);
-                showError(totalGiaoTrinhEl, 'Lỗi');
-                showError(totalTaiLieuEl, 'Lỗi');
-                showError(availableGiaoTrinhEl, 'Lỗi');
-                showError(availableTaiLieuEl, 'Lỗi');
+                showError(totalBanSaoEl, 'Lỗi');
+                showError(totalCoSanEl, 'Lỗi');
+                showError(totalDangMuonEl, 'Lỗi');
+                showError(tyLeCoSanEl, 'Lỗi');
                 showTableError(error.message);
             });
     }
 
-    // Public API
     return {
         init: function () {
-            // Get DOM elements (cũ)
-            totalGiaoTrinhEl = document.getElementById('totalGiaoTrinh');
-            totalTaiLieuEl = document.getElementById('totalTaiLieu');
-            availableGiaoTrinhEl = document.getElementById('availableGiaoTrinh');
-            availableTaiLieuEl = document.getElementById('availableTaiLieu');
+            totalBanSaoEl = document.getElementById('totalBanSao');
+            totalCoSanEl = document.getElementById('totalCoSan');
+            totalDangMuonEl = document.getElementById('totalDangMuon');
+            tyLeCoSanEl = document.getElementById('tyLeCoSan');
             categoryTableBody = document.querySelector('#categoryTable tbody');
             toggleDetailBtn = document.getElementById('toggleDetailBtn');
             categoryDetail = document.getElementById('categoryDetail');
+            summaryCards = document.getElementById('summaryCards');
             toggleIcon = document.getElementById('toggleIcon');
             toggleText = document.getElementById('toggleText');
 
-            // MỚI: Get DOM elements (của Modal)
             categoryDetailModalEl = document.getElementById('categoryDetailModal');
             modalCategoryTitleEl = document.getElementById('modalCategoryTitle');
             modalCategoryBodyEl = document.getElementById('modalCategoryBody');
 
-            if (!totalGiaoTrinhEl || !totalTaiLieuEl || !categoryTableBody || !toggleDetailBtn) {
+            if (!totalBanSaoEl || !totalCoSanEl || !categoryTableBody) {
                 console.error('Required DOM elements not found!');
                 return;
             }
 
-            // MỚI: Khởi tạo đối tượng Modal của Bootstrap
-            if (categoryDetailModalEl) {
+            if (categoryDetailModalEl && typeof bootstrap !== 'undefined') {
                 categoryDetailModal = new bootstrap.Modal(categoryDetailModalEl);
             } else {
-                console.error('Category detail modal element not found!');
+                console.warn('Bootstrap Modal not available or modal element not found');
             }
 
-            // Add event listener for toggle button
-            toggleDetailBtn.addEventListener('click', toggleCategoryDetail);
+            if (toggleDetailBtn) {
+                toggleDetailBtn.addEventListener('click', toggleCategoryDetail);
+            } else {
+                console.warn('Toggle detail button not found');
+            }
 
-            // Load statistics
+            // Đảm bảo chi tiết bắt đầu ở trạng thái ẩn
+            if (categoryDetail) {
+                categoryDetail.style.display = 'none';
+            }
+
             loadStatistics();
         },
 
@@ -391,7 +399,6 @@ const DocumentStatistics = (function () {
     };
 })();
 
-// Auto-init khi DOM ready
 document.addEventListener('DOMContentLoaded', function () {
     DocumentStatistics.init();
 });
