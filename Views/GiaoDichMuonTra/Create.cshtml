@@ -193,10 +193,15 @@
             const createForm = document.getElementById('createGdForm');
             const submitButton = document.getElementById('submitButton');
 
-
             // --- 1. Xử lý chọn Thẻ Bạn đọc (AJAX) ---
-            $('#searchTbdBtn').click(function () {
-                var searchTerm = $('#tbdSearchTerm').val();
+
+            
+            // Hàm tìm kiếm Thẻ Bạn Đọc (được tách riêng để tái sử dụng)
+             
+            function searchActiveTbd(searchTerm) {
+                // Hiển thị loading
+                $('#tbdTableBody').html('<tr><td colspan="4" class="text-center"><i class="bx bx-loader bx-spin fs-4"></i> Đang tải...</td></tr>');
+
                 $.ajax({
                     url: '@Url.Action("SearchActiveTheBanDoc", "GiaoDichMuonTra")',
                     type: 'GET',
@@ -222,12 +227,29 @@
                     },
                     error: function () {
                         // Lỗi AJAX server side
-                        alert("Đã xảy ra lỗi khi tìm kiếm Thẻ Bạn đọc.");
+                        $('#tbdTableBody').html('<tr><td colspan="4" class="text-center text-danger">Đã xảy ra lỗi khi tìm kiếm.</td></tr>');
                     }
                 });
+            }
+
+            // Gắn sự kiện click cho nút tìm kiếm Thẻ
+            $('#searchTbdBtn').click(function () {
+                var searchTerm = $('#tbdSearchTerm').val();
+                searchActiveTbd(searchTerm); // Gọi hàm tìm kiếm
             });
 
-            // Sự kiện chọn Thẻ bạn đọc
+            // **[YÊU CẦU MỚI]**
+            // Tự động tải tất cả bạn đọc khi Modal được mở (nếu ô tìm kiếm rỗng)
+            $('#tbdSearchModal').on('show.bs.modal', function () {
+                var searchTerm = $('#tbdSearchTerm').val();
+                if (searchTerm === "") {
+                    // Chỉ gọi khi ô tìm kiếm rỗng
+                    searchActiveTbd("");
+                }
+            });
+
+
+            // Sự kiện chọn Thẻ bạn đọc (giữ nguyên)
             $(document).on('click', '.select-tbd-btn', function () {
                 var maTbd = $(this).data('matbd');
                 var hoTen = $(this).data('hoten');
@@ -238,15 +260,14 @@
             });
 
             // --- 2. Xử lý tìm và chọn Bản sao (AJAX) ---
+            // (Giữ nguyên toàn bộ code tìm kiếm Bản sao của bạn)
             $('#searchBanSaoBtn').click(function () {
                 var searchTerm = $('#banSaoSearchTerm').val();
                 if (searchTerm.length < 2) {
                     $('#banSaoSearchResults').html('<div class="alert alert-warning">Vui lòng nhập ít nhất 2 ký tự để tìm kiếm.</div>');
                     return;
                 }
-
                 $('#banSaoSearchResults').html('<div class="text-center"><i class="bx bx-loader bx-spin fs-4"></i> Đang tìm kiếm...</div>');
-
                 $.ajax({
                     url: '@Url.Action("SearchAvailableBanSao", "GiaoDichMuonTra")',
                     type: 'GET',
@@ -273,39 +294,28 @@
                         $('#banSaoSearchResults').html(resultsHtml);
                     },
                     error: function () {
-                        // Lỗi AJAX server side
                         $('#banSaoSearchResults').html('<div class="alert alert-danger">Lỗi khi tìm kiếm Bản sao.</div>');
                     }
                 });
             });
 
-            // Sự kiện chọn Bản sao
+            // (Giữ nguyên code .select-bs-btn và .remove-bs-btn...)
             $(document).on('click', '.select-bs-btn', function () {
                 var btn = $(this);
                 var maBs = btn.data('mabs');
                 var tenTl = btn.data('tentl');
-
-                // Tạo mục trong danh sách đã chọn và thêm input hidden
                 var listItem = '<li class="list-group-item d-flex justify-content-between align-items-center" data-mabs="' + maBs + '">' +
                     '<div><strong>' + maBs + '</strong> - ' + tenTl + '</div>' +
                     '<input type="hidden" name="selectedBanSaoList" value="' + maBs + '" />' +
                     '<button type="button" class="btn btn-sm btn-danger remove-bs-btn" data-mabs="' + maBs + '"><i class="bx bx-trash"></i></button>' +
                     '</li>';
-
                 $('#selectedBanSaoList').append(listItem);
-
-                // Cập nhật trạng thái nút "Thêm" thành "Đã thêm"
                 btn.replaceWith('<span class="badge bg-primary">Đã thêm</span>');
             });
 
-            // Sự kiện xóa Bản sao khỏi danh sách đã chọn
             $(document).on('click', '.remove-bs-btn', function () {
                 var maBsToRemove = $(this).data('mabs');
-
-                // Xóa khỏi danh sách đã chọn
                 $('#selectedBanSaoList li[data-mabs="' + maBsToRemove + '"]').remove();
-
-                // Cập nhật lại nút trong kết quả tìm kiếm (nếu đang hiển thị)
                 var currentResultItem = $('#banSaoSearchResults button[data-mabs="' + maBsToRemove + '"]').closest('li').find('.badge');
                 if (currentResultItem.length > 0) {
                     var tenTl = currentResultItem.closest('li').find('div strong').text().replace(maBsToRemove + ' - ', '');
@@ -313,9 +323,8 @@
                 }
             });
 
-            // --- 3. Logic Vô hiệu hóa nút và Hiển thị thông báo lỗi (BỔ SUNG) ---
 
-            // Logic 3a: Vô hiệu hóa nút khi submit
+            // --- 3. Logic Vô hiệu hóa nút và Hiển thị thông báo lỗi (Giữ nguyên) ---
             if (createForm && submitButton) {
                 createForm.addEventListener('submit', function (e) {
                     if ($(createForm).valid()) {
@@ -324,17 +333,13 @@
                     }
                 });
             }
-
-            // Logic 3b: Hiển thị thông báo từ TempData (chạy khi Controller return View)
             @if (TempData["StatusMessage"] != null && TempData["Message"] != null)
             {
                     if (TempData["StatusMessage"].ToString() == "danger")
                     {
                             <text>
                                 setTimeout(function() {
-                                    // Hiển thị toast
                                     showToast('@Html.Raw(TempData["Message"])', '@TempData["StatusMessage"]');
-                                    // Kích hoạt lại nút submit sau khi trang load lại nếu có lỗi
                                     if (submitButton) {
                                         submitButton.disabled = false;
                                         submitButton.innerHTML = '<i class="bx bx-plus me-1"></i> Tạo mới Giao dịch';
@@ -342,7 +347,6 @@
                                 }, 10);
                             </text>
                     }
-                    // Trường hợp nếu Controller vô tình redirect success về đây (tránh lỗi JS)
                     else if (TempData["StatusMessage"].ToString() == "success")
                     {
                              <text>
@@ -354,4 +358,4 @@
             }
         });
     </script>
-}y
+}
